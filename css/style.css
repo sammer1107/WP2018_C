@@ -1,3 +1,34 @@
-body{
-    
+body {
+    background-color: #f4b430;
+}
+
+#piano .keys {
+    background-color: #f4b430;
+}
+
+#piano .keys .key {
+    background-color: white;
+    border-radius: 0.2rem;
+    float: left;
+    height: 10rem;
+    margin: 0.1rem;
+    width: 3rem;
+}
+
+#piano .keys .black {
+    width: 0;
+    margin: 0;
+    z-index: 2;
+}
+
+#piano .keys .black::after {
+    background-color: #f4b430;
+    border-radius: 0 0 0.2rem 0.2rem;
+    content: "";
+    display: block;
+    height: 6rem;
+    left: -0.9rem;
+    position: relative;
+    top: 0;
+    width: 1.8rem;
 }
