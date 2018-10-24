@@ -9,6 +9,7 @@ body {
 #piano .keys .key {
     background-color: white;
     border-radius: 0.2rem;
+    cursor: pointer;
     float: left;
     height: 10rem;
     margin: 0.1rem;
