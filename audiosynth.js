@@ -1,25 +1,10 @@
 /*
 The MIT License (MIT)
-
 Copyright (c) 2013 Keith William Horwood
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-the Software, and to permit persons to whom the Software is furnished to do so,
-subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+github.com/keithwhor/audiosynth/blob/master/LICENSE
  */
+// Has removed unused func
 var Synth, AudioSynth, AudioSynthInstrument;
 !function(){
 
@@ -57,21 +42,7 @@ var Synth, AudioSynth, AudioSynthInstrument;
 	setPriv('_bitsPerSample',16);
 	setPriv('_channels',1);
 	setPriv('_sampleRate',44100,true);
-	setPub('setSampleRate', function(v) {
-		this._sampleRate = Math.max(Math.min(v|0,44100), 4000);
-		this._clearCache();
-		return this._sampleRate;
-	});
-	setPub('getSampleRate', function() { return this._sampleRate; });
 	setPriv('_volume',32768,true);
-	setPub('setVolume', function(v) {
-		v = parseFloat(v); if(isNaN(v)) { v = 0; }
-		v = Math.round(v*32768);
-		this._volume = Math.max(Math.min(v|0,32768), 0);
-		this._clearCache();
-		return this._volume;
-	});
-	setPub('getVolume', function() { return Math.round(this._volume/32768*10000)/10000; });
 	setPriv('_notes',{'C':261.63,'C#':277.18,'D':293.66,'D#':311.13,'E':329.63,'F':346.23,'F#':369.99,'G':392.00,'G#':415.30,'A':440.00,'A#':466.16,'B':493.88});
 	setPriv('_fileCache',[],true);
 	setPriv('_temp',{},true);
@@ -183,7 +154,6 @@ var Synth, AudioSynth, AudioSynthInstrument;
 		audio.play();
 		return true;
 	});
-	setPub('debug', function() { this._debug = true; });
 	setPub('createInstrument', function(sound) {
 		var n = 0;
 		var found = false;
@@ -207,13 +177,6 @@ var Synth, AudioSynth, AudioSynthInstrument;
 		var ins = new AudioSynthInstrument(this, sound, n);
 		_encapsulated = false;
 		return ins;
-	});
-	setPub('listSounds', function() {
-		var r = [];
-		for(var i=0;i<this._sounds.length;i++) {
-			r.push(this._sounds[i].name);
-		}
-		return r;
 	});
 	setPriv('__init__', function(){
 		this._resizeCache();
@@ -267,106 +230,6 @@ Synth.loadSoundProfile({
 			Math.pow(base(i, sampleRate, frequency, 0), 2) +
 				(0.75 * base(i, sampleRate, frequency, 0.25)) +
 				(0.1 * base(i, sampleRate, frequency, 0.5))
-		);
-	}
-},
-{
-	name: 'organ',
-	attack: function() { return 0.3 },
-	dampen: function(sampleRate, frequency) { return 1+(frequency * 0.01); },
-	wave: function(i, sampleRate, frequency) {
-		var base = this.modulate[0];
-		return this.modulate[1](
-			i,
-			sampleRate,
-			frequency,
-			base(i, sampleRate, frequency, 0) +
-				0.5*base(i, sampleRate, frequency, 0.25) +
-				0.25*base(i, sampleRate, frequency, 0.5)
-		);
-	}
-},
-{
-	name: 'acoustic',
-	attack:	function() { return 0.002; },
-	dampen: function() { return 1; },
-	wave: function(i, sampleRate, frequency) {
-
-		var vars = this.vars;
-		vars.valueTable = !vars.valueTable?[]:vars.valueTable;
-		if(typeof(vars.playVal)=='undefined') { vars.playVal = 0; }
-		if(typeof(vars.periodCount)=='undefined') { vars.periodCount = 0; }
-	
-		var valueTable = vars.valueTable;
-		var playVal = vars.playVal;
-		var periodCount = vars.periodCount;
-
-		var period = sampleRate/frequency;
-		var p_hundredth = Math.floor((period-Math.floor(period))*100);
-
-		var resetPlay = false;
-
-		if(valueTable.length<=Math.ceil(period)) {
-	
-			valueTable.push(Math.round(Math.random())*2-1);
-	
-			return valueTable[valueTable.length-1];
-	
-		} else {
-	
-			valueTable[playVal] = (valueTable[playVal>=(valueTable.length-1)?0:playVal+1] + valueTable[playVal]) * 0.5;
-	
-			if(playVal>=Math.floor(period)) {
-				if(playVal<Math.ceil(period)) {
-					if((periodCount%100)>=p_hundredth) {
-						// Reset
-						resetPlay = true;
-						valueTable[playVal+1] = (valueTable[0] + valueTable[playVal+1]) * 0.5;
-						vars.periodCount++;	
-					}
-				} else {
-					resetPlay = true;	
-				}
-			}
-	
-			var _return = valueTable[playVal];
-			if(resetPlay) { vars.playVal = 0; } else { vars.playVal++; }
-	
-			return _return;
-	
-		}
-	}
-},
-{
-	name: 'edm',
-	attack:	function() { return 0.002; },
-	dampen: function() { return 1; },
-	wave: function(i, sampleRate, frequency) {
-		var base = this.modulate[0];
-		var mod = this.modulate.slice(1);
-		return mod[0](
-			i,
-			sampleRate,
-			frequency,
-			mod[9](
-				i,
-				sampleRate,
-				frequency,
-				mod[2](
-					i,
-					sampleRate,
-					frequency,
-					Math.pow(base(i, sampleRate, frequency, 0), 3) +
-						Math.pow(base(i, sampleRate, frequency, 0.5), 5) +
-						Math.pow(base(i, sampleRate, frequency, 1), 7)
-				)
-			) +
-				mod[8](
-					i,
-					sampleRate,
-					frequency,
-					base(i, sampleRate, frequency, 1.75)
-				)
 		);
 	}
 });
