@@ -1,7 +1,26 @@
-body {
-    background-color: #f4b430;
+#piano-page {
+	background-color: #f4b430;	
 }
 
+#project-page {
+	background-color: #8D4898;
+}
+
+#team-page {
+	background-color: #FBFBF9;
+}
+
+#team-page footer {
+	background-color: #F1F1F1;
+}
+
+.icon {
+	background-color: #CAC0C0;
+	border-radius: 50%;
+}
+
+
+/* PIANO STYLE */
 #piano .keys {
     background-color: #f4b430;
     display: flex;
@@ -34,3 +53,5 @@ body {
     top: 0;
     width: 1.8rem;
 }
+
+/* END OF PIANO STYLE */
