@@ -15,9 +15,46 @@ body {
 	transform: translate(-50%, -50%);
 }
 
+#team-page #team-container {
+	border-style: solid;
+	border-width: 2px;
+	height: 70.888888889vh;
+	width: 75%;
+	margin-right: auto;
+	margin-left: auto;
+}
+
+#team-page #team-container .button {
+	display: inline-block;
+	height: 100%;
+	width: 10%;
+	border-style: solid;
+	border-width: 3px;
+}
+
+#team-page #team-container .wrapper {
+	display: inline-block;
+	height: 100%;
+	width: 77%;
+	border-style: solid;
+	border-width: 3px;
+}
+
+#team-page #team-container .wrapper #team .member {
+	display: inline-block;
+	position: relative;
+	overflow: hidden;
+	height: 100%;
+	width: 100%;
+}
+
+#team-page #team-page-title {
+	height: 18vh;
+}
+
 #team-page footer {
 	position: absolute;
-	height: 11.11vh;
+	height: 11.111111111vh;
 	width: 100%;
 	bottom: 0;
 	box-sizing: border-box;
