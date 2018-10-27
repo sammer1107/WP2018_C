@@ -16,6 +16,21 @@ body {
 	transform: translate(-50%, -50%);
 }
 
+#piano-page .desc {
+	color: white;
+	margin-top: 2rem;
+	text-align: center;
+}
+
+#piano-page .desc > * {
+	font-family: 'Varela Round', sans-serif;
+	margin: 0.6rem;
+}
+
+#piano-page .desc h2 {
+	font-size: 2em;
+}
+
 #team-page #team-container {
 	height: 50vh;
 	width: 100vh;
