@@ -1,5 +1,6 @@
 body {
 	margin: 0;
+	overflow-x: hidden;
 }
 
 .page {
@@ -16,45 +17,81 @@ body {
 }
 
 #team-page #team-container {
-	border-style: solid;
-	border-width: 2px;
-	height: 70.888888889vh;
-	width: 75%;
+	height: 50vh;
+	width: 100vh;
 	margin-right: auto;
 	margin-left: auto;
+	box-sizing: border-box;
+	overflow: visible;
+	position: relative;
 }
 
-#team-page #team-container .button {
-	display: inline-block;
+#team-container .button {
+	position: absolute;
+	width: 2.8vh;
+	height: 2.8vh;
+	top: 50%;
+    display: inline-block;
+    padding: 3px;
+	z-index: 1;
+}
+
+.button#right {
+	right: 0;
+	transform: translate(0, -50%) rotate(-45deg);
+	transform-origin: 50%;
+}
+.button#left {
+	left: 0;
+	transform: translate(0, -50%) rotate(135deg);
+	transform-origin: 50%;
+}
+
+#slider {
 	height: 100%;
-	width: 10%;
-	border-style: solid;
-	border-width: 3px;
+	position: relative;
+	white-space: nowrap; /* prevent inline-block from wrapping */
+	left: -100vh;
 }
 
-#team-page #team-container .wrapper {
-	display: inline-block;
-	height: 100%;
-	width: 77%;
-	border-style: solid;
-	border-width: 3px;
-}
-
-#team-page #team-container .wrapper #team .member {
+#team-container .member-container {
 	display: inline-block;
 	position: relative;
-	overflow: hidden;
 	height: 100%;
+	width: 70%;
+	margin: 0 15% 0 15%;
+}
+
+.member-container .card {
+	width: 100%;
+	height: 100%;
+}
+
+.member-container .name {
+	position: absolute;
+	top: -20%;
+	height: 20%;
 	width: 100%;
 }
 
+#team-page #upper {
+	position: relative;
+	height: 88.9vh;
+	width: 100%;
+	padding-top: 18.9vh;
+	box-sizing: border-box;
+}
+
 #team-page #team-page-title {
+	position: absolute;
+	bottom: 0;
 	height: 18vh;
+	width: 100%;
 }
 
 #team-page footer {
 	position: absolute;
-	height: 11.111111111vh;
+	height: 11.1vh;
 	width: 100%;
 	bottom: 0;
 	box-sizing: border-box;
