@@ -44,6 +44,7 @@
     cursor: pointer;
     height: 10rem;
     margin: 0.1rem;
+    transition: background-color 0.2s;
     width: 3rem;
 }
 
@@ -53,7 +54,7 @@
     z-index: 2;
 }
 
-#piano .keys .black::after {
+#piano .keys .black::before {
     background-color: #f4b430;
     border-radius: 0 0 0.2rem 0.2rem;
     content: "";
@@ -62,7 +63,16 @@
     left: -0.9rem;
     position: relative;
     top: 0;
+    transition: background-color 0.2s;
     width: 1.8rem;
+}
+
+#piano .keys .key.indicate {
+    background-color: #7bdece;
+}
+
+#piano .keys .black.indicate::before {
+    background-color: #7bdece;
 }
 
 /* END OF PIANO STYLE */
