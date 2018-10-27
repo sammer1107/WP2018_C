@@ -18,13 +18,22 @@ body {
 #team-page #team-container {
 	border-style: solid;
 	border-width: 2px;
-	height: 70.888888889vh;
-	width: 75%;
+	height: 73.888888889vh;
+	width: 100%;
 	margin-right: auto;
 	margin-left: auto;
 }
 
-#team-page #team-container .button {
+#team-page #team-container .wrapper {
+	height: 100%;
+	width: 100%;
+	border-style: solid;
+	border-width: 3px;
+	/*overflow: hidden;*/
+	clear: both;
+}
+
+#team-page #team-container .wrapper .button {
 	display: inline-block;
 	height: 100%;
 	width: 10%;
@@ -32,24 +41,34 @@ body {
 	border-width: 3px;
 }
 
-#team-page #team-container .wrapper {
-	display: inline-block;
-	height: 100%;
-	width: 77%;
-	border-style: solid;
-	border-width: 3px;
-}
-
-#team-page #team-container .wrapper #team .member {
+#team-page #team-container .wrapper #container {
 	display: inline-block;
 	position: relative;
-	overflow: hidden;
 	height: 100%;
-	width: 100%;
+	width: 50%;
+}
+
+#team-page #team-container .wrapper #container #team {
+	position: absolute;
+	width: 500%;
+	height: 100%;
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+#team-page #team-container .wrapper #container #team .member {
+	transform: translate3d(0px, 0px, 0px);
+	border-style: solid;
+	border-width: 3px;
+	height: 100%;
+	width: 20%;
+	margin: 0;
+	white-space: nowrap;
+	overflow: hidden;
 }
 
 #team-page #team-page-title {
-	height: 18vh;
+	height: 15vh;
 }
 
 #team-page footer {
