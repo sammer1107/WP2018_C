@@ -9,6 +9,7 @@ header {
 	align-items: center;
 	padding-left: 5rem;
 	height: 15vh;
+	min-height: 4em;
 	width: 100%;
 }
 
@@ -20,6 +21,7 @@ header > * {
 .page {
 	position: relative;
 	height: 100vh;
+	min-height: 480px;
 	width: 100%;
 }
 
@@ -114,11 +116,41 @@ header > * {
 	box-sizing: border-box;
 }
 
-#team-page #team-page-title {
+#team-page #title-area {
 	position: absolute;
 	bottom: 0;
-	height: 18vh;
+	height: 12vh;
+	min-height: 2em;
+	padding-bottom: 6vh;
 	width: 100%;
+	display: flex;
+	flex-wrap: nowrap;
+	justify-content: flex-start;
+}
+
+#title-area #title-container {
+	height: 100%;
+	width: 100%;
+	padding-left: 50px;
+	display: flex;
+	flex-wrap: nowrap;
+	justify-content: flex-end;
+	align-items: flex-end;
+}
+
+#title-container h1 {
+	margin: 0;
+	white-space: nowrap;
+}
+
+#title-container hr {
+	margin: 0 0 0.5em 30px;
+	width: 100%;
+}
+
+#title-container h1 {
+	font-family: Arial, Helvetica, sans-serif;
+	color: #151514;
 }
 
 #team-page footer {

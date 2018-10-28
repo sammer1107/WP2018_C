@@ -15,9 +15,7 @@
 }
 
 #team-container .button {
-	font-weight: bold;
-	font-size: 24px;
-    border: solid grey;
+    border: solid #B0B0AE;
     border-width: 0 3px 3px 0;
 	cursor: pointer;
 }
@@ -35,6 +33,10 @@
 	border-radius: 50%;
 }
 
+#title-container hr {
+	border: solid #DCDCDA 3px;
+}
+
 
 /* PIANO STYLE */
 #piano .keys {
@@ -49,7 +51,7 @@
     cursor: pointer;
     height: 10rem;
     margin: 0.1rem;
-    transition: background-color 0.2s;
+    transition: background-color 0.3s;
     width: 3rem;
 }
 
@@ -68,7 +70,7 @@
     left: -0.9rem;
     position: relative;
     top: 0;
-    transition: background-color 0.2s;
+    transition: background-color 0.3s;
     width: 1.8rem;
 }
 
