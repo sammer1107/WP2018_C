@@ -24,28 +24,28 @@ $(document).ready(function(){
 	
 	/* Usage: notePlay("Note names with Tempo", BPM, callback)
 	   Tempo symbol: Default is quarter note, '-':*2, '^':/2, '.':*1.5(once only) */
-	var notesPlay = function(n, bpm, callback = ()=>{}) {
-		let notes = n.split(" ");
-		let ms_per_note = 60000/bpm;
-		let play_promise = Promise.resolve();
-		notes.forEach(note => {
-			play_promise = play_promise.then(() => {
-				//Use includes("#") to decide should the 2nd pos be preserved. Ex: C#
-				let note_name = note.slice(0, 1+(note.includes("#") | 0));
-				let time_param = ms_per_note;
-				/* (split.length-1) counts the char, but here we make two
-				   nums do substraction, so (-1)-(-1)=0, no need for (-1).
-				   Here '-' means twice the time and '^' means half the time */
-				time_param *= 2**(note.split("-").length - note.split("^").length);
-				time_param *= (note.includes("."))? 1.5 : 1;
-				piano.play(note_name, 4, 2);
-				return new Promise((resolve) => {
-					setTimeout(resolve, time_param);
-				});
-			});
-		});
-		play_promise.then( callback );
-	};
+    var notesPlay = async function(n, bpm, callback = ()=>{}) {
+        let notes = n.split(" ");
+        let ms_per_note = 60000/bpm;
+        const noteLasting = (t) => {
+            return new Promise((resolve) => {
+                setTimeout(resolve, t);
+            });
+        };
+        for (const note of notes) {
+            //Use includes("#") to decide should the 2nd pos be preserved. Ex: C#
+            let note_name = note.slice(0, 1+(note.includes("#") | 0));
+            let time_param = ms_per_note;
+            /* (split.length-1) counts the char, but here we make two
+                nums do substraction, so (-1)-(-1)=0, no need for (-1).
+                Here '-' means twice the time and '^' means half the time */
+            time_param *= 2**(note.split("-").length - note.split("^").length);
+            time_param *= (note.includes("."))? 1.5 : 1;
+            piano.play(note_name, 4, 2);
+            await noteLasting(time_param);
+        };
+		callback();
+    };
 
     $.scrollify({
 		section: ".page",
