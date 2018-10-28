@@ -10,11 +10,11 @@ $(document).ready(function(){
     /* Usage: noteIndicate("Note names with space: C C# D D# E F F# G G# A A# B", callback) */
     var noteIndicate = function(n, callback = ()=>{}) {
         var notes = n.replace(/[\-\^\.]/g, "").split(" ");
-        $("[data-note='"+notes.shift()+"']").addClass("indicate");
-        $(".keys").on("click", ".indicate", function(){
+        $(`[data-note='${notes.shift()}']`).addClass("indicate");
+        $(".keys").on("mousedown", ".indicate", function(){
             $(this).removeClass("indicate");
             if(notes.length != 0) {
-                $("[data-note='"+notes.shift()+"']").addClass("indicate");
+                $(`[data-note='${notes.shift()}']`).addClass("indicate");
             }
             else {
                 callback();
