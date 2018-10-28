@@ -25,16 +25,16 @@ $(document).ready(function(){
     //noteIndicate("C D E F G", () => { alert("Well Played!") });
     
 	$(".button#left").click(function() {
-		var left = $("#team-container #slider").css( "left" );
-			$("#team-container #slider").animate({left: '+=100vh'}, 400);
 		current_slide -= 1;
+		var left = $("#team-container #slider").css( "left" );
+			$("#team-container #slider").animate({left: -current_slide*100 + 'vh'}, 400);
 		updateButtonDisplay();
 	});
 	
 	$(".button#right").click(function() {
-		var left = $("#team-container #slider").css( "left" );
-			$("#team-container #slider").animate({left: '-=100vh'}, 400);
 		current_slide += 1;
+		var left = $("#team-container #slider").css( "left" );
+			$("#team-container #slider").animate({left: -current_slide*100 + 'vh'}, 400);
 		updateButtonDisplay();
 	});
 });

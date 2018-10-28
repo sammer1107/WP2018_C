@@ -34,11 +34,11 @@ body {
 #team-page #team-container {
 	height: 50vh;
 	width: 100vh;
-	margin-right: auto;
-	margin-left: auto;
+	left: 50%;
+	transform: translate(-50%,0);
 	box-sizing: border-box;
 	overflow: visible;
-	position: relative;
+	position: absolute;
 }
 
 #team-container .button {
@@ -63,6 +63,7 @@ body {
 
 #slider {
 	height: 100%;
+	width: 100%;
 	position: relative;
 	white-space: nowrap; /* prevent inline-block from wrapping */
 	left: 0vh
@@ -71,9 +72,10 @@ body {
 #team-container .member-container {
 	display: inline-block;
 	position: relative;
+	box-sizing: border-box;
 	height: 100%;
-	width: 70%;
-	margin: 0 15% 0 15%;
+	width: 100%;
+	padding: 0 15% 0 15%;
 }
 
 .member-container .card {
