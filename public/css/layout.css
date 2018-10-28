@@ -37,6 +37,7 @@ header > * {
 }
 
 #piano-page .desc > * {
+	opacity: 0; /* use jquery to show */
 	font-family: 'Varela Round', sans-serif;
 	margin: 0.6rem;
 }

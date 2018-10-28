@@ -27,26 +27,31 @@ $(document).ready(function(){
 		setHeights: false,
 		scrollbars: false
     });
-
+	
+	$("#piano-page .desc h2").delay(1000).fadeTo(500, 1);
+	$("#piano-page .desc p").delay(2000).fadeTo(500, 1);
+	
     // Oh Susanna in D Major
     noteIndicate("D E F# A A B A F# D E F# F# E D E", () => { $.scrollify.next(); });
     
-	$(".button#left").click(function() {
-		current_slide -= 1;
-		var left = $("#team-container #slider").css( "left" );
-			$("#team-container #slider").animate({left: -current_slide*100 + 'vh'}, 400);
-		updateButtonDisplay();
-	});
-	
-	$(".button#right").click(function() {
-		current_slide += 1;
-		var left = $("#team-container #slider").css( "left" );
-			$("#team-container #slider").animate({left: -current_slide*100 + 'vh'}, 400);
-		updateButtonDisplay();
-	});
+	$(".button#left").click( slideCard );	
+	$(".button#right").click( slideCard );
 });
 
-function updateButtonDisplay(){
+function slideCard(){
+	clicked_button = $(this)
+	
+	if(clicked_button.attr("id") == 'left'){
+		current_slide -= 1;
+		var left = $("#team-container #slider").css( "left" );
+		$("#team-container #slider").animate({left: -current_slide*100 + 'vh'}, 400);
+	}else if(clicked_button.attr("id") == 'right'){
+		current_slide += 1;
+		var left = $("#team-container #slider").css( "left" );
+		$("#team-container #slider").animate({left: -current_slide*100 + 'vh'}, 400);
+	}
+	
+	// update button visibility
 	if(current_slide == 0){
 		$(".button#left").css("visibility", "hidden");
 	} else if (current_slide == 4){

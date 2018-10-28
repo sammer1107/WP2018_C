@@ -17,7 +17,7 @@
 #team-container .button {
 	font-weight: bold;
 	font-size: 24px;
-    border: solid black;
+    border: solid grey;
     border-width: 0 3px 3px 0;
 	cursor: pointer;
 }
