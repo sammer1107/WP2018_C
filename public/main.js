@@ -22,7 +22,14 @@ $(document).ready(function(){
         });
     };
 
-    //noteIndicate("C D E F G", () => { alert("Well Played!") });
+    $.scrollify({
+		section: ".page",
+		setHeights: false,
+		scrollbars: false
+    });
+
+    // Oh Susanna in D Major
+    noteIndicate("D E F# A A B A F# D E F# F# E D E", () => { $.scrollify.next(); });
     
 	$(".button#left").click(function() {
 		current_slide -= 1;
