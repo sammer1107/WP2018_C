@@ -46,7 +46,6 @@ body {
 	width: 2.8vh;
 	height: 2.8vh;
 	top: 50%;
-    display: inline-block;
     padding: 3px;
 	z-index: 1;
 }
@@ -66,7 +65,7 @@ body {
 	height: 100%;
 	position: relative;
 	white-space: nowrap; /* prevent inline-block from wrapping */
-	left: 0vh;
+	left: 0vh
 }
 
 #team-container .member-container {
@@ -80,6 +79,7 @@ body {
 .member-container .card {
 	width: 100%;
 	height: 100%;
+	position: relative;
 }
 
 .member-container .name {

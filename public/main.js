@@ -1,3 +1,5 @@
+current_slide = 0
+
 $(document).ready(function(){
     var piano = Synth.createInstrument("piano");
     $(".key").mousedown(function (e) { 
@@ -22,13 +24,28 @@ $(document).ready(function(){
 
     //noteIndicate("C D E F G", () => { alert("Well Played!") });
     
-	$("#left").click(function() {
+	$(".button#left").click(function() {
 		var left = $("#team-container #slider").css( "left" );
-			$("#team-container #slider").animate({left: '-=100vh'});
+			$("#team-container #slider").animate({left: '+=100vh'}, 400);
+		current_slide -= 1;
+		updateButtonDisplay();
 	});
 	
-	$("#right").click(function() {
+	$(".button#right").click(function() {
 		var left = $("#team-container #slider").css( "left" );
-			$("#team-container #slider").animate({left: '+=100vh'});
+			$("#team-container #slider").animate({left: '-=100vh'}, 400);
+		current_slide += 1;
+		updateButtonDisplay();
 	});
 });
+
+function updateButtonDisplay(){
+	if(current_slide == 0){
+		$(".button#left").css("visibility", "hidden");
+	} else if (current_slide == 4){
+		$(".button#right").css("visibility", "hidden");
+	} else {
+		$(".button#left").css("visibility", "visible");
+		$(".button#right").css("visibility", "visible");
+	}
+}
