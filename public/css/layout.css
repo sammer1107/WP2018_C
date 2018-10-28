@@ -3,6 +3,20 @@ body {
 	overflow-x: hidden;
 }
 
+header {
+	background-color: white;
+	display: flex;
+	align-items: center;
+	padding-left: 5rem;
+	height: 15vh;
+	width: 100%;
+}
+
+header > * {
+	font-family: 'Varela Round', 'Kosugi Maru', sans-serif;
+	margin-left: 1rem;
+}
+
 .page {
 	position: relative;
 	height: 100vh;
@@ -11,7 +25,7 @@ body {
 
 #piano {
 	position: absolute;
-	top: 50%;
+	top: 57.5%;
 	left: 50%;
 	transform: translate(-50%, -50%);
 }
