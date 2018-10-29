@@ -1,4 +1,4 @@
-current_slide = 0
+var current_slide = 0
 
 $(document).ready(function(){
     var piano = Synth.createInstrument("piano");
@@ -56,15 +56,21 @@ $(document).ready(function(){
 		scrollbars: false
     });
 	
-	$("#piano-page .desc h2").delay(1000).fadeTo(500, 1);
-	$("#piano-page .desc p").delay(2000).fadeTo(500, 1);
+	$("#piano-page .description #first h2").delay(1000).fadeTo(500, 1);
+	$("#piano-page .description #first p").delay(2000).fadeTo(500, 1);
 	
 	// Oh Susanna in D Major
 	var song = "D^^ E^^ F#^ A^ A^. B^^ A^ F#^ D^. E^^ F#^ F#^ E^ D^ E.";
 	setTimeout(function(){
 		noteIndicate(song, () => {
-			setTimeout(function(){ notesPlay(song, 60) }, 1000)})
-	}, 3000);
+			setTimeout(function(){
+				// play the song again and show messages simultaneously
+				notesPlay(song, 60, ()=>{ $.scrollify.move(1) });
+				$("#piano-page .description #first > *").css("opacity", 0);
+				$("#piano-page .description #second h2").fadeTo(500, 1);
+				$("#piano-page .description #second p").delay(2500).fadeTo(500, 1);
+				}, 1000);}) // delay for autoplay after player finished
+	}, 3000); // delay for indication to appear
     
 	$(".button#left").click( slideCard );	
 	$(".button#right").click( slideCard );

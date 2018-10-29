@@ -109,7 +109,9 @@
 
 @keyframes indicate {
 	0%   {}
+	25%  {background-color: #7bdece}
 	50%  {background-color: #7bdece}
+	85%  {}
 	100% {}
 }
 
