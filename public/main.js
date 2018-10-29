@@ -64,7 +64,7 @@ $(document).ready(function(){
 	setTimeout(function(){
 		noteIndicate(song, () => {
 			setTimeout(function(){ notesPlay(song, 60) }, 1000)})
-	}, 2000);
+	}, 3000);
     
 	$(".button#left").click( slideCard );	
 	$(".button#right").click( slideCard );

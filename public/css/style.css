@@ -81,12 +81,16 @@
     width: 1.8rem;
 }
 
-#piano .keys .key.indicate {
-    background-color: #7bdece;
+#piano .key.indicate {
+    animation-name: indicate;
+	animation-duration: 1.5s;
+	animation-iteration-count: infinite;
 }
 
-#piano .keys .black.indicate::before {
-    background-color: #7bdece;
+#piano .key.black.indicate::before {
+	animation-name: indicate;
+	animation-duration: 1.5s;
+	animation-iteration-count: infinite;
 }
 
 #piano .key.pressed { /* for auto replay */
@@ -101,6 +105,12 @@
 }
 #piano .key.black:active::before {
 	background-color: black;
+}
+
+@keyframes indicate {
+	0%   {}
+	50%  {background-color: #7bdece}
+	100% {}
 }
 
 /* END OF PIANO STYLE */
