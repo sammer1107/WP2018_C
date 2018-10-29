@@ -27,24 +27,34 @@ header > * {
 
 #piano {
 	position: absolute;
-	top: 57.5%;
-	left: 50%;
-	transform: translate(-50%, -50%);
+    top: 56%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 18em;
 }
 
-#piano-page .desc {
+#piano-page .description {
+	position: absolute;
+	height: 5em;
+	width: 100%;
+	bottom: 0;
 	color: white;
-	margin-top: 2rem;
 	text-align: center;
 }
 
-#piano-page .desc > * {
+#piano-page .description > * {
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+}
+
+#piano-page .description > * > * {
 	opacity: 0; /* use jquery to show */
 	font-family: 'Varela Round', sans-serif;
 	margin: 0.6rem;
 }
 
-#piano-page .desc h2 {
+#piano-page .description h2 {
 	font-size: 2em;
 }
 
