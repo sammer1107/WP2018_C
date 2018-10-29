@@ -29,8 +29,15 @@
 }
 
 .icon {
-	background-color: #CAC0C0;
+	/* background-color: #CAC0C0; */
 	border-radius: 50%;
+}
+
+.icon#github {
+	background-image: url("../res/GitHub-Mark-64px.png");
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center;
 }
 
 #title-container hr {
@@ -80,6 +87,20 @@
 
 #piano .keys .black.indicate::before {
     background-color: #7bdece;
+}
+
+#piano .key.pressed { /* for auto replay */
+	background-color: #8D4898;
+}
+#piano .key:active { /* for human hand play */
+	background-color: #8D4898;
+}
+
+#piano .key.black.pressed::before{
+	background-color: black;
+}
+#piano .key.black:active::before {
+	background-color: black;
 }
 
 /* END OF PIANO STYLE */

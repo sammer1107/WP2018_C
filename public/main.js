@@ -3,7 +3,7 @@ current_slide = 0
 $(document).ready(function(){
     var piano = Synth.createInstrument("piano");
     $(".key").mousedown(function (e) { 
-        e.preventDefault();
+        // e.preventDefault();
         piano.play($(this).data("note"), 4, 2);
     });
 
@@ -41,6 +41,9 @@ $(document).ready(function(){
                 Here '-' means twice the time and '^' means half the time */
             time_param *= 2**(note.split("-").length - note.split("^").length);
             time_param *= (note.includes("."))? 1.5 : 1;
+			$(`.key[data-note="${note_name}"]`).toggleClass("pressed").delay(300).queue(function(){
+				$(this).toggleClass("pressed").dequeue();
+			});
             piano.play(note_name, 4, 2);
             await noteLasting(time_param);
         };
@@ -58,10 +61,19 @@ $(document).ready(function(){
 	
 	// Oh Susanna in D Major
 	var song = "D^^ E^^ F#^ A^ A^. B^^ A^ F#^ D^. E^^ F#^ F#^ E^ D^ E.";
-	noteIndicate(song, () => { $.scrollify.next(); });
+	setTimeout(function(){
+		noteIndicate(song, () => {
+			setTimeout(function(){ notesPlay(song, 60) }, 1000)})
+	}, 2000);
     
 	$(".button#left").click( slideCard );	
 	$(".button#right").click( slideCard );
+	
+	$('.icon').mouseenter(function(){ 
+			$(this).shake({
+				interval: 100,
+				distance: 2,
+				times: 3 })});
 });
 
 function slideCard(){
@@ -87,3 +99,58 @@ function slideCard(){
 		$(".button#right").css("visibility", "visible");
 	}
 }
+
+
+// shake function
+(function($){
+    $.fn.shake = function(settings) {
+        if(typeof settings.interval == 'undefined'){
+            settings.interval = 100;
+        }
+
+        if(typeof settings.distance == 'undefined'){
+            settings.distance = 10;
+        }
+
+        if(typeof settings.times == 'undefined'){
+            settings.times = 4;
+        }
+
+        if(typeof settings.complete == 'undefined'){
+            settings.complete = function(){};
+        }
+
+        $(this).css('position','relative');
+
+        for(var iter=0; iter<(settings.times+1); iter++){
+            $(this).animate({ left:((iter%2 == 0 ? settings.distance : settings.distance * -1)) }, settings.interval);
+        }
+
+        $(this).animate({ left: 0}, settings.interval, settings.complete);  
+    }; 
+    $.fn.bounce = function(settings) {
+        if(typeof settings.interval == 'undefined'){
+            settings.interval = 100;
+        }
+
+        if(typeof settings.distance == 'undefined'){
+            settings.distance = 10;
+        }
+
+        if(typeof settings.times == 'undefined'){
+            settings.times = 4;
+        }
+
+        if(typeof settings.complete == 'undefined'){
+            settings.complete = function(){};
+        }
+
+        $(this).css('position','relative');
+
+        for(var iter=0; iter<(settings.times+1); iter++){
+            $(this).animate({ top:((iter%2 == 0 ? settings.distance : settings.distance * -1)) }, settings.interval);
+        }
+
+        $(this).animate({ top: 0}, settings.interval, settings.complete);  
+    };
+})(jQuery);
