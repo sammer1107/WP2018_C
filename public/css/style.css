@@ -62,10 +62,10 @@ header span {
 }
 
 .icon#github {
-	background-image: url("../res/github.png");
+	background-image: url("../res/icons/github.png");
 }
 .icon#github:hover {
-	background-image: url("../res/github-hover.png");
+	background-image: url("../res/icons/github-hover.png");
 }
 
 .icon#facebook {
