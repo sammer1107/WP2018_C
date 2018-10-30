@@ -1,3 +1,8 @@
+body::after{ /* for image preloading */
+    position:absolute; width:0; height:0; overflow:hidden; z-index:-1;
+    content:url('../res/icons/facebook-hover.png') url('../res/icons/twitter-hover.png') url('../res/icons/mail-hover.png') url('../res/icons/github-hover.png');
+}
+
 #piano-page {
 	background-color: #f4b430;	
 }
