@@ -60,7 +60,7 @@ $(document).ready(function(){
 	$("#piano-page .description #first p").delay(2000).fadeTo(500, 1);
 	
 	// Oh Susanna in D Major
-	var song = "D^^ E^^ F#^ A^ A^. B^^ A^ F#^ D^. E^^ F#^ F#^ E^ D^ E.";
+	var song = "D^^ E^^ F#^ A^ A^. B^^ A^ F#^ D^. E^^ F#^ F#^ E^ D^ E";
 	setTimeout(function(){
 		noteIndicate(song, () => {
 			setTimeout(function(){

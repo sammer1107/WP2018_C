@@ -20,6 +20,17 @@
 	cursor: pointer;
 }
 
+header {
+	background-color: white;
+	font-family: 'Varela Round', 'Kosugi Maru', sans-serif;
+}
+
+header span {
+	font-size: 1rem;
+    font-weight: 300;
+}
+
+
 .button#left {
 	visibility: hidden;
 }

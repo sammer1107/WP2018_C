@@ -4,9 +4,8 @@ body {
 }
 
 header {
-	background-color: white;
 	display: flex;
-	align-items: center;
+	align-items: flex-end;
 	padding-left: 5rem;
 	height: 15vh;
 	min-height: 4em;
@@ -14,8 +13,8 @@ header {
 }
 
 header > * {
-	font-family: 'Varela Round', 'Kosugi Maru', sans-serif;
-	margin-left: 1rem;
+	margin: 0 0 2rem 1rem;
+	vertical-align: baseline;
 }
 
 .page {
@@ -93,30 +92,29 @@ header > * {
 	width: 100%;
 	position: relative;
 	white-space: nowrap; /* prevent inline-block from wrapping */
-	left: 0vh
+	left: 0vh;
+	overflow: visible;
+	display: flex;
 }
 
 #team-container .member-container {
-	display: inline-block;
+	flex-shrink: 0; /* allow overflow without shrinking */
 	position: relative;
 	box-sizing: border-box;
 	height: 100%;
 	width: 100%;
 	padding: 0 15% 0 15%;
+	overflow: visible;
 }
 
-.member-container .card {
-	width: 100%;
-	height: 100%;
-	position: relative;
-}
-
-.member-container .name {
+.member-container object {
 	position: absolute;
-	top: -20%;
-	height: 20%;
-	width: 100%;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%,-50%);
+	height: 100%;
 }
+
 
 #team-page #upper {
 	position: relative;
@@ -186,3 +184,17 @@ header > * {
 	padding-bottom: 100%; /* set height equal to width */
 	width: 4.4vh;
 }
+
+/* OLD CARD LAYOUT 
+.member-container .card {
+	width: 100%;
+	height: 100%;
+	position: relative;
+}
+
+.member-container .name {
+	position: absolute;
+	top: -20%;
+	height: 20%;
+	width: 100%;
+}*/ 
