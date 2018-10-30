@@ -57,6 +57,15 @@ header > * {
 	font-size: 2em;
 }
 
+#project-page #text-area {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 23em;
+	padding: 0.5em 1em 0.5em 1em;
+}
+
 #team-page #team-container {
 	height: 50vh;
 	width: 100vh;
@@ -114,7 +123,6 @@ header > * {
 	transform: translate(-50%,-50%);
 	height: 100%;
 }
-
 
 #team-page #upper {
 	position: relative;

@@ -10,6 +10,14 @@
 	background-color: #FBFBF9;
 }
 
+#project-page #text-area {
+	border-width: 0 0 0 1px;
+	border-color: white;
+	border-style: solid;
+	color: ivory;
+	font-family: "Gen Jyuu Gothic P";
+}
+
 #team-page footer {
 	background-color: #F1F1F1;
 }

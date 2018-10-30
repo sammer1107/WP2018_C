@@ -104,6 +104,7 @@ function slideCard(){
 		$(".button#left").css("visibility", "visible");
 		$(".button#right").css("visibility", "visible");
 	}
+
 }
 
 
