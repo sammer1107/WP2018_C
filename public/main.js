@@ -75,11 +75,12 @@ $(document).ready(function(){
 	$(".button#left").click( slideCard );	
 	$(".button#right").click( slideCard );
 	
+	/*
 	$('.icon').mouseenter(function(){ 
 			$(this).shake({
 				interval: 100,
 				distance: 2,
-				times: 3 })});
+				times: 3 })}); */
 });
 
 function slideCard(){
@@ -107,7 +108,7 @@ function slideCard(){
 
 }
 
-
+/*
 // shake function
 (function($){
     $.fn.shake = function(settings) {
@@ -161,3 +162,4 @@ function slideCard(){
         $(this).animate({ top: 0}, settings.interval, settings.complete);  
     };
 })(jQuery);
+*/

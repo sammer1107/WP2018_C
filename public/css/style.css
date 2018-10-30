@@ -50,13 +50,38 @@ header span {
 .icon {
 	/* background-color: #CAC0C0; */
 	border-radius: 50%;
-}
-
-.icon#github {
-	background-image: url("../res/GitHub-Mark-64px.png");
 	background-size: contain;
 	background-repeat: no-repeat;
 	background-position: center;
+	cursor: pointer;
+}
+
+.icon#github {
+	background-image: url("../res/github.png");
+}
+.icon#github:hover {
+	background-image: url("../res/github-hover.png");
+}
+
+.icon#facebook {
+	background-image: url("../res/icons/facebook.png");
+}
+.icon#facebook:hover {
+	background-image: url("../res/icons/facebook-hover.png");
+}
+
+.icon#twitter {
+	background-image: url("../res/icons/twitter.png");
+}
+.icon#twitter:hover {
+	background-image: url("../res/icons/twitter-hover.png");
+}
+
+.icon#mail {
+	background-image: url("../res/icons/mail.png");
+}
+.icon#mail:hover {
+	background-image: url("../res/icons/mail-hover.png");
 }
 
 #title-container hr {

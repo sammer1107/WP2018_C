@@ -7,7 +7,7 @@ header {
 	display: flex;
 	align-items: flex-end;
 	padding-left: 5rem;
-	height: 15vh;
+	height: 14vh;
 	min-height: 4em;
 	width: 100%;
 }
@@ -185,10 +185,11 @@ header > * {
 
 #team-page footer .icon-container {
 	display: inline-block;
-	margin-left: 10px;
+	margin-left: 15px;
 }
 
 .icon {
+	display: block;
 	padding-bottom: 100%; /* set height equal to width */
 	width: 4.4vh;
 }
