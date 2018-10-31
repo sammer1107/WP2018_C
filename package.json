@@ -1,0 +1,22 @@
+{
+  "name": "wp2018_c",
+  "version": "1.0.0",
+  "description": "basic server",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sammer1107/WP2018_C.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sammer1107/WP2018_C/issues"
+  },
+  "homepage": "https://github.com/sammer1107/WP2018_C#readme",
+  "dependencies": {
+    "express": "^4.16.4"
+  }
+}
