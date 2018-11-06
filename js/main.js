@@ -1,5 +1,5 @@
 // "use strict";
-var kuro_speed = 5;
+var kuro_speed = 300;
 
 
 var MuziKuro = {
@@ -9,53 +9,78 @@ var MuziKuro = {
         this.load.image('google_tile', '/assets/tileset.png');
     },
     
-    create: function create(){
+    create: function(){
+        // create map
         var map = this.make.tilemap({ key: 'map'});
         var google_tile = map.addTilesetImage('google_tile');      // name as specified in map.json
         var layer = map.createStaticLayer('map_layer_0', google_tile);
         layer.setScale(1);
         
-        kuro = this.add.sprite(2500,2500, 'Kuro');
-        kuro.setScale(0.3);
+        // add player
+        this.kuro = this.physics.add.sprite(2525,2525, 'Kuro');
+        this.kuro.pointerDest = null;
+        this.kuro.setScale(0.3);
+        this.kuro.setOrigin(0.5,1);
         
-        this.cameras.main.startFollow(kuro);
-        this.cameras.main.setDeadzone(100, 100)
+        // camera setup
+        this.cameras.main.startFollow(this.kuro);
+        this.cameras.main.setDeadzone(100, 100);
         
-        key_w = this.input.keyboard.addKey("w");
-        key_a = this.input.keyboard.addKey("a");
-        key_s = this.input.keyboard.addKey("s");
-        key_d = this.input.keyboard.addKey("d");
+        // controlls
+        /*
+        KEY_W = this.input.keyboard.addKey("w");
+        KEY_A = this.input.keyboard.addKey("a");
+        KEY_S = this.input.keyboard.addKey("s");
+        KEY_D = this.input.keyboard.addKey("d");
+        */      
+        console.log(this)
+        this.input.on("pointerdown", pointerDown, this);
+
     },
     
-    update: function(){     
-        if(key_w.isDown){
+    update: function(time, delta){     
+        var kuro = this.kuro;
+        /*
+        if(KEY_W.isDown){
             kuro.y -= kuro_speed;
         }
-        if(key_a.isDown){
+        if(KEY_A.isDown){
             kuro.x -= kuro_speed;
         }
-        if(key_s.isDown){
+        if(KEY_S.isDown){
             kuro.y += kuro_speed;
         }
-        if(key_d.isDown){
+        if(KEY_D.isDown){
             kuro.x += kuro_speed;
         }
-    }
+        */
+        if(kuro.pointerDest != null){
+            // stop movement when kuro reached pointer movement's destination
+            if( Phaser.Math.Distance.Between(kuro.x, kuro.y, kuro.pointerDest.x, kuro.pointerDest.y) < 3){
+                kuro.body.velocity.set(0,0);
+                kuro.pointerDest = null;
+            }
+        }
+    },
+    
 }
 
 var config = {
     type: Phaser.AUTO, // renderer setting
     width: 800,
     height: 600,
-    parent: document.getElementById("game-container"),/*
+    parent: document.getElementById("game-container"),
     physics: {
         default: 'arcade',
-        arcade: {
-            gravity: {y: 200}
-        }
-    },*/
+    },
     scene: [MuziKuro]
 };
 
 var game = new Phaser.Game(config=config)
 
+
+function pointerDown(pointer){
+    var dest = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
+    this.kuro.pointerDest = dest
+    this.physics.moveToObject(this.kuro, dest, kuro_speed);
+}
