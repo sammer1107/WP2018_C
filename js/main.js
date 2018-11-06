@@ -7,15 +7,21 @@ var MuziKuro = {
         this.load.image('Kuro', '/assets/Kuro.png');
         this.load.tilemapTiledJSON('map', '/assets/map.json');
         this.load.image('google_tile', '/assets/tileset.png');
+        this.load.image('music_note','/assets/musical-note.png');
     },
     
     create: function(){
         // create map
+
         var map = this.make.tilemap({ key: 'map'});
         var google_tile = map.addTilesetImage('google_tile');      // name as specified in map.json
         var layer = map.createStaticLayer('map_layer_0', google_tile);
         layer.setScale(1);
-        
+
+        // create a music note randomly
+        var music_pos_y = Phaser.Math.Between(2500, 2699);
+        var music_pos_x = Phaser.Math.Between(2500, 2699);
+        this.music_note = this.physics.add.sprite(music_pos_x,music_pos_y,'music_note');
         // add player
         this.kuro = this.physics.add.sprite(2525,2525, 'Kuro');
         this.kuro.pointerDest = null;
@@ -32,7 +38,7 @@ var MuziKuro = {
         KEY_A = this.input.keyboard.addKey("a");
         KEY_S = this.input.keyboard.addKey("s");
         KEY_D = this.input.keyboard.addKey("d");
-        */      
+        */    
         console.log(this)
         this.input.on("pointerdown", pointerDown, this);
 
@@ -40,18 +46,23 @@ var MuziKuro = {
     
     update: function(time, delta){     
         var kuro = this.kuro;
+        var music_note=this.music_note;
         /*
         if(KEY_W.isDown){
             kuro.y -= kuro_speed;
+            
         }
         if(KEY_A.isDown){
             kuro.x -= kuro_speed;
+            
         }
         if(KEY_S.isDown){
             kuro.y += kuro_speed;
+            
         }
         if(KEY_D.isDown){
             kuro.x += kuro_speed;
+            
         }
         */
         if(kuro.pointerDest != null){
