@@ -1,6 +1,12 @@
-// "use strict";
-var kuro_speed = 300;
+"use strict";
+const KURO_SPEED = 300;
 
+var socket = io.connect();
+socket.on("connect", onSocketConnected); 
+
+function onSocketConnected(){
+    console.log("Socket connected.");
+}
 
 var MuziKuro = {
     preload: function() {
@@ -44,7 +50,6 @@ var MuziKuro = {
         KEY_S = this.input.keyboard.addKey("s");
         KEY_D = this.input.keyboard.addKey("d");
         */    
-        console.log(this)
         this.input.on("pointerdown", pointerDown, this);
 
     },
@@ -54,19 +59,19 @@ var MuziKuro = {
         var music_note=this.music_note;
         /*
         if(KEY_W.isDown){
-            kuro.y -= kuro_speed;
+            kuro.y -= KURO_SPEED;
             
         }
         if(KEY_A.isDown){
-            kuro.x -= kuro_speed;
+            kuro.x -= KURO_SPEED;
             
         }
         if(KEY_S.isDown){
-            kuro.y += kuro_speed;
+            kuro.y += KURO_SPEED;
             
         }
         if(KEY_D.isDown){
-            kuro.x += kuro_speed;
+            kuro.x += KURO_SPEED;
             
         }
         */
@@ -86,12 +91,13 @@ function collectMusicNote (player, music_note)
     music_note.disableBody(true, true);
 }
 
-
+var canvas_h = window.innerHeight * window.devicePixelRatio;
+var canvas_w = window.innerWidth * window.devicePixelRatio;
 
 var config = {
     type: Phaser.AUTO, // renderer setting
-    width: 800,
-    height: 600,
+    width: canvas_w,
+    height: canvas_h,
     parent: document.getElementById("game-container"),
     physics: {
         default: 'arcade',
@@ -105,5 +111,5 @@ var game = new Phaser.Game(config=config)
 function pointerDown(pointer){
     var dest = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
     this.kuro.pointerDest = dest
-    this.physics.moveToObject(this.kuro, dest, kuro_speed);
+    this.physics.moveToObject(this.kuro, dest, KURO_SPEED); // This will not stop when reached destination
 }

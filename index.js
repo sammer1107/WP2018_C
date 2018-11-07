@@ -1,9 +1,18 @@
 var express = require("express");
-const app = express()
-const port = 11070
-app.use(express.static(__dirname + '/public'))
-app.use('/js', express.static(__dirname + '/js'))
-app.use('/assets', express.static(__dirname + '/assets'))
+var app = express();
+var server = require('http').Server(app);
 
-console.log(`listening on port ${port}`)
-app.listen(port)
+const port = 11070;
+
+app.use(express.static(__dirname + '/public'));
+app.use('/js', express.static(__dirname + '/js'));
+app.use('/assets', express.static(__dirname + '/assets'));
+
+server.listen(port);
+console.log(`listening on port ${port}`);
+
+var io = require('socket.io')(server, {});
+
+io.sockets.on('connection', function(socket){
+    console.log(`socket ID: ${socket.id} connected.`)
+});
