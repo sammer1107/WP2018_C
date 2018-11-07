@@ -19,22 +19,11 @@ var MuziKuro = {
         layer.setScale(1);
 
         // create a music note randomly
-        // var music_pos_y = Phaser.Math.Between(2500, 2699);
-        // var music_pos_x = Phaser.Math.Between(2500, 2699);
-        // this.music_note = this.physics.add.sprite(music_pos_x,music_pos_y,'music_note');
-        
-        // create 11 music notes that Kuro can eat
-        this.music_note = this.physics.add.group({
-            key: 'music_note',
-            repeat: 11,
-            setXY: { x: 2525, y: 2525, stepX: 70 }
-        });
-        
-        this.music_note.children.iterate(function (child) {
-        
-            child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
-        
-        });
+        this.music_note = this.physics.add.group();
+        for (var i = 0; i < 11; i++)
+        {
+            this.music_note.create(2525 + Math.random() * 400, 2525 + Math.random() * 400, 'music_note');
+        }
 
         // add player
         this.kuro = this.physics.add.sprite(2525,2525, 'Kuro');
@@ -96,6 +85,8 @@ function collectMusicNote (player, music_note)
 {
     music_note.disableBody(true, true);
 }
+
+
 
 var config = {
     type: Phaser.AUTO, // renderer setting
