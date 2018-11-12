@@ -14,7 +14,10 @@ console.log(`listening on port ${port}`);
 
 var io = require('socket.io')(server, {});
 
-var players = [];
+var players = {
+    array: [],
+    id: {},
+};
 
 var Player = function (init_x, init_y, socket_id){
     this.x = init_x;
@@ -25,23 +28,46 @@ var Player = function (init_x, init_y, socket_id){
 function onNewPlayer(data){
     var newPlayer = new Player(data.x, data.y, this.id);
     console.log(`Created new player at ${data.x},${data.y}.`);
-    players.push(newPlayer);
+    
+    var connected_socket = this;
+    // send existing player information to the player connected
+    players.array.forEach( function(p){
+        connected_socket.emit("newPlayer", p);
+    });
+    
+    // send to everyone else except for the new connected player
+    this.broadcast.emit("newPlayer", newPlayer); 
+    
+    players.array.push(newPlayer);
+    players.id[newPlayer.id] = newPlayer;
+}
+
+function onPlayerMove(data){
+    players.id[this.id].x = data.x;
+    players.id[this.id].y = data.y;
+    this.broadcast.volatile.emit("playerMove", {
+       id: this.id,
+       x : data.x,
+       y : data.y,
+    });
 }
 
 function onDisconnect(){
-    console.log(players)
-    var removePlayer = players.find( p =>{
+    var removePlayer = players.array.find( p =>{
        return p.id == this.id 
     });
     console.log(`player ${removePlayer.id} disconnected.`)
-    players = players.filter( p =>{
+    players.array = players.array.filter( p =>{
         return p.id != this.id
     });
-    console.log(players)
+    delete players.id[this.id];
+    this.broadcast.emit("destroyPlayer", {id: this.id})
+    console.log("remaining players: \n", players.array);
 }
 
 io.sockets.on('connection', function(socket){
     console.log(`socket ID: ${socket.id} connected.`)
-    socket.on("new_player", onNewPlayer);
-    socket.on("disconnect", onDisconnect)
+    socket.on("newPlayer", onNewPlayer);
+    socket.on("playerMove", onPlayerMove);
+    socket.on("disconnect", onDisconnect);
 });

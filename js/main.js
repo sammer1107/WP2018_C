@@ -2,35 +2,77 @@
 const KURO_SPEED = 300;
 
 var socket;
+var players = new Players();
 
 function onSocketConnected(){
     console.log("Socket connected.");
-    var scene = game.scene.getScene('muziKuro');
-    createPlayer(scene, 2525, 2525);
-    socket.emit("new_player", {x:2525,y:2525})
+    MuziKuro = game.scene.getScene('muziKuro');
+    console.log(MuziKuro)
+    createPlayer(2525, 2525);
+    socket.emit("newPlayer", {x:2525,y:2525})
 }
 
 function onSocketDisconnected(){
-    var scene = game.scene.getScene('muziKuro');
-    scene.player.destroy();
+    MuziKuro.player.destroy();
+    players.array.forEach(function(elem){
+        elem.sprite.destroy() 
+    });
+    players = new Players();
 }
 
-function createPlayer(scene,x,y){
-    scene.player = scene.physics.add.sprite(x,y, 'Kuro')
-    scene.player.pointerDest = null;
-    scene.player.setScale(0.3);
-    scene.player.setOrigin(0.5,1);
-    scene.player.setCollideWorldBounds(true);
-    // camera setup
-    scene.cameras.main.startFollow(scene.player);
-    scene.cameras.main.setLerp(0.1,0.1);
+function onNewPlayer(data){
+    var new_player = new RemotePlayer(data.id, data.x, data.y);
+    players.array.push(new_player);
+    players.id[data.id] = new_player;
+}
+
+function onPlayerMove(data){
+    console.log("move")
+    var moved_player = players.id[data.id];
+    moved_player.sprite.x = data.x;
+    moved_player.sprite.y = data.y;
+}
+
+function onDestroyPlayer(data){
+    players.id[data.id].sprite.destroy();
+    delete players.id[data.id];
+    players.array = players.array.filter(function(elem){
+        return elem.id != data.id
+    });
+    console.log("destroyed player:\n", players)
+}
+
+// class for player list
+function Players(){
+    this.array = [];
+    this.id = {};
+}
+
+var RemotePlayer = function (id, init_x, init_y){
+    this.id = id;
     
-    scene.input.on("pointerdown", function(pointer){
+    this.sprite = MuziKuro.physics.add.sprite(init_x, init_y, 'Kuro');
+    this.sprite.setScale(0.3);
+    this.sprite.setOrigin(0.5,1);
+    this.sprite.setCollideWorldBounds(true);
+}
+
+function createPlayer(x,y){
+    MuziKuro.player = MuziKuro.physics.add.sprite(x,y, 'Kuro')
+    MuziKuro.player.pointerDest = null;
+    MuziKuro.player.setScale(0.3);
+    MuziKuro.player.setOrigin(0.5,1);
+    MuziKuro.player.setCollideWorldBounds(true);
+    // camera setup
+    MuziKuro.cameras.main.startFollow(MuziKuro.player);
+    MuziKuro.cameras.main.setLerp(0.1,0.1);
+    
+    MuziKuro.input.on("pointerdown", function(pointer){
         console.log(pointer.x, pointer.y)
         var dest = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
         this.player.pointerDest = dest
         this.physics.moveToObject(this.player, dest, KURO_SPEED); // This will not stop when reached destination
-    }, scene);
+    }, MuziKuro);
 }
 
 var MuziKuro = {
@@ -45,7 +87,10 @@ var MuziKuro = {
     create: function(){
         socket = io.connect();
         socket.on("connect", onSocketConnected);
-        socket.on("disconnect", onSocketDisconnected)
+        socket.on("disconnect", onSocketDisconnected);
+        socket.on("newPlayer", onNewPlayer);
+        socket.on("playerMove", onPlayerMove);
+        socket.on("destroyPlayer", onDestroyPlayer)
         
         // create map
 
@@ -98,6 +143,11 @@ var MuziKuro = {
                 player.pointerDest = null;
             }
         }
+        
+        socket.emit("playerMove", {
+            x: player.x,
+            y: player.y,
+        });
     },
     
 }
@@ -106,9 +156,6 @@ function collectMusicNote (player, music_note)
 {
     music_note.disableBody(true, true);
 }
-
-console.log(`window hieght: ${window.innerHeight}`)
-console.log(`window width: ${window.innerWidth}`)
 
 var config = {
     type: Phaser.AUTO, // renderer setting
@@ -119,8 +166,7 @@ var config = {
     physics: {
         default: 'arcade',
     },
-    scene: [MuziKuro, MuziKuro],
+    scene: [MuziKuro],
 };
 
 var game = new Phaser.Game(config=config);
-
