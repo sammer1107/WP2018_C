@@ -1,0 +1,216 @@
+body {
+	margin: 0;
+	overflow-x: hidden;
+}
+
+header {
+	display: flex;
+	align-items: flex-end;
+	padding-left: 5rem;
+	height: 14vh;
+	min-height: 4em;
+	width: 100%;
+}
+
+header > * {
+	margin: 0 0 2rem 1rem;
+	vertical-align: baseline;
+}
+
+.page {
+	position: relative;
+	height: 100vh;
+	min-height: 480px;
+	width: 100%;
+}
+
+#piano {
+	position: absolute;
+    top: 56%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 18em;
+}
+
+#piano-page .description {
+	position: absolute;
+	height: 5em;
+	width: 100%;
+	bottom: 0;
+	color: white;
+	text-align: center;
+}
+
+#piano-page .description > * {
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+}
+
+#piano-page .description > * > * {
+	opacity: 0; /* use jquery to show */
+	font-family: 'Varela Round', sans-serif;
+	margin: 0.6rem;
+}
+
+#piano-page .description h2 {
+	font-size: 2em;
+}
+
+#project-page #text-area {
+	position: absolute;
+	top: 46%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 23em;
+	padding: 0.5em 1em 0.5em 1em;
+}
+
+#project-page #play-button {
+    position: absolute;
+    top: 70%;
+    left: 50%;
+    transform: translate(-50%, 0);
+}
+
+#team-page #team-container {
+	height: 50vh;
+	width: 100vh;
+	left: 50%;
+	transform: translate(-50%,0);
+	box-sizing: border-box;
+	overflow: visible;
+	position: absolute;
+}
+
+#team-container .button {
+	position: absolute;
+	width: 2.8vh;
+	height: 2.8vh;
+	top: 50%;
+    padding: 3px;
+	z-index: 1;
+}
+
+.button#right {
+	right: 0;
+	transform: translate(0, -50%) rotate(-45deg);
+	transform-origin: 50%;
+}
+.button#left {
+	left: 0;
+	transform: translate(0, -50%) rotate(135deg);
+	transform-origin: 50%;
+}
+
+#slider {
+	height: 100%;
+	width: 100%;
+	position: relative;
+	white-space: nowrap; /* prevent inline-block from wrapping */
+	left: 0vh;
+	overflow: visible;
+	display: flex;
+}
+
+#team-container .member-container {
+	flex-shrink: 0; /* allow overflow without shrinking */
+	position: relative;
+	box-sizing: border-box;
+	height: 100%;
+	width: 100%;
+	padding: 0 15% 0 15%;
+	overflow: visible;
+}
+
+.member-container object {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%,-50%);
+	height: 100%;
+}
+
+#team-page #upper {
+	position: relative;
+	height: 88.9vh;
+	width: 100%;
+	padding-top: 18.9vh;
+	box-sizing: border-box;
+}
+
+#team-page #title-area {
+	position: absolute;
+	bottom: 0;
+	height: 12vh;
+	min-height: 2em;
+	padding-bottom: 6vh;
+	width: 100%;
+	display: flex;
+	flex-wrap: nowrap;
+	justify-content: flex-start;
+}
+
+#title-area #title-container {
+	height: 100%;
+	width: 100%;
+	padding-left: 50px;
+	display: flex;
+	flex-wrap: nowrap;
+	justify-content: flex-end;
+	align-items: flex-end;
+}
+
+#title-container h1 {
+	margin: 0;
+	white-space: nowrap;
+}
+
+#title-container hr {
+	margin: 0 0 0.5em 30px;
+	width: 100%;
+}
+
+#title-container h1 {
+	font-family: Arial, Helvetica, sans-serif;
+	color: #151514;
+}
+
+#team-page footer {
+	position: absolute;
+	height: 11.1vh;
+	width: 100%;
+	bottom: 0;
+	box-sizing: border-box;
+	padding: 0 50px 0 50px;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	justify-content: flex-end;
+	align-items: center;
+}
+
+#team-page footer .icon-container {
+	display: inline-block;
+	margin-left: 15px;
+}
+
+.icon {
+	display: block;
+	padding-bottom: 100%; /* set height equal to width */
+	width: 5.5vh;
+}
+
+/* OLD CARD LAYOUT 
+.member-container .card {
+	width: 100%;
+	height: 100%;
+	position: relative;
+}
+
+.member-container .name {
+	position: absolute;
+	top: -20%;
+	height: 20%;
+	width: 100%;
+}*/ 

@@ -1,0 +1,18 @@
+@font-face {
+	font-family: 'Gen Jyuu Gothic P';
+	font-style: normal;
+	font-weight: 400;
+	src: local('Gen Jyuu Gothic P Medium'),
+		 url('../res/fonts/genjyuu-m.woff2') format('woff2'), 
+		 url('../res/fonts/genjyuu-m.woff') format('woff');
+}
+  
+@font-face {
+	font-family: 'Gen Jyuu Gothic P';
+	font-style: bold;
+	font-weight: 600;
+	src: local('Gen Jyuu Gothic P Bold'),
+		url('../res/fonts/genjyuu-b.woff2') format('woff2'), 
+		url('../res/fonts/genjyuu-b.woff') format('woff');
+}
+  
