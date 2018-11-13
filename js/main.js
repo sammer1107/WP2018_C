@@ -75,6 +75,23 @@ function createPlayer(x,y){
     }, MuziKuro);
 }
 
+function resize() {
+    var canvas = document.querySelector("canvas");
+    var windowRatio = window.innerWidth / window.innerHeight;
+    var gameRatio = game.config.width / game.config.height;
+    
+		if(windowRatio < gameRatio){
+				canvas.style.width = window.innerWidth + "px";
+				canvas.style.height = (window.innerWidth / gameRatio) + "px";
+		}
+		else {
+				canvas.style.width = (window.innerHeight * gameRatio) + "px";
+				canvas.style.height = window.innerHeight + "px";
+	  }
+}
+
+window.addEventListener("resize", resize, false);
+
 var MuziKuro = {
     key: 'muziKuro',
     preload: function() {
@@ -112,7 +129,7 @@ var MuziKuro = {
         KEY_A = this.input.keyboard.addKey("a");
         KEY_S = this.input.keyboard.addKey("s");
         KEY_D = this.input.keyboard.addKey("d");
-        */    
+        */
 
     },
     
