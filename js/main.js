@@ -79,18 +79,19 @@ function resize() {
     var canvas = document.querySelector("canvas");
     var windowRatio = window.innerWidth / window.innerHeight;
     var gameRatio = game.config.width / game.config.height;
+
     
-		if(windowRatio < gameRatio){
-				canvas.style.width = window.innerWidth + "px";
-				canvas.style.height = (window.innerWidth / gameRatio) + "px";
-		}
-		else {
-				canvas.style.width = (window.innerHeight * gameRatio) + "px";
-				canvas.style.height = window.innerHeight + "px";
-	  }
+    if(windowRatio < gameRatio){
+        canvas.style.width = window.innerWidth + "px";
+        canvas.style.height = (window.innerWidth / gameRatio) + "px";
+    }
+    else {
+        canvas.style.width = (window.innerHeight * gameRatio) + "px";
+        canvas.style.height = window.innerHeight + "px";
+    }
+    
 }
 
-window.addEventListener("resize", resize, false);
 
 var MuziKuro = {
     key: 'muziKuro',
@@ -187,3 +188,4 @@ var config = {
 };
 
 var game = new Phaser.Game(config=config);
+window.addEventListener("resize", resize, false);
