@@ -13,7 +13,7 @@ function onSocketConnected(){
 }
 
 function onSocketDisconnected(){
-    MuziKuro.player.destroy();
+    MuziKuro.destroy();
     players.array.forEach(function(elem){
         elem.sprite.destroy() 
     });
@@ -48,31 +48,54 @@ function Players(){
     this.id = {};
 }
 
-var RemotePlayer = function (id, init_x, init_y){
-    this.id = id;
-    
+
+function Player(init_x, init_y){
     this.sprite = MuziKuro.physics.add.sprite(init_x, init_y, 'Kuro');
     this.sprite.setScale(0.3);
     this.sprite.setOrigin(0.5,1);
     this.sprite.setCollideWorldBounds(true);
 }
 
+Player.prototype.getPosition = function(){
+    return {x: this.sprite.x, y: this.sprite.y};
+};
+
+function RemotePlayer(id, init_x, init_y){
+    Player.call(this, init_x, init_y);
+    this.id = id;
+}
+RemotePlayer.prototype = Object.create(Player.prototype)
+RemotePlayer.prototype.contructor = RemotePlayer;
+
+function LocalPlayer(init_x, init_y){
+    Player.call(this, init_x, init_y);
+    // for storing pointer movement destination
+    this.pointerDest = null;
+    // for storing the vector from the position when pointer clicked to the destination
+    // so that the dot product can be calculated and stop the movement when the dot product is smaller than 0
+    this.pointerVect = null; 
+}
+LocalPlayer.prototype = Object.create(Player.prototype)
+LocalPlayer.prototype.contructor = LocalPlayer;
+
+function pointerDown(pointer){
+    // console.log(pointer.x, pointer.y)
+    var dest = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
+    this.player.pointerDest = dest;
+    this.player.pointerVect = new Phaser.Math.Vector2(dest).subtract(this.player.getPosition());
+    if(this.player.pointerVect.length() > 30){
+        this.physics.moveToObject(this.player.sprite, dest, KURO_SPEED); // This will not stop when reached destination
+    }
+}
+
 function createPlayer(x,y){
-    MuziKuro.player = MuziKuro.physics.add.sprite(x,y, 'Kuro')
-    MuziKuro.player.pointerDest = null;
-    MuziKuro.player.setScale(0.3);
-    MuziKuro.player.setOrigin(0.5,1);
-    MuziKuro.player.setCollideWorldBounds(true);
-    // camera setup
-    MuziKuro.cameras.main.startFollow(MuziKuro.player);
-    MuziKuro.cameras.main.setLerp(0.1,0.1);
+    MuziKuro.player = new LocalPlayer(x,y);
     
-    MuziKuro.input.on("pointerdown", function(pointer){
-        console.log(pointer.x, pointer.y)
-        var dest = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
-        this.player.pointerDest = dest
-        this.physics.moveToObject(this.player, dest, KURO_SPEED); // This will not stop when reached destination
-    }, MuziKuro);
+    // camera setup
+    MuziKuro.cameras.main.startFollow(MuziKuro.player.sprite);
+    MuziKuro.cameras.main.setLerp(0.15,0.15);
+    
+    MuziKuro.input.on("pointerdown", pointerDown, MuziKuro);
 }
 
 function resize() {
@@ -131,11 +154,32 @@ var MuziKuro = {
         KEY_S = this.input.keyboard.addKey("s");
         KEY_D = this.input.keyboard.addKey("d");
         */
-
     },
     
     update: function(time, delta){     
         var player = this.player;
+        
+        if(player){
+            if(this.input.mousePointer.isDown){
+                pointerDown.call(this, {x: this.input.mousePointer.x, y: this.input.mousePointer.y});
+            }
+            
+            if(player.pointerDest != null){
+                // stop movement when kuro reached pointer movement's destination
+                var dest_vec = new Phaser.Math.Vector2(player.pointerDest).subtract(player.getPosition());
+                if( player.pointerVect.dot(dest_vec) <= 0){
+                    player.sprite.body.velocity.set(0,0);
+                    console.log(player.getPosition(), player.pointerDest);
+                    player.pointerDest = null;
+                }
+            }
+            
+            socket.emit("playerMove", {
+                x: player.sprite.x,
+                y: player.sprite.y,
+            });    
+        }
+        
         /*
         if(KEY_W.isDown){
             kuro.y -= KURO_SPEED;
@@ -154,18 +198,6 @@ var MuziKuro = {
             
         }
         */
-        if(player.pointerDest != null){
-            // stop movement when kuro reached pointer movement's destination
-            if( Phaser.Math.Distance.Between(player.x, player.y, player.pointerDest.x, player.pointerDest.y) < 3){
-                player.body.velocity.set(0,0);
-                player.pointerDest = null;
-            }
-        }
-        
-        socket.emit("playerMove", {
-            x: player.x,
-            y: player.y,
-        });
     },
     
 }

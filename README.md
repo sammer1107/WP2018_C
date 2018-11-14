@@ -5,7 +5,7 @@ Repository for WP2018 team C
 # Usage
 1. `npm install` to install the dependancies
 2. launch server using `npm start`
-3. browse localhost:11070 to see the game.
+3. browse localhost:11070/muzikuro to see the game.
 
 # Files and Folders
 ### assets/
