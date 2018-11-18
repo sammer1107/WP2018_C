@@ -13,12 +13,7 @@ console.log(`listening on port ${port}`);
 
 
 var io = require('socket.io')(server, {});
-/*
-#TODO
-complete updatePartner:
-The client side code is not complete
-also when player disconnected, the partner should also be updated.
-*/
+
 var players = {
     array: [],
     id: {},
@@ -42,6 +37,10 @@ var players = {
     },
 };
 
+function getRandomArbitrary(min, max) {
+    return Math.random() * (max - min) + min;
+}
+
 var Player = function (init_x, init_y, socket_id, role, partner_id){
     this.x = init_x;
     this.y = init_y;
@@ -53,8 +52,8 @@ var Player = function (init_x, init_y, socket_id, role, partner_id){
 function onRequestPlayer(){
     var role, new_player, lonely_player, connected_socket, init_x, init_y;
     
-    init_x = 2525;
-    init_y = 2525;
+    init_x = getRandomArbitrary(2525+100, 2525-100);
+    init_y = getRandomArbitrary(2525+100, 2525-100);
     
     if(players.num_kuro > players.num_muzi){
         role = "Muzi";
@@ -102,6 +101,9 @@ function onRequestPlayer(){
 }
 
 function onPlayerMove(data){
+    if(!players.id[this.id]){
+        return;
+    }
     players.id[this.id].x = data.x;
     players.id[this.id].y = data.y;
     this.broadcast.volatile.emit("playerMove", {
@@ -119,8 +121,9 @@ function onDisconnect(){
     lonely_player = players.array.find( p =>{
        return p.partner_id == this.id 
     });
-    
-    lonely_player.partner_id = null;
+    if(lonely_player){
+        lonely_player.partner_id = null;
+    }
     
     console.log(`player ${remove_player.id} disconnected.`)
     
