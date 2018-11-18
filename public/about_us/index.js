@@ -53,7 +53,8 @@ $(document).ready(function(){
     $.scrollify({
 		section: ".page",
 		setHeights: false,
-		scrollbars: false
+		scrollbars: false,
+        touchScroll: true,
     });
 	
 	$("#piano-page .description #first h2").delay(1000).fadeTo(500, 1);

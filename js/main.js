@@ -4,30 +4,83 @@ const KURO_SPEED = 300;
 var socket;
 var players = new Players();
 
+// class for player list
+function Players(){
+    this.array = [];
+    this.id = {};
+    this.add = function(player){
+        this.array.push(player);
+        this.id[player.id] = player;
+    };
+}
+
+
+function Player(init_x, init_y, role, partner_id){
+    this.role = role;
+    this.partner_id = partner_id;
+    this.sprite = MuziKuro.physics.add.sprite(init_x, init_y, role);
+    this.sprite.setScale(0.3);
+    this.sprite.setOrigin(0.5,1);
+    this.sprite.setCollideWorldBounds(true);
+}
+
+Player.prototype.getPosition = function(){
+    return {x: this.sprite.x, y: this.sprite.y};
+};
+
+function RemotePlayer(init_x, init_y, id, role, partner_id){
+    Player.call(this, init_x, init_y, role, partner_id);
+    this.id = id;
+}
+RemotePlayer.prototype = Object.create(Player.prototype)
+RemotePlayer.prototype.constructor = RemotePlayer;
+
+function LocalPlayer(init_x, init_y, role, partner_id){
+    Player.call(this, init_x, init_y, role, partner_id);
+    // for storing pointer movement destination
+    this.pointerDest = null;
+    // for storing the vector from the position when pointer clicked to the destination
+    // so that the dot product can be calculated and stop the movement when the dot product is smaller than 0
+    this.pointerVect = null; 
+}
+LocalPlayer.prototype = Object.create(Player.prototype)
+LocalPlayer.prototype.constructor = LocalPlayer;
+
+
 function onSocketConnected(){
     console.log("Socket connected.");
-    MuziKuro = game.scene.getScene('muziKuro');
-    console.log(MuziKuro)
-    createPlayer(2525, 2525);
-    socket.emit("newPlayer", {x:2525,y:2525})
+    socket.emit("requestPlayer");
 }
 
 function onSocketDisconnected(){
-    MuziKuro.destroy();
+    MuziKuro.player.sprite.destroy();
     players.array.forEach(function(elem){
         elem.sprite.destroy() 
     });
     players = new Players();
+
+}
+
+function onCreateLocalPlayer(data){
+    MuziKuro.player = new LocalPlayer(data.x, data.y, data.role, data.partner_id);
+    
+    // camera setup
+    MuziKuro.cameras.main.startFollow(MuziKuro.player.sprite);
+    MuziKuro.cameras.main.setLerp(0.15,0.15);
+    
+    MuziKuro.input.on("pointerdown", pointerDown, MuziKuro);
 }
 
 function onNewPlayer(data){
-    var new_player = new RemotePlayer(data.id, data.x, data.y);
-    players.array.push(new_player);
-    players.id[data.id] = new_player;
+    var new_player = new RemotePlayer(data.x, data.y, data.id, data.role, data.partner_id);
+    players.add(new_player);
+}
+
+function onUpdatePartner(data){
+    players.id[data[0]].partner_id = data[1];
 }
 
 function onPlayerMove(data){
-    console.log("move")
     var moved_player = players.id[data.id];
     moved_player.sprite.x = data.x;
     moved_player.sprite.y = data.y;
@@ -39,44 +92,8 @@ function onDestroyPlayer(data){
     players.array = players.array.filter(function(elem){
         return elem.id != data.id
     });
-    console.log("destroyed player:\n", players)
 }
 
-// class for player list
-function Players(){
-    this.array = [];
-    this.id = {};
-}
-
-
-function Player(init_x, init_y){
-    this.sprite = MuziKuro.physics.add.sprite(init_x, init_y, 'Kuro');
-    this.sprite.setScale(0.3);
-    this.sprite.setOrigin(0.5,1);
-    this.sprite.setCollideWorldBounds(true);
-}
-
-Player.prototype.getPosition = function(){
-    return {x: this.sprite.x, y: this.sprite.y};
-};
-
-function RemotePlayer(id, init_x, init_y){
-    Player.call(this, init_x, init_y);
-    this.id = id;
-}
-RemotePlayer.prototype = Object.create(Player.prototype)
-RemotePlayer.prototype.contructor = RemotePlayer;
-
-function LocalPlayer(init_x, init_y){
-    Player.call(this, init_x, init_y);
-    // for storing pointer movement destination
-    this.pointerDest = null;
-    // for storing the vector from the position when pointer clicked to the destination
-    // so that the dot product can be calculated and stop the movement when the dot product is smaller than 0
-    this.pointerVect = null; 
-}
-LocalPlayer.prototype = Object.create(Player.prototype)
-LocalPlayer.prototype.contructor = LocalPlayer;
 
 function pointerDown(pointer){
     // console.log(pointer.x, pointer.y)
@@ -88,15 +105,6 @@ function pointerDown(pointer){
     }
 }
 
-function createPlayer(x,y){
-    MuziKuro.player = new LocalPlayer(x,y);
-    
-    // camera setup
-    MuziKuro.cameras.main.startFollow(MuziKuro.player.sprite);
-    MuziKuro.cameras.main.setLerp(0.15,0.15);
-    
-    MuziKuro.input.on("pointerdown", pointerDown, MuziKuro);
-}
 
 function resize() {
     var canvas = document.querySelector("canvas");
@@ -120,6 +128,7 @@ var MuziKuro = {
     key: 'muziKuro',
     preload: function() {
         this.load.image('Kuro', '/assets/Kuro.png');
+        this.load.image('Muzi', '/assets/Muzi.png');
         this.load.tilemapTiledJSON('map', '/assets/map.json');
         this.load.image('google_tile', '/assets/tileset.png');
         this.load.image('music_note','/assets/musical-note.png');
@@ -129,9 +138,11 @@ var MuziKuro = {
         socket = io.connect();
         socket.on("connect", onSocketConnected);
         socket.on("disconnect", onSocketDisconnected);
+        socket.on("createLocalPlayer", onCreateLocalPlayer);
         socket.on("newPlayer", onNewPlayer);
         socket.on("playerMove", onPlayerMove);
-        socket.on("destroyPlayer", onDestroyPlayer)
+        socket.on("destroyPlayer", onDestroyPlayer);
+        socket.on("updatePartner", onUpdatePartner);
         
         // create map
 
@@ -154,6 +165,7 @@ var MuziKuro = {
         KEY_S = this.input.keyboard.addKey("s");
         KEY_D = this.input.keyboard.addKey("d");
         */
+        MuziKuro = this;
     },
     
     update: function(time, delta){     
@@ -169,7 +181,6 @@ var MuziKuro = {
                 var dest_vec = new Phaser.Math.Vector2(player.pointerDest).subtract(player.getPosition());
                 if( player.pointerVect.dot(dest_vec) <= 0){
                     player.sprite.body.velocity.set(0,0);
-                    console.log(player.getPosition(), player.pointerDest);
                     player.pointerDest = null;
                 }
             }

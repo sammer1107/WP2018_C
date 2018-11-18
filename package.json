@@ -2,10 +2,10 @@
   "name": "wp2018_c",
   "version": "1.0.0",
   "description": "basic server",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "start": "node index.js",
-    "dstart": "nodemon -w index.js index.js",
+    "start": "node server.js",
+    "dstart": "nodemon -w server.js server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
