@@ -78,6 +78,7 @@ LocalPlayer.prototype.constructor = LocalPlayer;
 function onSocketConnected(){
     console.log("Socket connected.");
     socket.emit("requestPlayer");
+    socket.emit("requestNotes");
 }
 
 function onSocketDisconnected(){
@@ -117,6 +118,14 @@ function onUpdatePartner(data){
         updated.setInGame(true);
     }
     
+}
+
+function onNotesUpdate(data) {
+    console.log(data);
+    for(const note of data) {
+        MuziKuro.music_note.create(note.x, note.y, 'music_note');
+        //console.log(`Create Note at (${note.x}, ${note.y})`);
+    }
 }
 
 function onPlayerMove(data){
@@ -186,6 +195,7 @@ var MuziKuro = {
         socket.on("playerMove", onPlayerMove);
         socket.on("destroyPlayer", onDestroyPlayer);
         socket.on("updatePartner", onUpdatePartner);
+        socket.on("notesUpdate", onNotesUpdate);
         
         KURO_HEIGHT = this.textures.get('Kuro').frames.__BASE.height;
         MUZI_HEIGHT = this.textures.get('Muzi').frames.__BASE.height;
@@ -198,10 +208,10 @@ var MuziKuro = {
         
         // create a music note randomly
         this.music_note = this.physics.add.group();
-        for (var i = 0; i < 11; i++)
+        /*for (var i = 0; i < 11; i++)
         {
             this.music_note.create(2525 + Math.random() * 400, 2525 + Math.random() * 400, 'music_note');
-        }
+        }*/
         
         // controlls
         /*

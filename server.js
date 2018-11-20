@@ -43,6 +43,33 @@ function getRandomArbitrary(min, max) {
     return Math.random() * (max - min) + min;
 }
 
+var Note = function (note_id, x, y) {
+    this.x = x;
+    this.y = y;
+    this.id = note_id;
+}
+
+var notes = {
+    list: {},
+    num: 0,
+    MAX_NOTES: 30,
+    create: function() {
+        let note;
+        do {
+            let x = Math.round(getRandomArbitrary(0, 5000));
+            let y = Math.round(getRandomArbitrary(0, 5000));
+            note = new Note(`${x}${y}`, x, y);
+        } while (typeof this.list[note.id] !== 'undefined');
+        this.list[note.id] = note;
+        this.num += 1;
+        return note;
+    },
+    removeById: function(id) {
+        this.num -= 1;
+        delete this.list[id];
+    }
+};
+
 var Player = function (init_x, init_y, socket_id, role, partner_id){
     this.x = init_x;
     this.y = init_y;
@@ -115,6 +142,20 @@ function onPlayerMove(data){
     });
 }
 
+function notesUpdate() {
+    let new_notes_tmp = [];
+    while(notes.num < notes.MAX_NOTES) {
+        let tmp = notes.create()
+        new_notes_tmp.push(tmp);
+        //console.log(`New Note at (${tmp.x}, ${tmp.y})`);
+    }
+    return new_notes_tmp;
+}
+
+function onRequestNotes() {
+    this.emit("notesUpdate", Object.values(notes.list));
+}
+
 function onDisconnect(){
     var remove_player, lonely_player;
     remove_player = players.array.find( p =>{
@@ -135,9 +176,15 @@ function onDisconnect(){
     this.broadcast.emit("destroyPlayer", {id: this.id});
 }
 
+notesUpdate();
+
 io.sockets.on('connection', function(socket){
-    console.log(`socket ID: ${socket.id} connected.`)
+    console.log(`socket ID: ${socket.id} connected.`);
     socket.on("requestPlayer", onRequestPlayer);
+    socket.on("requestNotes", onRequestNotes);
     socket.on("playerMove", onPlayerMove);
     socket.on("disconnect", onDisconnect);
+    setInterval(function() {
+        socket.broadcast.emit("notesUpdate", notesUpdate());
+    }, 30000);
 });
