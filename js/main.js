@@ -1,5 +1,6 @@
 "use strict";
 const KURO_SPEED = 300;
+var KURO_HEIGHT, MUZI_HEIGHT;
 
 var socket;
 var local_player;
@@ -13,21 +14,46 @@ function Players(){
         this.array.push(player);
         this.id[player.id] = player;
     };
+    this.removeById = function(del_id){
+        delete this.id[del_id];
+        this.array = players.array.filter(function(elem){
+            return elem.id != del_id
+        });  
+    };
 }
 
 
 function Player(init_x, init_y, role, partner_id){
     this.role = role;
     this.partner_id = partner_id;
+    this.in_game = true;
     this.sprite = MuziKuro.physics.add.sprite(init_x, init_y, role);
+    
+    if(role == "Muzi"){
+        this.sprite.setDepth(1);
+        this.sprite.setDisplayOrigin(0.5*this.sprite.width, KURO_HEIGHT + MUZI_HEIGHT);
+    }
+    else{
+        this.sprite.setOrigin(0.5,1);
+    }
     this.sprite.setScale(0.3);
-    this.sprite.setOrigin(0.5,1);
+
     this.sprite.setCollideWorldBounds(true);
+    
+    if(partner_id == null){
+        this.setInGame(false);
+    }
 }
 
 Player.prototype.getPosition = function(){
     return {x: this.sprite.x, y: this.sprite.y};
 };
+
+Player.prototype.setInGame = function(bool){
+    this.sprite.setActive(bool);
+    this.sprite.setVisible(bool);
+    this.in_game = bool;
+}
 
 function RemotePlayer(init_x, init_y, id, role, partner_id){
     Player.call(this, init_x, init_y, role, partner_id);
@@ -42,7 +68,8 @@ function LocalPlayer(init_x, init_y, role, partner_id){
     this.pointerDest = null;
     // for storing the vector from the position when pointer clicked to the destination
     // so that the dot product can be calculated and stop the movement when the dot product is smaller than 0
-    this.pointerVect = null; 
+    this.pointerVect = null;
+    this.id = socket.id;
 }
 LocalPlayer.prototype = Object.create(Player.prototype)
 LocalPlayer.prototype.constructor = LocalPlayer;
@@ -69,7 +96,7 @@ function onCreateLocalPlayer(data){
     MuziKuro.cameras.main.startFollow(local_player.sprite);
     MuziKuro.cameras.main.setLerp(0.15,0.15);
     
-    MuziKuro.input.on("pointerdown", pointerDown, MuziKuro);
+    // MuziKuro.input.on("pointerdown", pointerDown, MuziKuro);
 }
 
 function onNewPlayer(data){
@@ -78,27 +105,36 @@ function onNewPlayer(data){
 }
 
 function onUpdatePartner(data){
-    if( players.id[data[0]] ){
-        players.id[data[0]].partner_id = data[1];
+    var updated = players.id[data[0]] || (local_player.id == data[0] ? local_player : null);
+    
+    if(!updated) return;
+    
+    updated.partner_id = data[1];
+    if(data[1] == null){ // partner is null in the case of player disconnected
+        updated.setInGame(false);
     }
-    else if( socket.id == data[0] ){
-        local_player.partner_id = data[1];
+    else{
+        updated.setInGame(true);
     }
     
 }
 
 function onPlayerMove(data){
-    var moved_player = players.id[data.id];
-    moved_player.sprite.x = data.x;
-    moved_player.sprite.y = data.y;
+    var moved = players.id[data.id];
+    moved.sprite.x = data.x;
+    moved.sprite.y = data.y;
+    
+    if(players.id[moved.partner_id]){
+        players.id[moved.partner_id].sprite.setPosition(data.x, data.y)        
+    }
+    else if(local_player.id == moved.partner_id){
+        local_player.sprite.setPosition(data.x, data.y);
+    }
 }
 
 function onDestroyPlayer(data){
     players.id[data.id].sprite.destroy();
-    delete players.id[data.id];
-    players.array = players.array.filter(function(elem){
-        return elem.id != data.id
-    });
+    players.removeById(data.id)
 }
 
 
@@ -107,7 +143,7 @@ function pointerDown(pointer){
     var dest = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
     local_player.pointerDest = dest;
     local_player.pointerVect = new Phaser.Math.Vector2(dest).subtract(local_player.getPosition());
-    if(local_player.pointerVect.length() > 30){
+    if(local_player.pointerVect.length() > 10){
         this.physics.moveToObject(local_player.sprite, dest, KURO_SPEED); // This will not stop when reached destination
     }
 }
@@ -151,8 +187,10 @@ var MuziKuro = {
         socket.on("destroyPlayer", onDestroyPlayer);
         socket.on("updatePartner", onUpdatePartner);
         
+        KURO_HEIGHT = this.textures.get('Kuro').frames.__BASE.height;
+        MUZI_HEIGHT = this.textures.get('Muzi').frames.__BASE.height;
         // create map
-
+        
         var map = this.make.tilemap({ key: 'map'});
         var google_tile = map.addTilesetImage('google_tile');      // name as specified in map.json
         var layer = map.createStaticLayer('map_layer_0', google_tile);
@@ -177,7 +215,8 @@ var MuziKuro = {
     
     update: function(time, delta){     
         
-        if(local_player){
+        if(local_player && local_player.role == 'Kuro' && local_player.in_game ){
+            
             if(this.input.mousePointer.isDown){
                 pointerDown.call(this, {x: this.input.mousePointer.x, y: this.input.mousePointer.y});
             }
@@ -191,10 +230,9 @@ var MuziKuro = {
                 }
             }
             
-            socket.emit("playerMove", {
-                x: local_player.sprite.x,
-                y: local_player.sprite.y,
-            });    
+            socket.emit("playerMove", local_player.getPosition());
+            
+            players.id[local_player.partner_id].sprite.setPosition(local_player.sprite.x, local_player.sprite.y);
         }
         
         /*

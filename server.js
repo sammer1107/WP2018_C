@@ -7,7 +7,9 @@ const port = 11070;
 app.use(express.static(__dirname + '/public'));
 app.use('/js', express.static(__dirname + '/js'));
 app.use('/assets', express.static(__dirname + '/assets'));
-
+app.get('/', function(req, res){
+   res.redirect('/about_us') 
+});
 server.listen(port);
 console.log(`listening on port ${port}`);
 
@@ -123,13 +125,14 @@ function onDisconnect(){
     });
     if(lonely_player){
         lonely_player.partner_id = null;
+        this.broadcast.emit("updatePartner", [lonely_player.id, null]);
     }
     
-    console.log(`player ${remove_player.id} disconnected.`)
+    console.log(`player ${remove_player.id} disconnected.`);
     
     players.removeById(this.id);
     
-    this.broadcast.emit("destroyPlayer", {id: this.id})
+    this.broadcast.emit("destroyPlayer", {id: this.id});
 }
 
 io.sockets.on('connection', function(socket){
