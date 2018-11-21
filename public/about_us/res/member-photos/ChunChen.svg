@@ -3,7 +3,7 @@
 <svg version="1.1" id="ChunChen" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 width="100%" height="100%" viewBox="0 0 353 213.599" xml:space="preserve">
 <defs>
-	<style>@import url('../../css/GenJyuu.css');</style>
+	<style>@import url('/css/GenJyuu.css');</style>
 </defs>
 <path fill="#93985A" d="M33.456,88.973c0,0,10.53-8.156,22.113-8.518c11.583-0.359,38.171,5.76,48.569,8.518
 	c10.398,2.76,34.221,9.117,52.121,8.758s37.098-14.338,72.92-14.943c39.62-0.67,38.302,10.486,52.384,10.496

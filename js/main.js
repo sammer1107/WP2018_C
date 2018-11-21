@@ -7,6 +7,14 @@ var local_player;
 var players = new Players();
 var notes_list = {};
 
+$("#join-game").click( function(){
+    var name = $("#player-name input").val();
+    if(name){
+        $("#login").animate({top: "-100vh"});
+        socket.emit("requestPlayer", { name: name });
+    }
+});
+
 // class for player list
 function Players(){
     this.array = [];
@@ -24,7 +32,8 @@ function Players(){
 }
 
 
-function Player(init_x, init_y, role, partner_id){
+function Player(init_x, init_y, name,  role, partner_id){
+    this.name = name;
     this.role = role;
     this.partner_id = partner_id;
     this.in_game = true;
@@ -57,15 +66,15 @@ Player.prototype.setInGame = function(bool){
     this.in_game = bool;
 }
 
-function RemotePlayer(init_x, init_y, id, role, partner_id){
-    Player.call(this, init_x, init_y, role, partner_id);
+function RemotePlayer(init_x, init_y, name, id, role, partner_id){
+    Player.call(this, init_x, init_y, name, role, partner_id);
     this.id = id;
 }
 RemotePlayer.prototype = Object.create(Player.prototype)
 RemotePlayer.prototype.constructor = RemotePlayer;
 
-function LocalPlayer(init_x, init_y, role, partner_id){
-    Player.call(this, init_x, init_y, role, partner_id);
+function LocalPlayer(init_x, init_y, name, role, partner_id){
+    Player.call(this, init_x, init_y, name, role, partner_id);
     // for storing pointer movement destination
     this.pointerDest = null;
     // for storing the vector from the position when pointer clicked to the destination
@@ -79,7 +88,6 @@ LocalPlayer.prototype.constructor = LocalPlayer;
 
 function onSocketConnected(){
     console.log("Socket connected.");
-    socket.emit("requestPlayer");
     socket.emit("requestNotes");
 }
 
@@ -93,7 +101,7 @@ function onSocketDisconnected(){
 }
 
 function onCreateLocalPlayer(data){
-    local_player = new LocalPlayer(data.x, data.y, data.role, data.partner_id);
+    local_player = new LocalPlayer(data.x, data.y, data.name, data.role, data.partner_id);
     
     // camera setup
     MuziKuro.cameras.main.startFollow(local_player.sprite);
@@ -103,7 +111,7 @@ function onCreateLocalPlayer(data){
 }
 
 function onNewPlayer(data){
-    var new_player = new RemotePlayer(data.x, data.y, data.id, data.role, data.partner_id);
+    var new_player = new RemotePlayer(data.x, data.y, data.name, data.id, data.role, data.partner_id);
     players.add(new_player);
 }
 

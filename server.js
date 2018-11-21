@@ -70,15 +70,16 @@ var notes = {
     }
 };
 
-var Player = function (init_x, init_y, socket_id, role, partner_id){
+function Player(init_x, init_y, name, socket_id, role, partner_id){
     this.x = init_x;
     this.y = init_y;
     this.id = socket_id;
     this.role = role;
-    this.partner_id = partner_id;    
+    this.partner_id = partner_id; 
+    this.name = name;
 }
 
-function onRequestPlayer(){
+function onRequestPlayer(data){
     var role, new_player, lonely_player, connected_socket, init_x, init_y;
     
     init_x = getRandomArbitrary(2525+100, 2525-100);
@@ -93,19 +94,19 @@ function onRequestPlayer(){
         players.num_kuro += 1;
     }
 
-    lonely_player = players.array.filter( function(elem){
+    lonely_player = players.array.find( function(elem){
         return elem.partner_id == null && elem.role == (role == "Muzi" ? "Kuro" : "Muzi")
-    })[0];
-    console.log("lonely_player", lonely_player)
+    });
+
     if(!lonely_player){
-        new_player = new Player(init_x, init_y, this.id, role, null);
+        new_player = new Player(init_x, init_y, data.name, this.id, role, null);
     }
     else{
-        new_player = new Player(init_x, init_y, this.id, role, lonely_player.id);
+        new_player = new Player(init_x, init_y, data.name, this.id, role, lonely_player.id);
         lonely_player.partner_id = this.id;
     }
     
-    console.log("Created new player: \n", new_player);
+    console.log(`Created new player: name:${new_player.name}, role:${new_player.role}, partner:${lonely_player ? lonely_player.name : null}`);
     
     // send existing player information to the player connected
     this.emit("createLocalPlayer", {
@@ -162,10 +163,11 @@ function onNoteCollected(data) {
 }
 
 function onDisconnect(){
-    var remove_player, lonely_player;
-    remove_player = players.array.find( p =>{
-       return p.id == this.id 
-    });
+    console.log(`socket ID: ${this.id} disconnected.`);
+    if(!players.id[this.id]) return; // player disconnected before creating a player
+    
+    var lonely_player;
+    
     lonely_player = players.array.find( p =>{
        return p.partner_id == this.id 
     });
@@ -173,12 +175,11 @@ function onDisconnect(){
         lonely_player.partner_id = null;
         this.broadcast.emit("updatePartner", [lonely_player.id, null]);
     }
-    
-    console.log(`player ${remove_player.id} disconnected.`);
+        
+    this.broadcast.emit("destroyPlayer", {id: this.id});
     
     players.removeById(this.id);
-    
-    this.broadcast.emit("destroyPlayer", {id: this.id});
+
 }
 
 notesUpdate();

@@ -4,7 +4,7 @@
 	 width="100%" height="100%" viewBox="0 0 354 220.464" xml:space="preserve">
 <defs>
 <style>
-	@import url('../../css/GenJyuu.css');
+	@import url('/css/GenJyuu.css');
 </style>
 </defs>
 <path fill="#F17C67" d="M33.267,95.091c0,0,10.53-8.156,22.113-8.518c11.583-0.359,38.171,5.76,48.569,8.518
