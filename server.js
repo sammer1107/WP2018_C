@@ -156,6 +156,11 @@ function onRequestNotes() {
     this.emit("notesUpdate", Object.values(notes.list));
 }
 
+function onNoteCollected(data) {
+    notes.removeById(data);
+    this.broadcast.emit("notesRemove", data);
+}
+
 function onDisconnect(){
     var remove_player, lonely_player;
     remove_player = players.array.find( p =>{
@@ -177,14 +182,15 @@ function onDisconnect(){
 }
 
 notesUpdate();
+setInterval(function() {
+    io.emit("notesUpdate", notesUpdate());
+}, 30000);
 
 io.sockets.on('connection', function(socket){
     console.log(`socket ID: ${socket.id} connected.`);
     socket.on("requestPlayer", onRequestPlayer);
     socket.on("requestNotes", onRequestNotes);
     socket.on("playerMove", onPlayerMove);
+    socket.on("noteCollected", onNoteCollected);
     socket.on("disconnect", onDisconnect);
-    setInterval(function() {
-        socket.broadcast.emit("notesUpdate", notesUpdate());
-    }, 30000);
 });

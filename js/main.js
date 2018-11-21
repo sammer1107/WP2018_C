@@ -5,6 +5,7 @@ var KURO_HEIGHT, MUZI_HEIGHT;
 var socket;
 var local_player;
 var players = new Players();
+var notes_list = {};
 
 // class for player list
 function Players(){
@@ -39,6 +40,7 @@ function Player(init_x, init_y, role, partner_id){
     this.sprite.setScale(0.3);
 
     this.sprite.setCollideWorldBounds(true);
+    MuziKuro.physics.add.overlap(this.sprite, MuziKuro.music_notes, collectMusicNote, null, MuziKuro);
     
     if(partner_id == null){
         this.setInGame(false);
@@ -121,11 +123,15 @@ function onUpdatePartner(data){
 }
 
 function onNotesUpdate(data) {
-    console.log(data);
     for(const note of data) {
-        MuziKuro.music_note.create(note.x, note.y, 'music_note');
+        notes_list[`${note.x}${note.y}`] = MuziKuro.music_notes.create(note.x, note.y, 'music_note');
         //console.log(`Create Note at (${note.x}, ${note.y})`);
     }
+}
+
+function onNotesRemove(data) {
+    console.log(data);
+    MuziKuro.music_notes.remove(notes_list[data], true, true);
 }
 
 function onPlayerMove(data){
@@ -196,6 +202,7 @@ var MuziKuro = {
         socket.on("destroyPlayer", onDestroyPlayer);
         socket.on("updatePartner", onUpdatePartner);
         socket.on("notesUpdate", onNotesUpdate);
+        socket.on("notesRemove", onNotesRemove);
         
         KURO_HEIGHT = this.textures.get('Kuro').frames.__BASE.height;
         MUZI_HEIGHT = this.textures.get('Muzi').frames.__BASE.height;
@@ -207,7 +214,7 @@ var MuziKuro = {
         this.physics.world.setBounds(0,0,5000,5000);
         
         // create a music note randomly
-        this.music_note = this.physics.add.group();
+        this.music_notes = this.physics.add.group();
         /*for (var i = 0; i < 11; i++)
         {
             this.music_note.create(2525 + Math.random() * 400, 2525 + Math.random() * 400, 'music_note');
@@ -270,6 +277,8 @@ var MuziKuro = {
 function collectMusicNote (player, music_note)
 {
     music_note.disableBody(true, true);
+    socket.emit("noteCollected", `${music_note.x}${music_note.y}`);
+    MuziKuro.music_notes.remove(music_note, true, true);
 }
 
 var config = {
