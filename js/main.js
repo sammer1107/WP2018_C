@@ -18,7 +18,7 @@ $("#join-game").click( function(){
 // class for player list
 function Players(){
     this.array = [];
-    this.id = {};
+    this.id = {}; 
     this.add = function(player){
         this.array.push(player);
         this.id[player.id] = player;
@@ -35,6 +35,7 @@ function Players(){
 function Player(init_x, init_y, name,  role, partner_id){
     this.name = name;
     this.role = role;
+    this.score = 0;
     this.partner_id = partner_id;
     this.in_game = true;
     this.sprite = MuziKuro.physics.add.sprite(init_x, init_y, role);
@@ -106,7 +107,6 @@ function onCreateLocalPlayer(data){
     // camera setup
     MuziKuro.cameras.main.startFollow(local_player.sprite);
     MuziKuro.cameras.main.setLerp(0.15,0.15);
-    
     // MuziKuro.input.on("pointerdown", pointerDown, MuziKuro);
 }
 
@@ -282,6 +282,46 @@ var MuziKuro = {
     
 }
 
+class HUD extends Phaser.Scene {
+  
+  constructor()
+  {
+    super({ key: 'head-up_display', active: true});
+    this.score = 0;
+  }
+  create(data)
+  { 
+    //scoreBar
+    var scoreBox = this.add.graphics();
+    var scoreBar = this.add.graphics();
+    scoreBox.fillStyle(0x222222, 0.8);
+    scoreBox.fillRoundedRect(10+110,
+                             window.innerHeight/80,
+                             window.innerWidth/4,
+                             window.innerHeight/20,
+                             window.innerHeight/40);
+    scoreBar.fillStyle(0xffff37, 1);
+    scoreBar.fillRoundedRect(10+10+110,
+                             window.innerHeight/80+10,
+                             window.innerWidth/4-20,
+                             window.innerHeight/20-20,
+                             (window.innerHeight/20-20)/2);
+    var scoreText = this.add.text(10, 10, 'Score:',{ fontSize: window.innerHeight/25, fill: '0x000'});
+    var playerText = this.add.text(10, 10+scoreText.y+scoreText.height, 'player:', {fontSize: window.innerHeight/25, fill: '0x000'});
+    var partnerText = this.add.text(10, 10+playerText.y+playerText.height, 'partner:', {fontSize: window.innerHeight/25, fill: '0x000'});
+
+    //
+  }
+  update(time, delta)
+  {
+    /*if (local_player.in_game){
+      var playerName = this.add.text(10+playerText.x+playerText.width, playerText.y, local_player.name,
+                                    {fontSize: window.innerHeight/25, fill:'0x000'});
+
+    }*/
+  }
+}
+
 function collectMusicNote (player, music_note)
 {
     music_note.disableBody(true, true);
@@ -298,7 +338,7 @@ var config = {
     physics: {
         default: 'arcade',
     },
-    scene: [MuziKuro],
+    scene: [MuziKuro, HUD],
 };
 
 var game = new Phaser.Game(config=config);
