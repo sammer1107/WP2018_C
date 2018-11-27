@@ -7,8 +7,9 @@ var local_player;
 var players = new Players();
 var notes_list = {};
 
+$("#player-name input").focus();
 $("#join-game").click( function(){
-    var name = $("#player-name input").val();
+    var name = $("#player-name input").val().substring(0,20);
     if(name){
         $("#login").animate({top: "-100vh"});
         socket.emit("requestPlayer", { name: name });
@@ -32,59 +33,62 @@ function Players(){
 }
 
 
-function Player(init_x, init_y, name,  role, partner_id){
-    this.name = name;
-    this.role = role;
-    this.score = 0;
-    this.partner_id = partner_id;
-    this.in_game = true;
-    this.sprite = MuziKuro.physics.add.sprite(init_x, init_y, role);
+class Player{
+    constructor(init_x, init_y, name, id, role, partner_id){
+        this.name = name;
+        this.role = role;
+        this.score = 0;
+        this.id = id;
+        this.partner_id = partner_id;
+        this.in_game = true;
+        this.sprite = MuziKuro.physics.add.sprite(init_x, init_y, role);
+        
+        if(role == "Muzi"){
+            this.sprite.setDepth(1);
+            this.sprite.setDisplayOrigin(0.5*this.sprite.width, KURO_HEIGHT + MUZI_HEIGHT);
+        }
+        else{
+            this.sprite.setOrigin(0.5,1);
+        }
+        this.sprite.setScale(0.3);
+
+        this.sprite.setCollideWorldBounds(true);
+        MuziKuro.physics.add.overlap(this.sprite, MuziKuro.music_notes, collectMusicNote, null, MuziKuro);
+        
+        if(partner_id == null){
+            this.setInGame(false);
+        }
+    }
     
-    if(role == "Muzi"){
-        this.sprite.setDepth(1);
-        this.sprite.setDisplayOrigin(0.5*this.sprite.width, KURO_HEIGHT + MUZI_HEIGHT);
+    getPosition(){
+        return {x: this.sprite.x, y: this.sprite.y};
     }
-    else{
-        this.sprite.setOrigin(0.5,1);
-    }
-    this.sprite.setScale(0.3);
 
-    this.sprite.setCollideWorldBounds(true);
-    MuziKuro.physics.add.overlap(this.sprite, MuziKuro.music_notes, collectMusicNote, null, MuziKuro);
+    setInGame(bool){
+        this.sprite.setActive(bool);
+        this.sprite.setVisible(bool);
+        this.in_game = bool;
+    }
     
-    if(partner_id == null){
-        this.setInGame(false);
+}
+
+
+class RemotePlayer extends Player{
+    constructor(init_x, init_y, name, id, role, partner_id){
+        super(init_x, init_y, name, id, role, partner_id)
+    }    
+}
+
+class LocalPlayer extends Player{
+    constructor(init_x, init_y, name, role, partner_id){
+        super(init_x, init_y, name, socket.id, role, partner_id);
+        // for storing pointer movement destination
+        this.pointerDest = null;
+        // for storing the vector from the position when pointer clicked to the destination
+        // so that the dot product can be calculated and stop the movement when the dot product is smaller than 0
+        this.pointerVect = null;
     }
 }
-
-Player.prototype.getPosition = function(){
-    return {x: this.sprite.x, y: this.sprite.y};
-};
-
-Player.prototype.setInGame = function(bool){
-    this.sprite.setActive(bool);
-    this.sprite.setVisible(bool);
-    this.in_game = bool;
-}
-
-function RemotePlayer(init_x, init_y, name, id, role, partner_id){
-    Player.call(this, init_x, init_y, name, role, partner_id);
-    this.id = id;
-}
-RemotePlayer.prototype = Object.create(Player.prototype)
-RemotePlayer.prototype.constructor = RemotePlayer;
-
-function LocalPlayer(init_x, init_y, name, role, partner_id){
-    Player.call(this, init_x, init_y, name, role, partner_id);
-    // for storing pointer movement destination
-    this.pointerDest = null;
-    // for storing the vector from the position when pointer clicked to the destination
-    // so that the dot product can be calculated and stop the movement when the dot product is smaller than 0
-    this.pointerVect = null;
-    this.id = socket.id;
-}
-LocalPlayer.prototype = Object.create(Player.prototype)
-LocalPlayer.prototype.constructor = LocalPlayer;
 
 
 function onSocketConnected(){
@@ -191,7 +195,7 @@ function resize() {
 
 
 var MuziKuro = {
-    key: 'muziKuro',
+    key: 'MuziKuro',
     preload: function() {
         this.load.image('Kuro', '/assets/Kuro.png');
         this.load.image('Muzi', '/assets/Muzi.png');
@@ -230,11 +234,11 @@ var MuziKuro = {
         
         // controlls
         /*
-        KEY_W = this.input.keyboard.addKey("w");
-        KEY_A = this.input.keyboard.addKey("a");
-        KEY_S = this.input.keyboard.addKey("s");
-        KEY_D = this.input.keyboard.addKey("d");
-        */
+        var KEY_W = this.input.keyboard.addKey("w");
+        var KEY_A = this.input.keyboard.addKey("a");
+        var KEY_S = this.input.keyboard.addKey("s");
+        var KEY_D = this.input.keyboard.addKey("d");
+        console.log(this.input.eventNames())*/
         MuziKuro = this;
     },
     
@@ -286,8 +290,8 @@ class HUD extends Phaser.Scene {
   
   constructor()
   {
-    super({ key: 'head-up_display', active: true});
-    this.score = 0;
+    super({ key: 'HUD', active: true});
+    this.score = 0; // ??
   }
   create(data)
   { 
@@ -314,11 +318,6 @@ class HUD extends Phaser.Scene {
   }
   update(time, delta)
   {
-    /*if (local_player.in_game){
-      var playerName = this.add.text(10+playerText.x+playerText.width, playerText.y, local_player.name,
-                                    {fontSize: window.innerHeight/25, fill:'0x000'});
-
-    }*/
   }
 }
 
