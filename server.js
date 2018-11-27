@@ -2,10 +2,11 @@ var express = require("express");
 var app = express();
 var server = require('http').Server(app);
 
-const port = 11070;
+const port = process.env.PORT || 11070;
 
 app.use(express.static(__dirname + '/public'));
-app.use('/js', express.static(__dirname + '/js'));
+app.use('/client', express.static(__dirname + '/client'));
+app.use('/lib', express.static(__dirname + '/client/lib'))
 app.use('/assets', express.static(__dirname + '/assets'));
 app.get('/', function(req, res){
    res.redirect('/about_us') 
