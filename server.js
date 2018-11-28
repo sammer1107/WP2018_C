@@ -81,10 +81,7 @@ function Player(init_x, init_y, name, socket_id, role, partner_id){
 }
 
 function onRequestPlayer(data){
-    var role, new_player, lonely_player, connected_socket, init_x, init_y;
-    
-    init_x = getRandomArbitrary(2525+100, 2525-100);
-    init_y = getRandomArbitrary(2525+100, 2525-100);
+    var role, new_player, lonely_player, connected_socket;
     
     if(players.num_kuro > players.num_muzi){
         role = "Muzi";
@@ -100,10 +97,12 @@ function onRequestPlayer(data){
     });
 
     if(!lonely_player){
+        let init_x = getRandomArbitrary(2525+100, 2525-100);
+        let init_y = getRandomArbitrary(2525+100, 2525-100);
         new_player = new Player(init_x, init_y, data.name, this.id, role, null);
     }
     else{
-        new_player = new Player(init_x, init_y, data.name, this.id, role, lonely_player.id);
+        new_player = new Player(lonely_player.x, lonely_player.y, data.name, this.id, role, lonely_player.id);
         lonely_player.partner_id = this.id;
     }
     
@@ -132,11 +131,18 @@ function onRequestPlayer(data){
 }
 
 function onPlayerMove(data){
-    if(!players.id[this.id]){
+    var player = players.id[this.id];
+        
+    if(!player){
         return;
     }
-    players.id[this.id].x = data.x;
-    players.id[this.id].y = data.y;
+    var partner = players.id[player.partner_id];
+    
+    player.x = data.x;
+    player.y = data.y;
+    partner.x = data.x;
+    partner.y = data.y;
+    
     this.broadcast.volatile.emit("playerMove", {
        id: this.id,
        x : data.x,

@@ -1,5 +1,4 @@
-var KURO_HEIGHT = 499;
-var MUZI_HEIGHT = 264;
+import {KURO_HEIGHT, MUZI_HEIGHT} from './constants.js'
 
 class Player extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, init_x, init_y, name, id, role, partner_id){
