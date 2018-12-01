@@ -1,24 +1,30 @@
-import {KURO_HEIGHT, MUZI_HEIGHT} from './constants.js'
+import {FRONT, LEFT, RIGHT, BACK} from './constants.js'
 
 class Player extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, init_x, init_y, name, id, role, partner_id){
-        super(scene, init_x, init_y, role);
-        this.scene.physics.world.enable(this);
+        super(scene, init_x, init_y, 'character');
         this.scene.add.existing(this);
         this.name = name;
         this.role = role;
         this.score = 0;
         this.id = id;
         this.partner_id = partner_id;
+        this.facing = FRONT;
+        this.walking = false;
         this.in_game = true;
         
+        
         if(role == "Muzi"){
-            this.setDepth(1).setDisplayOrigin(0.5*this.width, KURO_HEIGHT + MUZI_HEIGHT);
+            this.setDepth(1)
         }
         else if(role == "Kuro"){
-            this.setOrigin(0.5,1);
+            this.scene.physics.world.enable(this);
+            this.setCollideWorldBounds(true)
+            // need this so when frames are flipped using scaleX, the physics body stays in place, not sure why
+            this.body.transform = new Phaser.GameObjects.Components.TransformMatrix(1,0,0,1,0,0); 
         }
-        this.setScale(0.3).setCollideWorldBounds(true);
+
+        this.setOrigin(0.5,0.95).setFrame(`front_${role}`);
         
         // this.scene.physics.add.overlap(this, this.scene.music_notes, collectMusicNote, null, MuziKuro);
         
@@ -35,6 +41,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     setInGame(bool){
         this.setActive(bool);
         this.setVisible(bool);
+        this.body.setEnable(bool)
         this.in_game = bool;
     }
     

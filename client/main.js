@@ -9,6 +9,7 @@ var config = {
     parent: "game-container",
     physics: {
         default: 'arcade',
+        arcade: {debug: true}
     },
     scene: [MuziKuro, HUD],
 };
@@ -24,6 +25,7 @@ class Game extends Phaser.Game {
 }
 
 var game = new Game(config);
+console.log("Game:", game);
 
 $("#player-name input").focus();
 $("#join-game").click( function(){

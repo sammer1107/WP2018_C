@@ -1,5 +1,6 @@
-var KURO_SPEED = 300;
-var KURO_HEIGHT = 499;
-var MUZI_HEIGHT = 264;
-
-export { KURO_SPEED, KURO_HEIGHT, MUZI_HEIGHT }
+export const KURO_SPEED = 600;
+export const WALK_ANIM_DURATION = 500;
+export const FRONT = 'front';
+export const LEFT = 'left';
+export const RIGHT = 'right';
+export const BACK = 'back';

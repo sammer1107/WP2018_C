@@ -112,6 +112,7 @@ function onRequestPlayer(data){
     this.emit("createLocalPlayer", {
         x: new_player.x,
         y: new_player.y,
+        name: new_player.name,
         role: new_player.role,
         partner_id: new_player.partner_id
     });
@@ -140,8 +141,10 @@ function onPlayerMove(data){
     
     player.x = data.x;
     player.y = data.y;
-    partner.x = data.x;
-    partner.y = data.y;
+    if(partner){
+        partner.x = data.x;
+        partner.y = data.y;        
+    }
     
     this.broadcast.volatile.emit("playerMove", {
        id: this.id,

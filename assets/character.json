@@ -1,0 +1,902 @@
+{
+	"textures": [
+		{
+			"image": "character.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 497,
+				"h": 782
+			},
+			"scale": 1,
+			"frames": [
+				{
+					"filename": "front_walk_Kuro_5",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 111,
+						"h": 166
+					},
+					"spriteSourceSize": {
+						"x": 1,
+						"y": 40,
+						"w": 110,
+						"h": 126
+					},
+					"frame": {
+						"x": 1,
+						"y": 1,
+						"w": 110,
+						"h": 126
+					}
+				},
+				{
+					"filename": "front_walk_Kuro_1",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 111,
+						"h": 166
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 41,
+						"w": 110,
+						"h": 125
+					},
+					"frame": {
+						"x": 113,
+						"y": 1,
+						"w": 110,
+						"h": 125
+					}
+				},
+				{
+					"filename": "front_walk_Kuro_2",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 111,
+						"h": 166
+					},
+					"spriteSourceSize": {
+						"x": 2,
+						"y": 40,
+						"w": 109,
+						"h": 126
+					},
+					"frame": {
+						"x": 225,
+						"y": 1,
+						"w": 109,
+						"h": 126
+					}
+				},
+				{
+					"filename": "front_walk_Kuro_4",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 111,
+						"h": 166
+					},
+					"spriteSourceSize": {
+						"x": 2,
+						"y": 40,
+						"w": 109,
+						"h": 125
+					},
+					"frame": {
+						"x": 113,
+						"y": 128,
+						"w": 109,
+						"h": 125
+					}
+				},
+				{
+					"filename": "front_walk_Kuro_0",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 111,
+						"h": 166
+					},
+					"spriteSourceSize": {
+						"x": 3,
+						"y": 40,
+						"w": 108,
+						"h": 126
+					},
+					"frame": {
+						"x": 1,
+						"y": 129,
+						"w": 108,
+						"h": 126
+					}
+				},
+				{
+					"filename": "front_walk_Kuro_3",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 111,
+						"h": 166
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 40,
+						"w": 108,
+						"h": 126
+					},
+					"frame": {
+						"x": 336,
+						"y": 1,
+						"w": 108,
+						"h": 126
+					}
+				},
+				{
+					"filename": "front_Muzi",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 111,
+						"h": 166
+					},
+					"spriteSourceSize": {
+						"x": 28,
+						"y": 0,
+						"w": 50,
+						"h": 70
+					},
+					"frame": {
+						"x": 446,
+						"y": 1,
+						"w": 50,
+						"h": 70
+					}
+				},
+				{
+					"filename": "front_walk_Muzi_0",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 111,
+						"h": 166
+					},
+					"spriteSourceSize": {
+						"x": 30,
+						"y": 0,
+						"w": 50,
+						"h": 70
+					},
+					"frame": {
+						"x": 446,
+						"y": 73,
+						"w": 50,
+						"h": 70
+					}
+				},
+				{
+					"filename": "back_walk_Kuro_2",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 105,
+						"h": 170
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 41,
+						"w": 105,
+						"h": 128
+					},
+					"frame": {
+						"x": 224,
+						"y": 129,
+						"w": 105,
+						"h": 128
+					}
+				},
+				{
+					"filename": "back_walk_Kuro_5",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 105,
+						"h": 170
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 42,
+						"w": 105,
+						"h": 128
+					},
+					"frame": {
+						"x": 111,
+						"y": 255,
+						"w": 105,
+						"h": 128
+					}
+				},
+				{
+					"filename": "back_walk_Kuro_4",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 105,
+						"h": 170
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 42,
+						"w": 105,
+						"h": 126
+					},
+					"frame": {
+						"x": 1,
+						"y": 257,
+						"w": 105,
+						"h": 126
+					}
+				},
+				{
+					"filename": "front_Kuro",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 111,
+						"h": 166
+					},
+					"spriteSourceSize": {
+						"x": 3,
+						"y": 40,
+						"w": 107,
+						"h": 123
+					},
+					"frame": {
+						"x": 331,
+						"y": 129,
+						"w": 107,
+						"h": 123
+					}
+				},
+				{
+					"filename": "front_walk_Muzi_5",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 111,
+						"h": 166
+					},
+					"spriteSourceSize": {
+						"x": 31,
+						"y": 1,
+						"w": 50,
+						"h": 69
+					},
+					"frame": {
+						"x": 440,
+						"y": 145,
+						"w": 50,
+						"h": 69
+					}
+				},
+				{
+					"filename": "front_walk_Muzi_4",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 111,
+						"h": 166
+					},
+					"spriteSourceSize": {
+						"x": 30,
+						"y": 2,
+						"w": 50,
+						"h": 67
+					},
+					"frame": {
+						"x": 440,
+						"y": 216,
+						"w": 50,
+						"h": 67
+					}
+				},
+				{
+					"filename": "side_Kuro",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 98,
+						"h": 173
+					},
+					"spriteSourceSize": {
+						"x": 1,
+						"y": 38,
+						"w": 97,
+						"h": 135
+					},
+					"frame": {
+						"x": 331,
+						"y": 254,
+						"w": 97,
+						"h": 135
+					}
+				},
+				{
+					"filename": "front_walk_Muzi_1",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 111,
+						"h": 166
+					},
+					"spriteSourceSize": {
+						"x": 31,
+						"y": 2,
+						"w": 49,
+						"h": 68
+					},
+					"frame": {
+						"x": 430,
+						"y": 285,
+						"w": 49,
+						"h": 68
+					}
+				},
+				{
+					"filename": "front_walk_Muzi_3",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 111,
+						"h": 166
+					},
+					"spriteSourceSize": {
+						"x": 30,
+						"y": 3,
+						"w": 50,
+						"h": 66
+					},
+					"frame": {
+						"x": 430,
+						"y": 355,
+						"w": 50,
+						"h": 66
+					}
+				},
+				{
+					"filename": "side_walk_Kuro_1",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 98,
+						"h": 173
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 36,
+						"w": 98,
+						"h": 133
+					},
+					"frame": {
+						"x": 218,
+						"y": 259,
+						"w": 98,
+						"h": 133
+					}
+				},
+				{
+					"filename": "back_walk_Kuro_1",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 105,
+						"h": 170
+					},
+					"spriteSourceSize": {
+						"x": 4,
+						"y": 41,
+						"w": 101,
+						"h": 128
+					},
+					"frame": {
+						"x": 318,
+						"y": 391,
+						"w": 101,
+						"h": 128
+					}
+				},
+				{
+					"filename": "back_Muzi",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 105,
+						"h": 170
+					},
+					"spriteSourceSize": {
+						"x": 28,
+						"y": 0,
+						"w": 54,
+						"h": 61
+					},
+					"frame": {
+						"x": 421,
+						"y": 423,
+						"w": 54,
+						"h": 61
+					}
+				},
+				{
+					"filename": "front_walk_Muzi_2",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 111,
+						"h": 166
+					},
+					"spriteSourceSize": {
+						"x": 31,
+						"y": 5,
+						"w": 50,
+						"h": 64
+					},
+					"frame": {
+						"x": 421,
+						"y": 486,
+						"w": 50,
+						"h": 64
+					}
+				},
+				{
+					"filename": "side_walk_Kuro_2",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 98,
+						"h": 173
+					},
+					"spriteSourceSize": {
+						"x": 1,
+						"y": 35,
+						"w": 97,
+						"h": 133
+					},
+					"frame": {
+						"x": 1,
+						"y": 385,
+						"w": 97,
+						"h": 133
+					}
+				},
+				{
+					"filename": "side_walk_Kuro_5",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 98,
+						"h": 173
+					},
+					"spriteSourceSize": {
+						"x": 1,
+						"y": 37,
+						"w": 97,
+						"h": 133
+					},
+					"frame": {
+						"x": 100,
+						"y": 385,
+						"w": 97,
+						"h": 133
+					}
+				},
+				{
+					"filename": "side_walk_Kuro_0",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 98,
+						"h": 173
+					},
+					"spriteSourceSize": {
+						"x": 1,
+						"y": 37,
+						"w": 97,
+						"h": 132
+					},
+					"frame": {
+						"x": 199,
+						"y": 394,
+						"w": 97,
+						"h": 132
+					}
+				},
+				{
+					"filename": "side_walk_Kuro_3",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 98,
+						"h": 173
+					},
+					"spriteSourceSize": {
+						"x": 1,
+						"y": 36,
+						"w": 97,
+						"h": 132
+					},
+					"frame": {
+						"x": 298,
+						"y": 521,
+						"w": 97,
+						"h": 132
+					}
+				},
+				{
+					"filename": "side_walk_Kuro_4",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 98,
+						"h": 173
+					},
+					"spriteSourceSize": {
+						"x": 1,
+						"y": 37,
+						"w": 97,
+						"h": 132
+					},
+					"frame": {
+						"x": 397,
+						"y": 552,
+						"w": 97,
+						"h": 132
+					}
+				},
+				{
+					"filename": "back_walk_Kuro_0",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 105,
+						"h": 170
+					},
+					"spriteSourceSize": {
+						"x": 4,
+						"y": 43,
+						"w": 101,
+						"h": 126
+					},
+					"frame": {
+						"x": 1,
+						"y": 655,
+						"w": 101,
+						"h": 126
+					}
+				},
+				{
+					"filename": "back_walk_Kuro_3",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 105,
+						"h": 170
+					},
+					"spriteSourceSize": {
+						"x": 4,
+						"y": 40,
+						"w": 101,
+						"h": 126
+					},
+					"frame": {
+						"x": 1,
+						"y": 520,
+						"w": 101,
+						"h": 126
+					}
+				},
+				{
+					"filename": "back_walk_Muzi_0",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 105,
+						"h": 170
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 83,
+						"h": 119
+					},
+					"frame": {
+						"x": 104,
+						"y": 520,
+						"w": 83,
+						"h": 119
+					}
+				},
+				{
+					"filename": "back_Kuro",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 105,
+						"h": 170
+					},
+					"spriteSourceSize": {
+						"x": 3,
+						"y": 45,
+						"w": 102,
+						"h": 122
+					},
+					"frame": {
+						"x": 189,
+						"y": 528,
+						"w": 102,
+						"h": 122
+					}
+				},
+				{
+					"filename": "back_walk_Muzi_4",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 105,
+						"h": 170
+					},
+					"spriteSourceSize": {
+						"x": 28,
+						"y": 0,
+						"w": 55,
+						"h": 58
+					},
+					"frame": {
+						"x": 104,
+						"y": 641,
+						"w": 55,
+						"h": 58
+					}
+				},
+				{
+					"filename": "back_walk_Muzi_5",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 105,
+						"h": 170
+					},
+					"spriteSourceSize": {
+						"x": 27,
+						"y": 0,
+						"w": 55,
+						"h": 58
+					},
+					"frame": {
+						"x": 161,
+						"y": 652,
+						"w": 55,
+						"h": 58
+					}
+				},
+				{
+					"filename": "side_walk_Muzi_0",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 98,
+						"h": 173
+					},
+					"spriteSourceSize": {
+						"x": 40,
+						"y": 0,
+						"w": 48,
+						"h": 66
+					},
+					"frame": {
+						"x": 104,
+						"y": 701,
+						"w": 48,
+						"h": 66
+					}
+				},
+				{
+					"filename": "side_walk_Muzi_4",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 98,
+						"h": 173
+					},
+					"spriteSourceSize": {
+						"x": 38,
+						"y": 0,
+						"w": 48,
+						"h": 66
+					},
+					"frame": {
+						"x": 218,
+						"y": 652,
+						"w": 48,
+						"h": 66
+					}
+				},
+				{
+					"filename": "side_walk_Muzi_5",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 98,
+						"h": 173
+					},
+					"spriteSourceSize": {
+						"x": 38,
+						"y": 0,
+						"w": 48,
+						"h": 66
+					},
+					"frame": {
+						"x": 154,
+						"y": 712,
+						"w": 48,
+						"h": 66
+					}
+				},
+				{
+					"filename": "back_walk_Muzi_1",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 105,
+						"h": 170
+					},
+					"spriteSourceSize": {
+						"x": 30,
+						"y": 0,
+						"w": 55,
+						"h": 57
+					},
+					"frame": {
+						"x": 268,
+						"y": 655,
+						"w": 55,
+						"h": 57
+					}
+				},
+				{
+					"filename": "back_walk_Muzi_3",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 105,
+						"h": 170
+					},
+					"spriteSourceSize": {
+						"x": 29,
+						"y": 0,
+						"w": 55,
+						"h": 57
+					},
+					"frame": {
+						"x": 325,
+						"y": 655,
+						"w": 55,
+						"h": 57
+					}
+				},
+				{
+					"filename": "side_walk_Muzi_1",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 98,
+						"h": 173
+					},
+					"spriteSourceSize": {
+						"x": 38,
+						"y": 0,
+						"w": 48,
+						"h": 65
+					},
+					"frame": {
+						"x": 382,
+						"y": 686,
+						"w": 48,
+						"h": 65
+					}
+				},
+				{
+					"filename": "side_walk_Muzi_2",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 98,
+						"h": 173
+					},
+					"spriteSourceSize": {
+						"x": 38,
+						"y": 0,
+						"w": 48,
+						"h": 64
+					},
+					"frame": {
+						"x": 432,
+						"y": 686,
+						"w": 48,
+						"h": 64
+					}
+				},
+				{
+					"filename": "side_Muzi",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 98,
+						"h": 173
+					},
+					"spriteSourceSize": {
+						"x": 39,
+						"y": 0,
+						"w": 47,
+						"h": 65
+					},
+					"frame": {
+						"x": 268,
+						"y": 714,
+						"w": 47,
+						"h": 65
+					}
+				},
+				{
+					"filename": "back_walk_Muzi_2",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 105,
+						"h": 170
+					},
+					"spriteSourceSize": {
+						"x": 28,
+						"y": 2,
+						"w": 55,
+						"h": 55
+					},
+					"frame": {
+						"x": 204,
+						"y": 720,
+						"w": 55,
+						"h": 55
+					}
+				},
+				{
+					"filename": "side_walk_Muzi_3",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 98,
+						"h": 173
+					},
+					"spriteSourceSize": {
+						"x": 39,
+						"y": 0,
+						"w": 47,
+						"h": 65
+					},
+					"frame": {
+						"x": 317,
+						"y": 714,
+						"w": 47,
+						"h": 65
+					}
+				}
+			]
+		}
+	],
+	"meta": {
+		"app": "https://www.codeandweb.com/texturepacker",
+		"version": "3.0",
+		"smartupdate": "$TexturePacker:SmartUpdate:3f8f77ca7c48bdbd70c2728cd9f9ef0f:f2d1e1417216271771589f59a337c16f:42e475aa4a03af306bdc7acb5ff91d19$"
+	}
+}
