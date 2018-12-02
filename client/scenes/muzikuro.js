@@ -148,6 +148,8 @@ export default class MuziKuro extends Phaser.Scene {
         this.game.local_player = new LocalPlayer(this, data.x, data.y, data.name, this.game.socket.id, data.role, data.partner_id);
         this.local_player = this.game.local_player;
         this.players.set(this.local_player.id, this.local_player)
+        
+        this.events.emit('playerStateChange');
     }
     
     onSocketDisconnected(){
@@ -207,10 +209,12 @@ export default class MuziKuro extends Phaser.Scene {
                 this.cameras.main.startFollow(group);
                 this.cameras.main.setLerp(0.15,0.15);
             }
+            this.events.emit('playerStateChange');
         }
         if(data[1] == null){
             updated.group.destroy();
             this.groups = this.groups.filter(g => !(g === g));
+            this.events.emit('playerStateChange');
         }
         
         console.log(this.groups)
