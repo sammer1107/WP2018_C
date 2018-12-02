@@ -1,5 +1,6 @@
 import {LocalPlayer, RemotePlayer} from '../player.js'
 import {KURO_SPEED, WALK_ANIM_DURATION, FRONT, LEFT, RIGHT, BACK} from '../constants.js'
+import {getDirection} from '../utils.js'
 
 export default class MuziKuro extends Phaser.Scene {
     constructor(){
@@ -32,14 +33,13 @@ export default class MuziKuro extends Phaser.Scene {
         socket.on("notesRemove", this.onNotesRemove.bind(this));
 
         this.players = this.game.players;
-        // create map
         
+        // create map
         var map = this.make.tilemap({ key: 'map'});
         var google_tile = map.addTilesetImage('google_tile');      // name as specified in map.json
         var layer = map.createStaticLayer('map_layer_0', google_tile);
         this.physics.world.setBounds(0,0,5000,5000);
         
-        // create a music note randomly
         this.music_notes = this.physics.add.group();
         
         // animations
@@ -74,7 +74,6 @@ export default class MuziKuro extends Phaser.Scene {
         var KEY_A = this.input.keyboard.addKey("a");
         var KEY_S = this.input.keyboard.addKey("s");
         var KEY_D = this.input.keyboard.addKey("d");
-        console.log(this.input.eventNames())
         */
     }
     
@@ -91,7 +90,7 @@ export default class MuziKuro extends Phaser.Scene {
                 if( this.local_player.pointerVect.dot(dest_vec) <= 0){
                     let partner = this.players.get(this.local_player.partner_id);
                     
-                    this.local_player.body.velocity.set(0,0);
+                    this.local_player.container.body.velocity.set(0,0);
                     this.local_player.pointerDest = null;
                     this.local_player.walking = false;
                     this.local_player.anims.stop();
@@ -106,10 +105,9 @@ export default class MuziKuro extends Phaser.Scene {
                         partner.setFrame(`side_${partner.role}`);
                     }
                 }
+                this.game.socket.emit("playerMove", this.local_player.getPosition());
             }
-            
-            this.game.socket.emit("playerMove", this.local_player.getPosition());
-            this.players.get(this.local_player.partner_id).setPosition(this.local_player.x, this.local_player.y);
+            this.local_player.container.iterate(function(character){character.anims.update(time, delta)});
         }
         
         /*
@@ -149,9 +147,13 @@ export default class MuziKuro extends Phaser.Scene {
     onCreateLocalPlayer(data){
         this.game.local_player = new LocalPlayer(this, data.x, data.y, data.name, this.game.socket.id, data.role, data.partner_id);
         this.local_player = this.game.local_player;
+        this.players.set(this.local_player.id, this.local_player)
         // camera setup
-        this.cameras.main.startFollow(this.local_player);
-        this.cameras.main.setLerp(0.15,0.15);
+        if(this.local_player.role == "Kuro"){
+            this.cameras.main.startFollow(this.local_player.container);            
+            this.cameras.main.setLerp(0.15,0.15);
+        }
+        
     }
     
     onSocketDisconnected(){
@@ -169,11 +171,12 @@ export default class MuziKuro extends Phaser.Scene {
     }
 
     onUpdatePartner(data){
-        var updated = this.players.get(data[0]) || (this.local_player.id == data[0] ? this.local_player : null);
+        // console.log("onUpdatePartner: ", data)
+        var updated = this.players.get(data[0])
         
         if(!updated) return;
         
-        updated.partner_id = data[1];
+        updated.setupPartner(data[1]);
         if(data[1] == null){ // partner is null in the case of player disconnected
             updated.setInGame(false);
         }
@@ -181,6 +184,7 @@ export default class MuziKuro extends Phaser.Scene {
             updated.setInGame(true);
         }
         
+        this.cameras.main.startFollow(this.local_player.container)            
     }
 
     onNotesUpdate(data) {
@@ -197,15 +201,16 @@ export default class MuziKuro extends Phaser.Scene {
     
     onPlayerMove(data){
         var moved = this.players.get(data.id);
-        moved.x = data.x;
-        moved.y = data.y;
-        
+        moved.container.x = data.x;
+        moved.container.y = data.y;
+        /*
         if(this.players.has(moved.partner_id)){
             this.players.get(moved.partner_id).setPosition(data.x, data.y);
         }
         else if(this.local_player.id == moved.partner_id){
             this.local_player.setPosition(data.x, data.y);
         }
+        */
     }
 
     onDestroyPlayer(data){
@@ -222,43 +227,20 @@ export default class MuziKuro extends Phaser.Scene {
         this.local_player.pointerDest = dest;
         this.local_player.pointerVect = new Phaser.Math.Vector2(dest).subtract(this.local_player.getPosition());
         if(this.local_player.pointerVect.length() > 10){
-            this.physics.moveToObject(this.local_player, dest, KURO_SPEED); // This will not stop when reached destination
+            this.physics.moveToObject(this.local_player.container, dest, KURO_SPEED); // This will not stop when reached destination
             
-            let angle, facing, partner;
-            angle = this.local_player.pointerVect.angle() * Phaser.Math.RAD_TO_DEG;
-            switch(true){
-                case (angle <= 45 || angle > 315):
-                    facing = RIGHT;
-                    break;
-                
-                case (angle <= 135):
-                    facing = FRONT;
-                    break;
-                
-                case (angle <= 225):
-                    facing = LEFT;
-                    break;
-                
-                case (angle <= 315):
-                    facing = BACK;
-                    break
-            }
-            
+            let facing, partner;
+            facing = getDirection(this.local_player.pointerVect);
             partner = this.players.get(this.local_player.partner_id);
+            
             if(facing != this.local_player.facing || !this.local_player.walking){
                 if(facing == FRONT || facing == BACK){
-                    // this.local_player.setFlipX(false);
-                    // partner.setFlipX(false);
-                    this.local_player.scaleX = 1;
-                    partner.scaleX = 1;
+                    this.local_player.container.scaleX = 1;
                     this.local_player.play(`${facing}_walk_${this.local_player.role}`);
                     partner.play(`${facing}_walk_${partner.role}`);
                 }
                 else{
-                    this.local_player.scaleX = facing == LEFT ? -1: 1;
-                    partner.scaleX = facing == LEFT ? -1: 1;
-                    // this.local_player.setFlipX(facing == LEFT);
-                    // partner.setFlipX(facing == LEFT);
+                    this.local_player.container.scaleX = (facing == LEFT ? -1: 1);
                     
                     this.local_player.play(`side_walk_${this.local_player.role}`);
                     partner.play(`side_walk_${partner.role}`);
@@ -269,6 +251,7 @@ export default class MuziKuro extends Phaser.Scene {
             this.local_player.facing = facing;
             this.local_player.walking = true;
             partner.facing = facing;
+            
         }
     }
 }
