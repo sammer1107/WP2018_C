@@ -103,7 +103,6 @@ function onRequestPlayer(data){
     }
     else{
         new_player = new Player(lonely_player.x, lonely_player.y, data.name, this.id, role, lonely_player.id);
-        lonely_player.partner_id = this.id;
     }
     
     console.log(`Created new player: name:${new_player.name}, role:${new_player.role}, partner:${lonely_player ? lonely_player.name : null}`);
@@ -126,6 +125,7 @@ function onRequestPlayer(data){
     
     if(lonely_player){
         io.emit("updatePartner", [lonely_player.id, new_player.id]);
+        lonely_player.partner_id = this.id;
     }
     
     players.add(new_player);
@@ -139,18 +139,16 @@ function onPlayerMove(data){
     }
     var partner = players.id[player.partner_id];
     
-    player.x = data.x;
-    player.y = data.y;
+    player.x = data.pos.x;
+    player.y = data.pos.y;
     if(partner){
-        partner.x = data.x;
-        partner.y = data.y;        
+        partner.x = data.pos.x;
+        partner.y = data.pos.y;        
     }
     
-    this.broadcast.volatile.emit("playerMove", {
-       id: this.id,
-       x : data.x,
-       y : data.y,
-    });
+    data.id = this.id;
+    this.broadcast.emit("playerMove", data);
+
 }
 
 function notesUpdate() {

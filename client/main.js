@@ -9,7 +9,7 @@ var config = {
     parent: "game-container",
     physics: {
         default: 'arcade',
-        arcade: {debug: true}
+        arcade: {debug: false}
     },
     scene: [MuziKuro, HUD],
 };
@@ -25,7 +25,6 @@ class Game extends Phaser.Game {
 }
 
 var game = new Game(config);
-console.log("Game:", game);
 
 $("#player-name input").focus();
 $("#join-game").click( function(){
@@ -35,6 +34,12 @@ $("#join-game").click( function(){
         game.socket.emit("requestPlayer", { name: name });
     }
 });
+$(document).on("keypress", function(press){
+    if(press.which == 13){ // enter
+        $("#join-game").click();
+        $(document).off("keypress");
+    } 
+})
 
 window.addEventListener("resize", resize, false);
 function resize() {
