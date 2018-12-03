@@ -44,10 +44,13 @@ function getRandomArbitrary(min, max) {
     return Math.random() * (max - min) + min;
 }
 
-var Note = function (note_id, x, y) {
+var Melody = ['C D E G', 'A E G A', 'G A G F', 'D C E C', 'C C G G', 'F E D C', 'C D E C', 'B G A G'];
+
+var Note = function (note_id, x, y, melody) {
     this.x = x;
     this.y = y;
     this.id = note_id;
+    this.melody = melody;
 }
 
 var notes = {
@@ -55,12 +58,12 @@ var notes = {
     num: 0,
     MAX_NOTES: 30,
     create: function() {
-        let note;
+        let note, x, y;
         do {
-            let x = Math.round(getRandomArbitrary(0, 5000));
-            let y = Math.round(getRandomArbitrary(0, 5000));
-            note = new Note(`${x}${y}`, x, y);
-        } while (typeof this.list[note.id] !== 'undefined');
+            x = Math.round(getRandomArbitrary(0, 5000));
+            y = Math.round(getRandomArbitrary(0, 5000));
+        } while (typeof this.list[`${x}_${y}`] !== 'undefined');
+        note = new Note(`${x}_${y}`, x, y, Melody[Math.floor(Math.random()*Melody.length)]);
         this.list[note.id] = note;
         this.num += 1;
         return note;
@@ -194,6 +197,11 @@ notesUpdate();
 setInterval(function() {
     io.emit("notesUpdate", notesUpdate());
 }, 30000);
+
+const noteLasting = 500;
+setInterval(() => {
+    io.emit("tempoMeasurePast", noteLasting);
+}, noteLasting<<2); //=noteLasting*4
 
 io.sockets.on('connection', function(socket){
     console.log(`socket ID: ${socket.id} connected.`);

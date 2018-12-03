@@ -1,12 +1,13 @@
 import {LocalPlayer, RemotePlayer} from '../player.js'
 import {Group} from '../group.js'
-import {MOVE_SPEED, WALK_ANIM_DURATION, FRONT, LEFT, RIGHT, BACK, MUZI, KURO} from '../constants.js'
+import {MOVE_SPEED, WALK_ANIM_DURATION, FRONT, LEFT, RIGHT, BACK, MUZI, KURO, NOTE_THRESHOLD_DIST} from '../constants.js'
+import {Note} from '../note.js'
 import {getDirection} from '../utils.js'
 
 export default class MuziKuro extends Phaser.Scene {
     constructor(){
         super({ key: 'MuziKuro'});
-        this.notes_list = {};
+        this.notes_list = new Map();
         // local_player and players will be a reference to the Game Object's corresponding property
         this.local_player = null;
         this.players = null;
@@ -19,6 +20,7 @@ export default class MuziKuro extends Phaser.Scene {
         this.load.tilemapTiledJSON('map', 'map.json');
         this.load.image('google_tile', 'tileset.png');
         this.load.atlas('music_notes','music_notes.png', 'music_notes.json');
+        this.load.audio('piano', 'piano_pitch4.ogg');
     }
     
     create(){
@@ -33,6 +35,7 @@ export default class MuziKuro extends Phaser.Scene {
         socket.on("updatePartner", this.onUpdatePartner.bind(this));
         socket.on("notesUpdate", this.onNotesUpdate.bind(this));
         socket.on("notesRemove", this.onNotesRemove.bind(this));
+        socket.on("tempoMeasurePast", this.onTempoMeasurePast.bind(this));
 
         this.players = this.game.players;
         
@@ -43,6 +46,7 @@ export default class MuziKuro extends Phaser.Scene {
         this.physics.world.setBounds(0,0,5000,5000);
         
         this.music_notes = this.physics.add.group();
+        this.playerPiano = this.sound.add('piano');
         
         // animations
         this.anims.create({key:'front_walk_Kuro',
@@ -69,14 +73,6 @@ export default class MuziKuro extends Phaser.Scene {
             frames: this.anims.generateFrameNames('character', {prefix: 'back_walk_Muzi_', end:5}),
             repeat: -1,
             duration: WALK_ANIM_DURATION});
-            
-        // controlls
-        /*
-        var KEY_W = this.input.keyboard.addKey("w");
-        var KEY_A = this.input.keyboard.addKey("a");
-        var KEY_S = this.input.keyboard.addKey("s");
-        var KEY_D = this.input.keyboard.addKey("d");
-        */
 
         console.log("muzikuro: ", this)
     }
@@ -120,7 +116,8 @@ export default class MuziKuro extends Phaser.Scene {
         music_note.disableBody(true, true);
         // maybe just call destroy()
         // may also need to destroy the tweens associated with this note
-        this.game.socket.emit("noteCollected", `${music_note.x}${music_note.y}`);
+        this.game.socket.emit("noteCollected", `${music_note.x}_${music_note.y}`);
+        this.notes_list.delete(`${music_note.x}_${music_note.y}`);
         this.music_notes.remove(music_note, true, true);
     }
     
@@ -135,7 +132,18 @@ export default class MuziKuro extends Phaser.Scene {
     onCreateLocalPlayer(data){
         this.game.local_player = new LocalPlayer(this, data.x, data.y, data.name, this.game.socket.id, data.role, data.partner_id);
         this.local_player = this.game.local_player;
-        this.players.set(this.local_player.id, this.local_player)
+        this.players.set(this.local_player.id, this.local_player);
+        
+        //pianoKey consists of ['Key to Press', 'Note to Play', 'Start Time in Audio']
+        //ertyuio -> Second Row of Keyboard
+        let pianoKeyIndi = [['E','C',0], ['R','D',1.5], ['T','E',3], ['Y','F',4.5], ['U','G',6], ['I','A',7.5], ['O','B',9]];
+        Note.setSoundPool(this, 'piano', pianoKeyIndi, 5);
+        for(const [key, note, st] of pianoKeyIndi) {
+            this.playerPiano.addMarker({name: note, start: st, duration: 1.5});
+            this.input.keyboard.on(`keydown_${key}`, () => {
+                this.playerPiano.play(note);
+            })
+        }
         
         this.events.emit('playerStateChange');
     }
@@ -196,6 +204,11 @@ export default class MuziKuro extends Phaser.Scene {
                 group.setDepth(1);
                 this.cameras.main.startFollow(group);
                 this.cameras.main.setLerp(0.15,0.15);
+                for(const note of this.notes_list) {
+                    this.physics.add.overlap(this.local_player.group, note, (pl, n) => {
+                        n.changeVol((NOTE_THRESHOLD_DIST-Phaser.Math.Distance.Between(pl.x, pl.y, n.x, n.y))/NOTE_THRESHOLD_DIST);
+                    }, null, this)
+                }
             }
             this.events.emit('playerStateChange');
         }
@@ -209,9 +222,10 @@ export default class MuziKuro extends Phaser.Scene {
     }
 
     onNotesUpdate(data) {
-        for(let note of data) {
-            note = this.music_notes.create(note.x, note.y, 'music_notes', `${Math.floor(Math.random()*20)}`).setScale(0.6);
-            this.notes_list[`${note.x}${note.y}`] = note;
+        for(const note_d of data) {
+            let note = new Note(this, note_d.x, note_d.y, note_d.melody).setScale(0.6);
+            this.notes_list.set(`${note_d.x}_${note_d.y}`, note);
+            this.music_notes.add(note, true);
             this.tweens.add({
                 targets: note,
                 props: {
@@ -221,14 +235,42 @@ export default class MuziKuro extends Phaser.Scene {
                 repeat: -1,
                 duration: 1000 + (Math.random()-0.5)*600,
                 ease: t => Math.sin(Math.PI*(t-0.5))/2 + 0.5,
-            })
-            //console.log(`Create Note at (${note.x}, ${note.y})`);
+            });
+            note.body.immovable = true;
+            let th_wo_scale = NOTE_THRESHOLD_DIST/0.6;
+            note.body.setCircle(th_wo_scale, -th_wo_scale+(note.displayWidth>>1), -th_wo_scale+(note.displayHeight>>1));
+            if(this.local_player && this.local_player.group) {
+                this.physics.add.overlap(this.local_player.group, note, (pl, n) => {
+                    n.changeVol((NOTE_THRESHOLD_DIST-Phaser.Math.Distance.Between(pl.x, pl.y, note.x, note.y))/NOTE_THRESHOLD_DIST);
+                }, null, this)
+            }
+            //console.log(`Create Note at (${note_d.x}, ${note_d.y})`);
         }
     }
         
     onNotesRemove(data) {
         console.log("notes remove:", data);
-        this.music_notes.remove(notes_list[data], true, true);
+        this.music_notes.remove(notes_list.get(data), true, true);
+        this.notes_list.delete(data);
+    }
+
+    onTempoMeasurePast(ms_per_note) {
+        console.log("Beats!");
+        this.playNoteCheck(0);
+        setTimeout(() => { this.playNoteCheck(1, ms_per_note); }, ms_per_note*1);
+        setTimeout(() => { this.playNoteCheck(2, ms_per_note); }, ms_per_note*2);
+        setTimeout(() => { this.playNoteCheck(3, ms_per_note); }, ms_per_note*3);
+    }
+
+    playNoteCheck(index, ms_per_note) {
+        let pl = this.local_player.getPosition();
+        for(const [id, note] of this.notes_list) {
+            let dis = Phaser.Math.Distance.Between(pl.x, pl.y, note.x, note.y);
+            if(dis <= NOTE_THRESHOLD_DIST) {
+                note.requestSoundInInterval((ms_per_note*7)>>1); //=ms_per_note/3.5
+                note.playSpecificNote(index);
+            }
+        }
     }
     
     onPlayerMove(data){
@@ -288,13 +330,3 @@ export default class MuziKuro extends Phaser.Scene {
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
