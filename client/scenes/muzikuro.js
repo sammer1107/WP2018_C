@@ -18,7 +18,7 @@ export default class MuziKuro extends Phaser.Scene {
         this.load.atlas('character', 'character.png', 'character.json')
         this.load.tilemapTiledJSON('map', 'map.json');
         this.load.image('google_tile', 'tileset.png');
-        this.load.image('music_note','musical-note.png');
+        this.load.atlas('music_notes','music_notes.png', 'music_notes.json');
     }
     
     create(){
@@ -91,6 +91,9 @@ export default class MuziKuro extends Phaser.Scene {
             if(this.local_player.group.walking){
                 // stop smovement when kuro reached pointer movement's destination
                 let pos = this.local_player.getPosition();
+                this.game.socket.emit("playerMove", { pos: pos,
+                                                      vect: { x: this.local_player.pointerVect.x,
+                                                              y: this.local_player.pointerVect.y, }});
                 let dest_vec = new Phaser.Math.Vector2(this.local_player.pointerDest).subtract(pos);
                 if( this.local_player.pointerVect.dot(dest_vec) <= 0){
                     let partner = this.players.get(this.local_player.partner_id);
@@ -110,28 +113,13 @@ export default class MuziKuro extends Phaser.Scene {
         this.players.forEach(function(player){
             if(player.in_game) player.anims.update(time, delta);
         })
-        /*
-        if(KEY_W.isDown){
-            kuro.y -= MOVE_SPEED;
-            
-        }
-        if(KEY_A.isDown){
-            kuro.x -= MOVE_SPEED;
-            
-        }
-        if(KEY_S.isDown){
-            kuro.y += MOVE_SPEED;
-            
-        }
-        if(KEY_D.isDown){
-            kuro.x += MOVE_SPEED;
-            
-        }
-        */
+        
     }
     
     collectMusicNote(player, music_note){
         music_note.disableBody(true, true);
+        // maybe just call destroy()
+        // may also need to destroy the tweens associated with this note
         this.game.socket.emit("noteCollected", `${music_note.x}${music_note.y}`);
         this.music_notes.remove(music_note, true, true);
     }
@@ -217,12 +205,23 @@ export default class MuziKuro extends Phaser.Scene {
             this.events.emit('playerStateChange');
         }
         
-        console.log(this.groups)
+        console.log("groups: ", this.groups)
     }
 
     onNotesUpdate(data) {
-        for(const note of data) {
-            this.notes_list[`${note.x}${note.y}`] = this.music_notes.create(note.x, note.y, 'music_note');
+        for(let note of data) {
+            note = this.music_notes.create(note.x, note.y, 'music_notes', `${Math.floor(Math.random()*20)}`).setScale(0.6);
+            this.notes_list[`${note.x}${note.y}`] = note;
+            this.tweens.add({
+                targets: note,
+                props: {
+                    y: note.y + 15
+                },
+                yoyo: true,
+                repeat: -1,
+                duration: 1000 + (Math.random()-0.5)*600,
+                ease: t => Math.sin(Math.PI*(t-0.5))/2 + 0.5,
+            })
             //console.log(`Create Note at (${note.x}, ${note.y})`);
         }
     }
@@ -275,9 +274,6 @@ export default class MuziKuro extends Phaser.Scene {
         this.local_player.pointerVect = new Phaser.Math.Vector2(dest).subtract(pos);
         if(this.local_player.pointerVect.length() > 10){
             this.physics.moveToObject(this.local_player.group, dest, MOVE_SPEED); // This will not stop when reached destination
-            this.game.socket.emit("playerMove", { pos: pos,
-                                                  vect: { x: this.local_player.pointerVect.x,
-                                                          y: this.local_player.pointerVect.y, }});
 
             let facing, partner;
             facing = getDirection(this.local_player.pointerVect);

@@ -3,19 +3,19 @@ import {RIGHT, LEFT, FRONT, BACK} from './constants.js'
 export function getDirection(vec){
     var angle = new Phaser.Math.Vector2(vec).angle() * Phaser.Math.RAD_TO_DEG;
     switch(true){
-        case (angle <= 30 || angle > 330):
+        case (angle <= 45 || angle > 315):
             return RIGHT;
             break;
 
-        case (angle <= 150):
+        case (angle <= 135):
             return FRONT;
             break;
 
-        case (angle <= 210):
+        case (angle <= 225):
             return LEFT;
             break;
 
-        case (angle <= 330):
+        case (angle <= 315):
             return BACK;
             break
     }
