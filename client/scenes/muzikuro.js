@@ -25,6 +25,7 @@ export default class MuziKuro extends Phaser.Scene {
         this.load.image('google_tile', 'tileset.png');
         this.load.atlas('music_notes','music_notes.png', 'music_notes.json');
         this.load.audio('piano', 'piano_pitch4.ogg');
+        this.load.audio('drumbeat', 'beat_0_115.mp3')
     }
     
     create(){
@@ -49,8 +50,12 @@ export default class MuziKuro extends Phaser.Scene {
         var layer = map.createStaticLayer('map_layer_0', google_tile);
         this.physics.world.setBounds(0,0,5000,5000);
         
+        // yeah musics
+        this.sound.pauseOnBlur = false;
         this.music_notes = this.physics.add.group();
         this.playerPiano = this.sound.add('piano');
+        this.drumbeat = this.sound.add('drumbeat');
+        this.drumbeat.addMarker({name:'0', start:0, duration:115/60*1000*8})
         
         // animations
         this.anims.create({key:'front_walk_Kuro',
@@ -104,11 +109,10 @@ export default class MuziKuro extends Phaser.Scene {
                     this.local_player.group.walking = false;
                     this.local_player.group.stopWalkAnimation();
                 }else if(this.delta_last_send_move > this.move_send_interval){ // keep moving
-                    console.log("send move", this.delta_last_send_move)
-                    this.delta_last_send_move = 0;
                     this.game.socket.emit("playerMove", { pos: pos,
                                                           vect: { x: this.local_player.pointerVect.x,
                                                                   y: this.local_player.pointerVect.y, }});
+                    this.delta_last_send_move = 0;
                 }
             }
             
@@ -157,11 +161,11 @@ export default class MuziKuro extends Phaser.Scene {
     }
     
     onSocketDisconnected(){
-        this.local_player.destroy();
         this.players.forEach(function(elem){
             elem.destroy() 
         });
         this.players.clear();
+        this.groups.forEach((group)=>{group.destroy()})
         this.physics.pause();
     }
     
@@ -264,6 +268,7 @@ export default class MuziKuro extends Phaser.Scene {
 
     onTempoMeasurePast(ms_per_note) {
         console.log("Beats!");
+        this.drumbeat.play('0')
         this.playNoteCheck(0);
         setTimeout(() => { this.playNoteCheck(1, ms_per_note); }, ms_per_note*1);
         setTimeout(() => { this.playNoteCheck(2, ms_per_note); }, ms_per_note*2);

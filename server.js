@@ -40,8 +40,8 @@ var players = {
     },
 };
 
-function getRandomArbitrary(min, max) {
-    return Math.random() * (max - min) + min;
+function randint(min, max) {
+    return Math.floor(Math.random() * (max - min) + min);
 }
 
 var Melody = ['C D E G', 'A E G A', 'G A G F', 'D C E C', 'C C G G', 'F E D C', 'C D E C', 'B G A G'];
@@ -60,8 +60,8 @@ var notes = {
     create: function() {
         let note, x, y;
         do {
-            x = Math.round(getRandomArbitrary(0, 5000));
-            y = Math.round(getRandomArbitrary(0, 5000));
+            x = randint(0, 5000);
+            y = randint(0, 5000);
         } while (typeof this.list[`${x}_${y}`] !== 'undefined');
         note = new Note(`${x}_${y}`, x, y, Melody[Math.floor(Math.random()*Melody.length)]);
         this.list[note.id] = note;
@@ -100,8 +100,8 @@ function onRequestPlayer(data){
     });
 
     if(!lonely_player){
-        let init_x = getRandomArbitrary(2525+100, 2525-100);
-        let init_y = getRandomArbitrary(2525+100, 2525-100);
+        let init_x = randint(2525+100, 2525-100);
+        let init_y = randint(2525+100, 2525-100);
         new_player = new Player(init_x, init_y, data.name, this.id, role, null);
     }
     else{
@@ -198,10 +198,11 @@ setInterval(function() {
     io.emit("notesUpdate", notesUpdate());
 }, 30000);
 
-const noteLasting = 500;
+const noteLasting = 60/115*1000; // the drumbeat is 115 BPM
+
 setInterval(() => {
     io.emit("tempoMeasurePast", noteLasting);
-}, noteLasting<<2); //=noteLasting*4
+}, noteLasting<<3); //=noteLasting*4 *2(pause for 4 notes)
 
 io.sockets.on('connection', function(socket){
     console.log(`socket ID: ${socket.id} connected.`);
