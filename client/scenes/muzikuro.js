@@ -135,7 +135,6 @@ export default class MuziKuro extends Phaser.Scene {
     
     onSocketConnected(){
         console.log("Socket connected.");
-        this.game.socket.emit("requestNotes");
         if(this.physics){
             this.physics.resume();        
         }
@@ -145,15 +144,35 @@ export default class MuziKuro extends Phaser.Scene {
         this.game.local_player = new LocalPlayer(this, data.x, data.y, data.name, this.game.socket.id, data.role, data.partner_id);
         this.local_player = this.game.local_player;
         this.players.set(this.local_player.id, this.local_player);
+        this.game.socket.emit("requestNotes");
         
         //pianoKey consists of ['Key to Press', 'Note to Play', 'Start Time in Audio']
         //ertyuio -> Second Row of Keyboard
         let pianoKeyIndi = [['E','C',0], ['R','D',1.5], ['T','E',3], ['Y','F',4.5], ['U','G',6], ['I','A',7.5], ['O','B',9]];
         Note.setSoundPool(this, 'piano', pianoKeyIndi, 5);
-        for(const [key, note, st] of pianoKeyIndi) {
-            this.playerPiano.addMarker({name: note, start: st, duration: 1.5});
+        this.on_beats_user = false;
+        this.on_beats_index = 0;
+        for(const [key, note_name, st] of pianoKeyIndi) {
+            this.playerPiano.addMarker({name: note_name, start: st, duration: 1.5});
             this.input.keyboard.on(`keydown_${key}`, () => {
-                this.playerPiano.play(note);
+                this.playerPiano.play(note_name);
+                if(this.on_beats_user) {
+                    this.on_beats_user = false;
+                    for(let [id, note] of this.notes_list) {
+                        if(this.physics.overlap(this.local_player.group, note)) {
+                            if(note.melody[this.on_beats_index] == note_name) {
+                                this.tweens.add({
+                                    targets: note,
+                                    props: { scaleX: 0.65, scaleY: 0.65 },
+                                    yoyo: true,
+                                    repeat: 0,
+                                    duration: 100,
+                                    ease: t => Math.sin(Math.PI*(t-0.5))/2 + 0.5,
+                                });
+                            }
+                        }
+                    }
+                }
             })
         }
         
@@ -216,7 +235,7 @@ export default class MuziKuro extends Phaser.Scene {
                 group.setDepth(1);
                 this.cameras.main.startFollow(group);
                 this.cameras.main.setLerp(0.15,0.15);
-                for(const note of this.notes_list) {
+                for(const [id, note] of this.notes_list) {
                     this.physics.add.overlap(this.local_player.group, note, (pl, n) => {
                         n.changeVol((NOTE_THRESHOLD_DIST-Phaser.Math.Distance.Between(pl.x, pl.y, n.x, n.y))/NOTE_THRESHOLD_DIST);
                     }, null, this)
@@ -248,7 +267,6 @@ export default class MuziKuro extends Phaser.Scene {
                 duration: 1000 + (Math.random()-0.5)*600,
                 ease: t => Math.sin(Math.PI*(t-0.5))/2 + 0.5,
             });
-            note.body.immovable = true;
             let th_wo_scale = NOTE_THRESHOLD_DIST/0.6;
             note.body.setCircle(th_wo_scale, -th_wo_scale+(note.displayWidth>>1), -th_wo_scale+(note.displayHeight>>1));
             if(this.local_player && this.local_player.group) {
@@ -266,13 +284,24 @@ export default class MuziKuro extends Phaser.Scene {
         this.notes_list.delete(data);
     }
 
-    onTempoMeasurePast(ms_per_note) {
+    onTempoMeasurePast(beat_d) {
         console.log("Beats!");
+        let ms_per_note = beat_d;
         this.drumbeat.play('0')
         this.playNoteCheck(0);
-        setTimeout(() => { this.playNoteCheck(1, ms_per_note); }, ms_per_note*1);
+        setTimeout(() => { this.playNoteCheck(1, ms_per_note); }, ms_per_note);
         setTimeout(() => { this.playNoteCheck(2, ms_per_note); }, ms_per_note*2);
         setTimeout(() => { this.playNoteCheck(3, ms_per_note); }, ms_per_note*3);
+        let tolerance = 100;
+        for(let i = 0; i < 4; i += 1) {
+            setTimeout(() => { this.triggerOnBeatsUser(i, tolerance<<1) }, ms_per_note*(4+i)-tolerance);
+        }
+    }
+
+    triggerOnBeatsUser(index, tolerance) {
+        this.on_beats_index = index;
+        this.on_beats_user = true;
+        setTimeout(() => { this.on_beats_user = false }, tolerance);
     }
 
     playNoteCheck(index, ms_per_note) {

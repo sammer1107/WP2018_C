@@ -199,7 +199,6 @@ setInterval(function() {
 }, 30000);
 
 const noteLasting = 60/115*1000; // the drumbeat is 115 BPM
-
 setInterval(() => {
     io.emit("tempoMeasurePast", noteLasting);
 }, noteLasting<<3); //=noteLasting*4 *2(pause for 4 notes)
