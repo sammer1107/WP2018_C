@@ -243,11 +243,13 @@ export default class MuziKuro extends Phaser.Scene {
                 }
             }
             this.events.emit('playerStateChange');
+            this.events.emit('groupStateChange');
         }
         else{
+            this.groups = this.groups.filter(g => !(g == updated.group));
             updated.group.destroy();
-            this.groups = this.groups.filter(g => !(g === g));
             this.events.emit('playerStateChange');
+            this.events.emit('groupStateChange');
         }
         
         console.log("groups: ", this.groups)
