@@ -1,5 +1,5 @@
 "use strict";
-import MuziKuro from './Scenes/muzikuro.js'
+import MuziKuro from './Scenes/Muzikuro.js'
 import HUD from './Scenes/HUD.js'
 
 var config = {

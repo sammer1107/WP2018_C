@@ -1,8 +1,8 @@
-import {LocalPlayer, RemotePlayer} from '../GameObjects/player.js'
-import {Group} from '../GameObjects/group.js'
+import {LocalPlayer, RemotePlayer} from '../GameObjects/Player.js'
+import {Group} from '../GameObjects/Group.js'
 import {MOVE_SPEED, WALK_ANIM_DURATION, MOVE_UPDATE_PER_SEC, 
         FRONT, LEFT, RIGHT, BACK, MUZI, KURO, NOTE_THRESHOLD_DIST} from '../constants.js'
-import {Note} from '../GameObjects/note.js'
+import {Note} from '../GameObjects/Note.js'
 import {getDirection} from '../utils.js'
 
 export default class MuziKuro extends Phaser.Scene {
@@ -13,6 +13,7 @@ export default class MuziKuro extends Phaser.Scene {
         this.local_player = null;
         this.players = null;
         this.groups = [];
+        this.music_notes = null;
         
         this.move_send_interval = 1000/MOVE_UPDATE_PER_SEC;
         this.delta_last_send_move = 0;
