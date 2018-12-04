@@ -1,4 +1,4 @@
-import {FRONT, BACK, RIGHT, LEFT} from './constants.js'
+import {FRONT, BACK, RIGHT, LEFT} from '../constants.js'
 
 export class Group extends Phaser.GameObjects.Container{
     constructor(scene, muzi, kuro){

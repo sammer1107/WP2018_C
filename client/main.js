@@ -1,6 +1,6 @@
 "use strict";
-import MuziKuro from './scenes/muzikuro.js'
-import HUD from './scenes/HUD.js'
+import MuziKuro from './Scenes/muzikuro.js'
+import HUD from './Scenes/HUD.js'
 
 var config = {
     type: Phaser.AUTO, // renderer setting

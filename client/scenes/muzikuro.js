@@ -1,7 +1,8 @@
-import {LocalPlayer, RemotePlayer} from '../player.js'
-import {Group} from '../group.js'
-import {MOVE_SPEED, WALK_ANIM_DURATION, FRONT, LEFT, RIGHT, BACK, MUZI, KURO, NOTE_THRESHOLD_DIST} from '../constants.js'
-import {Note} from '../note.js'
+import {LocalPlayer, RemotePlayer} from '../GameObjects/player.js'
+import {Group} from '../GameObjects/group.js'
+import {MOVE_SPEED, WALK_ANIM_DURATION, MOVE_UPDATE_PER_SEC, 
+        FRONT, LEFT, RIGHT, BACK, MUZI, KURO, NOTE_THRESHOLD_DIST} from '../constants.js'
+import {Note} from '../GameObjects/note.js'
 import {getDirection} from '../utils.js'
 
 export default class MuziKuro extends Phaser.Scene {
@@ -12,6 +13,9 @@ export default class MuziKuro extends Phaser.Scene {
         this.local_player = null;
         this.players = null;
         this.groups = [];
+        
+        this.move_send_interval = 1000/MOVE_UPDATE_PER_SEC;
+        this.delta_last_send_move = 0;
     }
     
     preload() {
@@ -78,6 +82,7 @@ export default class MuziKuro extends Phaser.Scene {
     }
     
     update(time, delta){
+        this.delta_last_send_move += delta;
         if(this.local_player && this.local_player.role == 'Kuro' && this.local_player.in_game ){
 
             if(this.input.mousePointer.isDown){
@@ -87,11 +92,8 @@ export default class MuziKuro extends Phaser.Scene {
             if(this.local_player.group.walking){
                 // stop smovement when kuro reached pointer movement's destination
                 let pos = this.local_player.getPosition();
-                this.game.socket.emit("playerMove", { pos: pos,
-                                                      vect: { x: this.local_player.pointerVect.x,
-                                                              y: this.local_player.pointerVect.y, }});
                 let dest_vec = new Phaser.Math.Vector2(this.local_player.pointerDest).subtract(pos);
-                if( this.local_player.pointerVect.dot(dest_vec) <= 0){
+                if( this.local_player.pointerVect.dot(dest_vec) <= 0){ // reached destination
                     let partner = this.players.get(this.local_player.partner_id);
                     
                     this.local_player.group.body.velocity.set(0,0);
@@ -101,6 +103,12 @@ export default class MuziKuro extends Phaser.Scene {
                     this.local_player.pointerDest = null;
                     this.local_player.group.walking = false;
                     this.local_player.group.stopWalkAnimation();
+                }else if(this.delta_last_send_move > this.move_send_interval){ // keep moving
+                    console.log("send move", this.delta_last_send_move)
+                    this.delta_last_send_move = 0;
+                    this.game.socket.emit("playerMove", { pos: pos,
+                                                          vect: { x: this.local_player.pointerVect.x,
+                                                                  y: this.local_player.pointerVect.y, }});
                 }
             }
             
@@ -212,7 +220,7 @@ export default class MuziKuro extends Phaser.Scene {
             }
             this.events.emit('playerStateChange');
         }
-        if(data[1] == null){
+        else{
             updated.group.destroy();
             this.groups = this.groups.filter(g => !(g === g));
             this.events.emit('playerStateChange');

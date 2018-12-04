@@ -1,4 +1,4 @@
-import {FRONT, LEFT, RIGHT, BACK} from './constants.js'
+import {FRONT, LEFT, RIGHT, BACK} from '../constants.js'
 
 class Player extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, init_x, init_y, name, id, role, partner_id){
