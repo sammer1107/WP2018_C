@@ -2,7 +2,7 @@ export default class HUD extends Phaser.Scene {
   
     constructor()
     {
-        super({ key: 'HUD', active: true });
+        super({ key: 'HUD', active: false });
     }
 
     create()
@@ -28,9 +28,9 @@ export default class HUD extends Phaser.Scene {
             ULposX = ULposX + ULspacing;
         
         //first row : playerInfo
-        var playerName = this.add.text(ULposX, ULposY, '', {fontSize: sNumber/25, fill: '#00bb00'});
+        var playerName = this.add.text(ULposX, ULposY, '', {fontSize: sNumber/25, fill: '#ffffff'});
             ULposX = ULposX + sNumber/5 + ULspacing;
-        var partnerName = this.add.text(ULposX, ULposY, '', {fontSize: sNumber/25, fill: '#93ff93'});
+        var partnerName = this.add.text(ULposX, ULposY, '', {fontSize: sNumber/25, fill: '#999999'});
             ULposX = ULinitX + ULspacing;
             ULposY = ULposY + winH/16;
             
@@ -78,7 +78,7 @@ export default class HUD extends Phaser.Scene {
             URposY = URposY + lCtext.height + 2*URspacing;
             
         for (var i=0; i<4; i++){
-            groupContainer.fillStyle(0x00ffff, 0.5);
+            groupContainer.fillStyle(0x111111, 0.5);
             groupContainer.fillRoundedRect(URposX, URposY, lCwidth-2*URspacing, lCheight/5, winH/80);
             URposY = URposY + lCheight/5 + URspacing;
         }

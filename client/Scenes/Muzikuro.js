@@ -164,11 +164,11 @@ export default class MuziKuro extends Phaser.Scene {
                             if(note.melody[this.on_beats_index] == note_name) {
                                 this.tweens.add({
                                     targets: note,
-                                    props: { scaleX: 0.65, scaleY: 0.65 },
+                                    props: { scaleX: 0.7, scaleY: 0.7, angle: (Math.random()-0.5)*40 },
                                     yoyo: true,
                                     repeat: 0,
-                                    duration: 100,
-                                    ease: t => Math.sin(Math.PI*(t-0.5))/2 + 0.5,
+                                    duration: 150,
+                                    ease: "Sine",
                                 });
                             }
                         }
@@ -181,11 +181,11 @@ export default class MuziKuro extends Phaser.Scene {
     }
     
     onSocketDisconnected(){
+        this.groups.forEach((group)=>{group.destroy()})
         this.players.forEach(function(elem){
             elem.destroy() 
         });
         this.players.clear();
-        this.groups.forEach((group)=>{group.destroy()})
         this.physics.pause();
     }
     
@@ -246,7 +246,7 @@ export default class MuziKuro extends Phaser.Scene {
             this.events.emit('groupStateChange');
         }
         else{
-            this.groups = this.groups.filter(g => !(g == updated.group));
+            this.groups = this.groups.filter( g => g !== updated.group );
             updated.group.destroy();
             this.events.emit('playerStateChange');
             this.events.emit('groupStateChange');
