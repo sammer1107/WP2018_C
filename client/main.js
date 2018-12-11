@@ -11,7 +11,7 @@ var config = {
         default: 'arcade',
         arcade: {debug: false}
     },
-    scene: [MuziKuro, HUD],
+    scene: [MuziKuro],
 };
 
 

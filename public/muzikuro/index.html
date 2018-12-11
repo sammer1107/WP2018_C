@@ -4,6 +4,7 @@
         <meta charset="utf-8">
         <link href="https://fonts.googleapis.com/css?family=Kosugi+Maru|Varela+Round" rel="stylesheet"> 
         <link rel="stylesheet" type="text/css" href="index.css">
+        <link rel="stylesheet" type="text/css" href="HUD.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
         <script src="/socket.io/socket.io.js"></script>
         <script src="/lib/phaser.js"></script>
@@ -21,6 +22,59 @@
             </div>
         </div>
         <div id="game-container">
+        </div>
+        <div id="hud">
+            <div id="playerInfo">
+                <div id="player">
+                    <div class="imageContainer">
+                        <div class="playerRoleImage"></div>
+                    </div>
+                    <div class="nameContainer">
+                        <p id="playerName"></p>
+                    </div>
+                </div>
+                <div id="partner">
+                    <div class="imageContainer">
+                        <div class="playerRoleImage"></div>
+                    </div>
+                    <div class="nameContainer">
+                        <p id="partnerName"></p>
+                    </div>
+                </div>
+                <div id="scorebar">
+                </div>
+            </div>
+            <div id="leaderBoard">
+                <h2>LEADERBOARD</h2>
+                <div id="groupsContainer">
+                    <!--<div class="group">
+                        <div id="groupInfo">
+                            <div id="rank">
+                            </div>
+                            <div id="playerInfo">
+                                <div id="player">
+                                    <div class="imageContainer">
+                                        <div class="playerRoleImage"></div>
+                                    </div>
+                                    <div class="nameContainer">
+                                        <p id="playerName"></p>
+                                    </div>
+                                </div>
+                                <div id="player">
+                                    <div class="imageContainer">
+                                        <div class="playerRoleImage"></div>
+                                    </div>
+                                    <div class="nameContainer">
+                                        <p id="playerName"></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="score">
+                            </div>
+                        </div>
+                    </div>-->
+                </div>
+            </div>
         </div>
     </body>
     <script src="/client/main.js" type="module"></script>

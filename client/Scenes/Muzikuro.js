@@ -4,6 +4,7 @@ import {MOVE_SPEED, WALK_ANIM_DURATION, MOVE_UPDATE_PER_SEC,
         FRONT, LEFT, RIGHT, BACK, MUZI, KURO, NOTE_THRESHOLD_DIST} from '../constants.js'
 import {Note} from '../GameObjects/Note.js'
 import {getDirection} from '../utils.js'
+import {HUD} from '../HUD.js'
 
 export default class MuziKuro extends Phaser.Scene {
     constructor(){
@@ -13,6 +14,8 @@ export default class MuziKuro extends Phaser.Scene {
         this.local_player = null;
         this.players = null;
         this.groups = [];
+        /*this.groups.$item;*/
+        this.hud = new HUD();
         this.music_notes = null;
         
         this.move_send_interval = 1000/MOVE_UPDATE_PER_SEC;
@@ -83,6 +86,9 @@ export default class MuziKuro extends Phaser.Scene {
             frames: this.anims.generateFrameNames('character', {prefix: 'back_walk_Muzi_', end:5}),
             repeat: -1,
             duration: WALK_ANIM_DURATION});
+            
+        //leaderBoard controll
+        var keyTAB = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.TAB);
 
         console.log("muzikuro: ", this)
     }
@@ -177,7 +183,8 @@ export default class MuziKuro extends Phaser.Scene {
             })
         }
         
-        this.events.emit('playerStateChange');
+        console.log(this.local_player);
+        this.hud.UpdatePlayerState(this.players, this.local_player);
     }
     
     onSocketDisconnected(){
@@ -212,6 +219,7 @@ export default class MuziKuro extends Phaser.Scene {
                 group.setDepth(1);
             }
         }
+        this.hud.resetBoard(this.groups);
     }
 
     onUpdatePartner(data){
@@ -242,17 +250,15 @@ export default class MuziKuro extends Phaser.Scene {
                     }, null, this)
                 }
             }
-            this.events.emit('playerStateChange');
-            this.events.emit('groupStateChange');
         }
         else{
-            this.groups = this.groups.filter( g => g !== updated.group );
+            this.groups = this.groups.filter( g => !(g== updated.group) );
             updated.group.destroy();
-            this.events.emit('playerStateChange');
-            this.events.emit('groupStateChange');
         }
         
         console.log("groups: ", this.groups)
+        this.hud.resetBoard(this.groups);
+        this.hud.UpdatePlayerState(this.players, this.local_player);
     }
 
     onNotesUpdate(data) {
