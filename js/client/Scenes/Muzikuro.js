@@ -13,7 +13,6 @@ export default class MuziKuro extends Phaser.Scene {
         this.local_player = null;
         this.players = new Map();
         this.groups = [];
-        /*this.groups.$item;*/
         this.hud = new HUD();
         this.music_notes = null;
         this.on_beats_user = false;
