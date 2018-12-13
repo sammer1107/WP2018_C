@@ -2,7 +2,7 @@ import {FRONT, LEFT, RIGHT, BACK} from '../constants.js'
 
 class Player extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, init_x, init_y, name, id, role, partner_id){
-        console.log("create player: ", id)
+        console.log(`Created ${new.target.name}: ${name}(${role})`);
         super(scene, init_x, init_y, 'character');
         this.name = name;
         this.role = role;
@@ -33,7 +33,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 export class RemotePlayer extends Player{
     constructor(scene, init_x, init_y, name, id, role, partner_id){
         super(scene, init_x, init_y, name, id, role, partner_id)
-    }    
+    }
 }
 
 export class LocalPlayer extends Player{

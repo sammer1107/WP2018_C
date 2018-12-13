@@ -182,7 +182,7 @@ export default class HUD extends Phaser.Scene {
                 groupFourMuzi.setFill('#000000');
                 groupFourKuro.setFill('#000000');
             }
-            console.log(muzikuro.groups);
+            //console.log(muzikuro.groups);
         })
         //Upper right corner part end
         
