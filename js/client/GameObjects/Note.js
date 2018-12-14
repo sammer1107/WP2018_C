@@ -15,7 +15,7 @@ export class Note extends Phaser.Physics.Arcade.Sprite {
             sound.beOcupied = false;
             Note.soundPool.push(sound);
         }
-        console.log(Note.soundPool);
+        //console.log(Note.soundPool);
     }
     static getSoundFromPool() {
         for(let sound of Note.soundPool) {
