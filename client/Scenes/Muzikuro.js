@@ -87,8 +87,6 @@ export default class MuziKuro extends Phaser.Scene {
             repeat: -1,
             duration: WALK_ANIM_DURATION});
             
-        //leaderBoard controll
-        var keyTAB = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.TAB);
 
         console.log("muzikuro: ", this)
     }
@@ -123,6 +121,14 @@ export default class MuziKuro extends Phaser.Scene {
                 }
             }
             
+        }
+        
+        var keyQ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
+        if(Phaser.Input.Keyboard.JustDown(keyQ)) {
+            this.hud.showLeaderBoard();
+        }
+        if(Phaser.Input.Keyboard.JustUp(keyQ)) {
+            this.hud.hideLeaderBoard();
         }
         
         this.players.forEach(function(player){
@@ -183,6 +189,7 @@ export default class MuziKuro extends Phaser.Scene {
             })
         }
         
+
         console.log(this.local_player);
         this.hud.UpdatePlayerState(this.players, this.local_player);
     }
@@ -218,8 +225,8 @@ export default class MuziKuro extends Phaser.Scene {
                 this.cameras.main.setLerp(0.15,0.15);
                 group.setDepth(1);
             }
+            this.hud.resetBoard(this.groups);
         }
-        this.hud.resetBoard(this.groups);
     }
 
     onUpdatePartner(data){
@@ -256,9 +263,12 @@ export default class MuziKuro extends Phaser.Scene {
             updated.group.destroy();
         }
         
+        setTimeout(() => {
+            this.hud.resetBoard(this.groups);
+            this.hud.UpdatePlayerState(this.players, this.local_player);
+        }, 1000);
+        
         console.log("groups: ", this.groups)
-        this.hud.resetBoard(this.groups);
-        this.hud.UpdatePlayerState(this.players, this.local_player);
     }
 
     onNotesUpdate(data) {

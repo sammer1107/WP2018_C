@@ -3,65 +3,62 @@ export class HUD {
     UpdatePlayerState(players, local_player){
         
         if(local_player.id){
-            $("#hud #player #playerName").html( local_player.name );
+            $("#game-container .local_playerName").html( local_player.name );
             /*if(local_player.role == 'MUZI'){
-                $("#hud #player .playerRoleImage").addClass('MuziFace');
+                $("#game-container .imageContainer").addClass('MuziFace');
             } else {
-                $("#hud #player .playerRoleImage").addClass('KuroFace');
+                $("#game-container .imageContainer").addClass('KuroFace');
             }*/
         }
         if(local_player.partner_id){
-            $("#hud #partner #partnerName").html( players.get(local_player.partner_id).name );
+            $("#game-container .partnerName").html( players.get(local_player.partner_id).name );
             /*if(players[local_player.partner_id].role == 'MUZI'){
-                $("#hud #partner .playerRoleImage").addClass('MuziFace');
+                $("#game-container .imageContainer").addClass('MuziFace');
             } else {
-                $("#hud #partner .playerRoleImage").addClass('KuroFace');
+                $("#game-container .imageContainer").addClass('KuroFace');
             }*/
         } else {
-            $("#hud #partner #partnerName p").html( "No partner" );
+            $("#game-container .partnerName").html( "No partner" );
         }
         
-        $("#hud #scorebar").css("width", 50 + '%');
-        $("#hud").css("display", "block" );
+        $("#game-container #scorebar").css("width", 50 + '%');
+        $("#game-container #local_playerInfo").css("display", "block" );
         
     }
     
     resetBoard(groups) {
         //clear the groupContainer
-        $("#leaderBoard #groupsContainer").find("div.group").remove();
+        $("#leaderBoard #groupsTable").find("div.groupContainer").remove();
         
-        console.log(groups);
         //create the group div depend on group numbers
         for(var i=0; i < groups.length; i++){
-            var $item = $(
-                    "<div class='group'>" +
-                        "<div id='groupInfo'>" +
-                            "<div id='rank'>" + ( i + 1 ) + "</div>" +
-                            "<div id='playerInfo'>" +
-                                "<div id='player'>" +
-                                    "<div class='imageContainer'>" +
-                                        "<div class='playerRoleImage' class='MuziFace'></div>" +
-                                    "</div>" +
-                                    "<div class='nameContainer'>" +
-                                        "<p id='playerName'>" + groups[i].muzi.name + "</p>" +
-                                    "</div>" +
-                                "</div>" +
-                                "<div id='player'>" +
-                                    "<div class='imageContainer'>" +
-                                        "<div class='playerRoleImage' class='KuzoFace'></div>" +
-                                    "</div>" +
-                                    "<div class='nameContainer'>" +
-                                        "<p id='playerName'>" + groups[i].kuro.name + "</p>" +
-                                    "</div>" +
-                                "</div>" +
-                            "</div>" +
-                            "<div id='score'>" + groups[i].muzi.score + "</div>" +
-                        "</div>" +
-                    "</div>");
-            console.log(groups[i].muzi.name);
-            console.log(groups[i].kuro.name);
-            /*groups[i].$item = $item;*/
-            $("#leaderBoard #groupsContainer").append($item);
+            
+            var muzi = groups[i].muzi.name;
+            var kuro = groups[i].kuro.name;
+            
+            console.log(`${muzi}_${kuro}`);
+            var item = `<div class="groupContainer">
+                            <div class="group">
+                                <div class="rank"> ${i+1} </div>
+                                <div class="playerInfo">
+                                    <div class="player">
+                                        <div class="imageContainer class="MuziFace"></div>
+                                        <div class="nameContainer">
+                                            <p class="playerName"> ${muzi} </p>
+                                        </div>
+                                    </div>
+                                    <div class="player">
+                                        <div class="imageContainer" class="KuroFace"></div>
+                                        <div class="nameContainer">
+                                            <p class="playerName"> ${kuro} </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="score"> ${groups[i].muzi.score} </div>
+                            </div>
+                        </div`;
+            /*groups[i].item = item;*/
+            $("#leaderBoard #groupsTable").append($(item));
         }
     }
     
