@@ -1,6 +1,6 @@
 "use strict";
 import MuziKuro from './Scenes/Muzikuro.js'
-import HUD from './Scenes/HUD.js'
+import {HUD} from './HUD.js'
 import PreloadScene from './Scenes/PreloadScene.js'
 import {RemotePlayer, LocalPlayer} from './GameObjects/Player.js'
 
@@ -27,6 +27,7 @@ class Game extends Phaser.Game {
         this.events.once('preloadComplete', this.onPreloadComplete, this);
         this.socket.on('connect', ()=>{console.log("socket connected.")})
         this.socket.on('gameInit', this.onInit.bind(this));
+        this.hud = new HUD();
     }
     
     onPreloadComplete(){
@@ -48,6 +49,8 @@ class Game extends Phaser.Game {
                 this.scene.start('MuziKuro', data.scene_state);
                 break;
         }
+        // hud
+        this.hud.setScene(this.scene, data);
     }
 }
 

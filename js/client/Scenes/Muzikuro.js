@@ -13,7 +13,6 @@ export default class MuziKuro extends Phaser.Scene {
         this.local_player = null;
         this.players = new Map();
         this.groups = [];
-        this.hud = new HUD();
         this.music_notes = null;
         this.on_beats_user = false;
         this.on_beats_index = 0;
@@ -118,8 +117,10 @@ export default class MuziKuro extends Phaser.Scene {
 
         //leaderBoard controll
         var keyTAB = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.TAB);
-        this.hud.UpdatePlayerState(this.players, this.local_player);
-        
+        // create hud
+        this.game.hud.currentScene = this;
+        this.game.hud.UpdatePlayerState();
+        this.game.hud.resetBoard();
         // console.log("muzikuro: ", this)
     }
     
@@ -160,16 +161,15 @@ export default class MuziKuro extends Phaser.Scene {
         
         var keyQ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
         if(Phaser.Input.Keyboard.JustDown(keyQ)) {
-            this.hud.showLeaderBoard();
+            this.game.hud.showLeaderBoard();
         }
         if(Phaser.Input.Keyboard.JustUp(keyQ)) {
-            this.hud.hideLeaderBoard();
+            this.game.hud.hideLeaderBoard();
         }
         
         this.players.forEach(function(player){
             if(player.in_game) player.anims.update(time, delta);
         })
-        
     }
     
     collectMusicNote(player, music_note){
@@ -221,8 +221,9 @@ export default class MuziKuro extends Phaser.Scene {
                 this.cameras.main.setLerp(0.15,0.15);
                 group.setDepth(1);
             }
-            this.hud.resetBoard(this.groups);
+            this.game.hud.resetBoard();
         }
+        this.game.hud.UpdatePlayerState();
     }
 
     onUpdatePartner(data){
@@ -257,10 +258,8 @@ export default class MuziKuro extends Phaser.Scene {
             lonely_player.partner_id = null;
         }
         
-        setTimeout(() => {
-            this.hud.resetBoard(this.groups);
-            this.hud.UpdatePlayerState(this.players, this.local_player);
-        }, 500);
+        this.game.hud.resetBoard();
+        this.game.hud.UpdatePlayerState();
         
         //console.log("groups: ", this.groups)
     }
@@ -363,6 +362,8 @@ export default class MuziKuro extends Phaser.Scene {
             player.destroy(); 
             this.players.delete(data.id)
             console.log("deleted player: ", this.players)
+            this.game.hud.resetBoard();
+            this.game.hud.UpdatePlayerState();
         }
     }
 
