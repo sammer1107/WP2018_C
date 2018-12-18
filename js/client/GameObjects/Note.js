@@ -1,4 +1,4 @@
-export class Note extends Phaser.Physics.Arcade.Sprite {
+export default class Note extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y, melody) {
         super(scene, x, y, "music_notes", `${Math.floor(Math.random()*20)}`);
         this.melody = melody.split(" ");

@@ -1,8 +1,8 @@
 "use strict";
-import MuziKuro from './Scenes/Muzikuro.js'
-import {HUD} from './HUD.js'
 import PreloadScene from './Scenes/PreloadScene.js'
-import {RemotePlayer, LocalPlayer} from './GameObjects/Player.js'
+import LobbyScene from './Scenes/LobbyScene.js'
+import MuziKuro from './Scenes/Muzikuro.js'
+import Game from './Game.js'
 
 var config = {
     type: Phaser.AUTO, // renderer setting
@@ -13,49 +13,11 @@ var config = {
         default: 'arcade',
         arcade: {debug: false}
     },
-    scene: [PreloadScene, MuziKuro],
+    scene: [PreloadScene, LobbyScene, MuziKuro],
 };
 
-
-class Game extends Phaser.Game {
-    constructor(config){
-        super(config);
-        this.socket = io.connect();
-        this.players = new Map();
-        this.local_player = null;
-        this.preload_complete = false;
-        this.events.once('preloadComplete', this.onPreloadComplete, this);
-        this.socket.on('connect', ()=>{console.log("socket connected.")})
-        this.socket.on('gameInit', this.onInit.bind(this));
-        this.hud = new HUD();
-    }
-    
-    onPreloadComplete(){
-        console.log('preload complete.');
-        this.preload_complete = true;
-        this.scene.remove('Preload');
-    }
-    
-    onInit(data){
-        // players
-        for(let player of data.players){
-            this.players.set(player.id, player);
-        }
-        // local_player
-        this.local_player = data.local_player;
-        this.players.set(this.local_player.id, this.local_player);
-        switch(data.scene){
-            case "MuziKuro":
-                this.scene.start('MuziKuro', data.scene_state);
-                break;
-        }
-        // hud
-        this.hud.setScene(this.scene, data);
-    }
-}
-
 var game = new Game(config);
-//console.log("Game: ", game);
+console.log("Game: ", game);
 
 $("#player-name input").focus();
 $("#join-game").click( function(){

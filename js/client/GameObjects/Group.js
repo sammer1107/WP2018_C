@@ -1,6 +1,6 @@
 import {FRONT, BACK, RIGHT, LEFT} from '../constants.js'
 
-export class Group extends Phaser.GameObjects.Container{
+export default class Group extends Phaser.GameObjects.Container{
     constructor(scene, muzi, kuro){
         //console.log("create group", kuro.x, kuro.y)
         super(scene, kuro.x, kuro.y);

@@ -4,7 +4,7 @@ The constructor will be called in the game constructor
 */
 
 var Abstract = new Error("\n\t Do not call this method in BaseScene,\
-                          \n\tt his is a abstract method to be implemented by inherited Scenes.");
+                          \n\t this is a abstract method to be implemented by inherited Scenes.");
 
 
 class BaseScene{
@@ -14,10 +14,16 @@ class BaseScene{
         this.io = game.io;
     }
     
+    init(){
+        /*
+        This function is responsible for setting things up before the scene actually start.
+        */
+        throw Abstract;
+    }
+    
     start(){
         /*
-        This function should be responsible for setting up the scene
-        and get it running.
+        This function should be responsible for really get the scene start working.
         */
         throw Abstract;
     }
@@ -35,10 +41,19 @@ class BaseScene{
     
     getInitData(){
         /*
-        This function should return the necessary scene state so that 
+        This function should return the necessary scene state (does not including the players) so that 
         the client just connected can sync the game state.
         */
         throw Abstract;
+    }
+    
+    getStartData(){
+        /*
+        This function should return the data needed for the client side to start one scene.
+        Ex. regrouped players, new positions
+
+        */
+        throw Abstract
     }
 }
 

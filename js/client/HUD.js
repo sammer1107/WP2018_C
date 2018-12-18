@@ -1,17 +1,17 @@
-export class HUD {
+export default class HUD {
     
     constructor() {
         this.currentScene = null;
     }
     
-    setScene(SceneManager, sceneData) {
-        this.currentScene = SceneManager.keys[sceneData.scene];
+    bind(scene) {
+        this.currentScene = scene;
         /*console.log(sceneData.local_player);
         console.log(this.currentScene);
         console.log(this.currentScene.local_player);*/
     }
   
-    UpdatePlayerState(){
+    updatePlayerState(){
         if(this.currentScene){
             /*console.log(this.currentScene);*/
             if(this.currentScene.local_player.id){
@@ -49,7 +49,7 @@ export class HUD {
                 var muzi = this.currentScene.groups[i].muzi.name;
                 var kuro = this.currentScene.groups[i].kuro.name;
                 
-                console.log(`${muzi}_${kuro}`);
+                //console.log(`${muzi}_${kuro}`);
                 var item = `<div class="groupContainer">
                                 <div class="group">
                                     <div class="rank"> ${i+1} </div>

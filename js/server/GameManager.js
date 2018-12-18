@@ -3,12 +3,13 @@ This is the GameManager class definition
 GameManager is responsible for holding a global game state(players, current scene)
 and make transition between game scenes.
 */
+
 var constants = require('./constants');
 var MUZI = constants.MUZI;
 var KURO = constants.KURO;
-var randint = require('../shared/utils').randint;
 var Players = require('./Players');
 var Player = Players.Player;
+
 
 class GameManager{
     constructor(io){
@@ -20,48 +21,22 @@ class GameManager{
     
     start(){
         this.io.sockets.on('connection', function(socket){
-            console.log(`socket ID: ${socket.id} connected.`);
+            Log(`socket ID: ${socket.id} connected.`);
             //console.log(socket.request.connection.remoteAddress);
             this.bindSocket(socket, "login");
             this.bindSocket(socket, "disconnect");
             this.bindSocket(socket, "playerMove");
             // other events will be handled in the scene level
         }.bind(this));
-        this.startScene("MuziKuro");
+        this.startScene("Lobby");
     }
     
     onLogin(socket, data){
-        var new_player, lonely_player, init_x, init_y, partner_config={};
-        new_player = new Player(data.name, socket.id);
-
-        // pair player
-        for(let player of this.players.values()){
-            if(player.partner_id == null){
-                lonely_player = player;
-                // decide player role
-                let roles = [MUZI, KURO];
-                let rand = randint(0,1);
-                lonely_player.role = roles[rand];
-                new_player.role = roles[1-rand];
-                new_player.partner_id = lonely_player.id;
-                lonely_player.partner_id = new_player.id;
-                partner_config[lonely_player.role] = lonely_player.id;
-                partner_config[new_player.role] = new_player.id;
-                break;
-            }
-        }
+        var new_player = new Player(data.name, socket.id);
         
-        init_x = randint(2525+100, 2525-100);
-        init_y = randint(2525+100, 2525-100);
-        new_player.setPosition(init_x, init_y);
-        socket.broadcast.emit("newPlayer", new_player);
-        if(lonely_player){
-            lonely_player.setPosition(init_x, init_y);
-            socket.broadcast.emit("updatePartner", partner_config);
+        if(this.current_scene.onLogin){
+            this.current_scene.onLogin(socket, new_player);
         }
-        
-        console.log(`Created new player: name:${new_player.name}, role:${new_player.role}, partner:${lonely_player ? lonely_player.name : null}`);
-
         
         socket.emit("gameInit",{
             scene: this.current_scene.key,
@@ -71,10 +46,11 @@ class GameManager{
         })
 
         this.players.add(new_player);
+
     }
         
     onDisconnect(socket){
-        console.log(`socket ID: ${socket.id} disconnected.`);
+        Log(`socket ID: ${socket.id} disconnected.`);
         if(!this.players.has(socket.id)) return; // player disconnected before creating a player
         
         var lonely_player;
@@ -87,7 +63,7 @@ class GameManager{
         }
         if(lonely_player){
             lonely_player.partner_id = null;
-            console.log(`${lonely_player.name} is now lonely.`)
+            Log(`${lonely_player.name} is now lonely.`)
             socket.broadcast.emit("updatePartner", {lonely: lonely_player.id});
         }
             
@@ -99,7 +75,7 @@ class GameManager{
     onPlayerMove(socket, data){
         var player = this.players.get(socket.id);
             
-        if(!player){
+        if(!player || player.role == MUZI){
             return;
         }
         var partner = this.players.get(player.partner_id);
@@ -116,10 +92,14 @@ class GameManager{
     }
     
     startScene(key){
-        if(this.current_scene){
-            this.current_scene.stop();
-        }
+        Log(`Starting scene: ${key}`);
         var next = this.scenes.get(key);
+        next.init();
+        this.io.emit('sceneTransition', {
+            scene: next.key,
+            scene_data: next.getStartData(),
+            players: [...this.players.values()],
+        });
         next.start();
         this.current_scene = next;
     }
@@ -134,6 +114,8 @@ class GameManager{
         socket.on(event, this[func].bind(this, socket));
     }
 }
+
+var Log = require('./utils').log_func(GameManager)
 
 module.exports = function(io){
     return new GameManager(io);

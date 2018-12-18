@@ -1,5 +1,5 @@
 var BaseScene = require('./BaseScene');
-var randint = require('../../shared/utils').randint;
+var randint = require('../utils').randint;
 
 const Melody = ['C D E G', 'A E G A', 'G A G F', 'D C E C', 'C C G G', 'F E D C', 'C D E C', 'B G A G'];
 
@@ -11,8 +11,8 @@ function Note(note_id, x, y, melody) {
 }
 
 class MuziKuro extends BaseScene{
-    constructor(game){
-        super(game, "MuziKuro");
+    constructor(GameManager){
+        super(GameManager, "MuziKuro");
         this.notes = {
             list: {},
             num: 0,
@@ -33,6 +33,23 @@ class MuziKuro extends BaseScene{
                 delete this.list[id];
             }
         };
+    }
+    
+    init(){
+        var init = {};
+        for(let key of this.game.players.keys()){
+            if(init[key] == true){
+                continue;
+            }
+            let init_x, init_y, player, partner;
+            player = this.game.players.get(key);
+            partner = this.game.players.get(player.partner_id);
+            [init_x, init_y] = this.getRandomSpawnPoint();
+            player.setPosition(init_x, init_y);
+            partner.setPosition(init_x, init_y);
+            init[player.id] = true;
+            init[partner.id] = true;
+        }
     }
     
     start(){
@@ -59,6 +76,10 @@ class MuziKuro extends BaseScene{
         };
     }
     
+    getStartData(){
+        return null;
+    }
+    
     notesUpdate() {
         let new_notes_tmp = [];
         while(this.notes.num < this.notes.MAX_NOTES) {
@@ -67,6 +88,10 @@ class MuziKuro extends BaseScene{
             //console.log(`New Note at (${tmp.x}, ${tmp.y})`);
         }
         return new_notes_tmp;
+    }
+    
+    getRandomSpawnPoint(){
+        return [randint(2525+100, 2525-100), randint(2525+100, 2525-100)];
     }
 }
 

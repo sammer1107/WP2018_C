@@ -5,27 +5,13 @@ var KURO = constants.KURO;
 exports.PlayerList = class PlayerList extends Map{
     constructor(){
         super();
-        this.num_muzi= 0;
-        this.num_kuro= 0;
     }
     
     add(player){
         this.set(player.id, player);
-        if(player.role == MUZI){
-            this.num_muzi += 1;
-        }
-        else{
-            this.num_kuro += 1;
-        }
     }
     
     removeById(del_id){
-        if(this.get(del_id).role == MUZI){
-            this.num_muzi -= 1;
-        }
-        else{
-            this.num_kuro -= 1;
-        }
         this.delete(del_id);
     }
 }
