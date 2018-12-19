@@ -17,15 +17,15 @@ var config = {
     scene: [PreloadScene, LobbyScene, MuziKuro],
 };
 
-var game = new Game(config);
-//console.log("Game: ", game);
+var game;
 
 $("#player-name input").focus();
 $("#join-game").click( function(){
+    game = new Game(config);
+    console.log("Game: ", game);
+    game.sound.context.resume().then(()=>{console.log("Sound on.")});
     var name = $("#player-name input").val().substring(0,20);
     var login = function(){
-        var context = new AudioContext();
-        context.resume();
         $("#login").animate({bottom: "100vh"}, { complete: ()=> $("#login").css("display", "none") });
         game.socket.emit("login", { name: name });
     };

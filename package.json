@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "start": "webpack --config webpack.prod.js && node server.js",
-    "start-dev": "nodemon -w server.js -w js/server -w js/shared server.js",
+    "start-dev": "webpack --config webpack.dev.js && nodemon -w server.js -w js/server -w js/shared server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack --config webpack.prod.js"
   },
