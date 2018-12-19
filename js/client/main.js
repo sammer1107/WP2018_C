@@ -1,4 +1,5 @@
 "use strict";
+//import Phaser from './lib/phaser.js'
 import PreloadScene from './Scenes/PreloadScene.js'
 import LobbyScene from './Scenes/LobbyScene.js'
 import MuziKuro from './Scenes/Muzikuro.js'
@@ -17,12 +18,14 @@ var config = {
 };
 
 var game = new Game(config);
-console.log("Game: ", game);
+//console.log("Game: ", game);
 
 $("#player-name input").focus();
 $("#join-game").click( function(){
     var name = $("#player-name input").val().substring(0,20);
     var login = function(){
+        var context = new AudioContext();
+        context.resume();
         $("#login").animate({bottom: "100vh"}, { complete: ()=> $("#login").css("display", "none") });
         game.socket.emit("login", { name: name });
     };

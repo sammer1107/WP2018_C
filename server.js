@@ -5,7 +5,7 @@ var server = require('http').Server(app);
 const port = process.env.PORT || 11070;
 
 app.use(express.static(__dirname + '/public'));
-app.use('/client', express.static(__dirname + '/js/client'));
+app.use('/client', express.static(__dirname + '/js/dist'));
 app.use('/lib', express.static(__dirname + '/js/client/lib'))
 app.use('/assets', express.static(__dirname + '/assets'));
 app.get('/', function(req, res){
