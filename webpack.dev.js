@@ -24,14 +24,6 @@ module.exports = {
         ]
     },
     optimization: {
-        splitChunks: {
-            cacheGroups: {
-                phaser: {
-                    test: /phaser.js/,
-                    name: 'phaser',
-                    chunks: 'all'
-                }
-            }
-        }
+        minimize: false
     }
 };

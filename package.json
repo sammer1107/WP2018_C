@@ -6,9 +6,10 @@
   "private": true,
   "scripts": {
     "start": "webpack --config webpack.prod.js && node server.js",
-    "start-dev": "webpack --config webpack.dev.js && nodemon -w server.js -w js/server -w js/shared server.js",
+    "start-dev": "webpack --config webpack.dev.js && nodemon",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack --config webpack.prod.js"
+    "build:prod": "webpack --config webpack.prod.js",
+    "build:dev": "webpack --config webpack.dev.js"
   },
   "repository": {
     "type": "git",

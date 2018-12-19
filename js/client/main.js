@@ -21,9 +21,6 @@ var game;
 
 $("#player-name input").focus();
 $("#join-game").click( function(){
-    game = new Game(config);
-    console.log("Game: ", game);
-    game.sound.context.resume().then(()=>{console.log("Sound on.")});
     var name = $("#player-name input").val().substring(0,20);
     var login = function(){
         $("#login").animate({bottom: "100vh"}, { complete: ()=> $("#login").css("display", "none") });
@@ -31,6 +28,10 @@ $("#join-game").click( function(){
     };
     
     if(name){
+        game = new Game(config);
+        //console.log("Game: ", game);
+        game.sound.context.resume().then(()=>{console.log("Sound on.")});
+        
         $("#join-game").off('click');
         if(game.preload_complete){
             login();
