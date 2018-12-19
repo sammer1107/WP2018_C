@@ -7,6 +7,7 @@ and make transition between game scenes.
 var constants = require('./constants');
 var MUZI = constants.MUZI;
 var KURO = constants.KURO;
+var escapeHTML = require('./utils').escapeHTML;
 var Players = require('./Players');
 var Player = Players.Player;
 
@@ -32,7 +33,8 @@ class GameManager{
     }
     
     onLogin(socket, data){
-        var new_player = new Player(data.name, socket.id);
+        var name = escapeHTML(data.name);
+        var new_player = new Player(name, socket.id);
         
         if(this.current_scene.onLogin){
             this.current_scene.onLogin(socket, new_player);
