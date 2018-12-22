@@ -1,6 +1,19 @@
 var express = require("express");
 var app = express();
-var server = require('http').Server(app);
+var server;
+if(process.env.npm_config_usehttps) {
+   console.log('Using https for server');
+   var fs = require("fs");
+   var options = {
+      key: fs.readFileSync('/home/wp2018/ssl/private.key'),
+      cert: fs.readFileSync('/home/wp2018/ssl/certificate.crt')
+    };
+   server = require("https").createServer(options, app);
+}
+else {
+   console.log('Using http for server');
+   server = require("http").Server(app);
+}
 
 const port = process.env.PORT || 11070;
 
