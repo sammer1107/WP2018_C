@@ -5,8 +5,8 @@
   "main": "server.js",
   "private": true,
   "scripts": {
-    "start": "webpack --config webpack.prod.js && node server.js",
-    "start-dev": "webpack --config webpack.dev.js && nodemon",
+    "start": "set NODE_ENV=production&& node server.js",
+    "start-dev": "set NODE_ENV=development&& nodemon server.js -w js/server -w server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build:prod": "webpack --config webpack.prod.js",
     "build:dev": "webpack --config webpack.dev.js"
@@ -32,6 +32,7 @@
     "babel-loader": "^8.0.4",
     "uglifyjs-webpack-plugin": "^2.0.1",
     "webpack": "^4.27.1",
-    "webpack-cli": "^3.1.2"
+    "webpack-cli": "^3.1.2",
+    "webpack-dev-middleware": "^3.4.0"
   }
 }

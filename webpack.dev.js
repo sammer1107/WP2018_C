@@ -1,9 +1,8 @@
 const path = require('path');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 module.exports = {
     entry: ['babel-polyfill', './js/client/main.js'],
-    mode: 'production',
+    mode: 'development',
     output: {
         filename: '[name].js',
         path: path.resolve(__dirname, 'js/dist')
@@ -25,5 +24,9 @@ module.exports = {
     },
     optimization: {
         minimize: false
+    },
+    watch: true,
+    watchOptions:{
+        ignored: /node_modules/
     }
 };
