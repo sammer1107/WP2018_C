@@ -2,6 +2,8 @@ var BaseScene = require('./BaseScene');
 var randint = require('../utils').randint;
 
 const Melody = ['C D E G', 'A E G A', 'G A G F', 'D C E C', 'C C G G', 'F E D C', 'C D E C', 'B G A G'];
+const GAME_DURATION = 5*60*1000;
+const CHECK_INTERVAL = 10*1000;
 
 function Note(note_id, x, y, melody) {
     this.x = x;
@@ -33,6 +35,8 @@ class MuziKuro extends BaseScene{
                 delete this.list[id];
             }
         };
+        this.timer=0;
+        this.check_interval;
     }
     
     init(){
@@ -54,7 +58,7 @@ class MuziKuro extends BaseScene{
     
     start(){
         this.noteLasting = 60/115*1000; // the drumbeat is 115 BPM
-            
+        
         this.notesUpdate();
         this.noteUpdater = setInterval(() => {
             this.io.emit("notesUpdate", this.notesUpdate());
@@ -63,11 +67,21 @@ class MuziKuro extends BaseScene{
         this.tempo = setInterval(() => {
             this.io.emit("tempoMeasurePast", this.noteLasting);
         }, this.noteLasting*8); //=noteLasting*4 *2(pause for 4 notes)
+        
+        this.check_interval = setInterval(()=>{
+            this.timer += CHECK_INTERVAL;
+            if( this.timer >= GAME_DURATION ){
+                this.stop();
+                this.game.startScene("Lobby");
+            }
+        }, CHECK_INTERVAL);
     }
     
     stop(){
         clearInterval(this.noteUpdater);
         clearInterval(this.tempo);
+        clearInterval(this.check_interval);
+        return;
     }
     
     getInitData(){

@@ -16,17 +16,46 @@ class LobbyScene extends BaseScene{
     }
     
     init(){
+        //regroup players and give them initial position here 重新分組與配對(第一場玩muzi的第二場也能玩muzi) 沒配到的玩家資料要設為NULL
         var players = this.game.players;
-        /*
-        TODO: regroup players and give them initial position here
-        */
+        var player_id = [];
+        var init_x, init_y;
+        for(let player of players.values()){
+            let id = player.id;
+            players.get(id).role = null;
+            players.get(id).partner_id = null;
+            player_id.push(id);
+        }
+        if( player_id[0] ){
+            //shuffle the player_id array
+            for (let i = player_id.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [player_id[i], player_id[j]] = [player_id[j], player_id[i]];
+            }
+            for(let i=0; i<player_id.length; i+=2){
+                if( i+1 == player_id.length ){ //if player number is odd. make him lonely.
+                    break;
+                } else {
+                    [init_x, init_y] = this.getRandomSpawnPoint();
+                    players.get(player_id[i]).role = "Muzi";
+                    players.get(player_id[i+1]).role = "Kuro";
+                    players.get(player_id[i]).partner_id = player_id[i+1];
+                    players.get(player_id[i+1]).partner_id = player_id[i];
+                    Log(players.get(player_id[i]).partner_id);
+                    Log(players.get(player_id[i+1]).partner_id);
+                    players.get(player_id[i]).setPosition(init_x, init_y);
+                    players.get(player_id[i+1]).setPosition(init_x, init_y);
+                }
+            } 
+        }
+
     }
     
     start(){
         
         this.check_interval = setInterval(()=>{ // check for early start
             // if paired player > MAX_PLAYERS
-            this.time += CHECK_INTERVAL;
+            this.timer += CHECK_INTERVAL;
             var num_player = this.game.players.size;
             if(num_player >= MAX_PLAYERS || (this.timer >= LOBBY_WAIT_TIME && num_player >= 2 )){
                 this.stop();
