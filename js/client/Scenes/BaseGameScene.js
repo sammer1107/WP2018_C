@@ -114,7 +114,7 @@ export default class BaseGameScene extends Phaser.Scene{
         var group = this.players.get(data.id).group;
         if(!group){
             console.warn(`Player ${data.id}(${this.players.get(data.id).name}) moved while not grouped.`)
-            console.log(this.players.get(data.id))
+            //console.log(this.players.get(data.id))
             return;
         }
         group.x = data.pos.x;
@@ -144,7 +144,7 @@ export default class BaseGameScene extends Phaser.Scene{
             let player = this.players.get(data.id);
             player.destroy(); 
             this.players.delete(data.id)
-            console.log("deleted player: ", this.players)
+            //console.log("deleted player: ", this.players)
             this.game.hud.resetBoard();
             this.game.hud.updatePlayerState();
         }

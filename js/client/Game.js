@@ -1,3 +1,4 @@
+import io from 'socket.io-client'
 import HUD from './HUD.js'
 import {RemotePlayer, LocalPlayer} from './GameObjects/Player.js'
 

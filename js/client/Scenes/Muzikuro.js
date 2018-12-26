@@ -75,7 +75,7 @@ export default class MuziKuro extends BaseGameScene {
         this.game.hud.bind(this);
         this.game.hud.updatePlayerState();
         this.game.hud.resetBoard();
-        console.log("muzikuro: ", this)
+        //console.log("muzikuro: ", this)
     }
     
     update(time, delta){
@@ -92,7 +92,7 @@ export default class MuziKuro extends BaseGameScene {
     }
     
     onUpdatePartner(data){
-        console.log(`updatePartner: `, data);
+        //console.log(`updatePartner: `, data);
         
         let lonely_player = this.players.get(data.lonely);
         this.groups = this.groups.filter( g => g !== lonely_player.group );

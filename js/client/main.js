@@ -1,4 +1,5 @@
 "use strict";
+//import Phaser from './lib/phaser.js'
 import PreloadScene from './Scenes/PreloadScene.js'
 import LobbyScene from './Scenes/LobbyScene.js'
 import MuziKuro from './Scenes/Muzikuro.js'
@@ -16,8 +17,7 @@ var config = {
     scene: [PreloadScene, LobbyScene, MuziKuro],
 };
 
-var game = new Game(config);
-console.log("Game: ", game);
+var game;
 
 $("#player-name input").focus();
 $("#join-game").click( function(){
@@ -28,6 +28,10 @@ $("#join-game").click( function(){
     };
     
     if(name){
+        game = new Game(config);
+        //console.log("Game: ", game);
+        game.sound.context.resume().then(()=>{console.log("Sound on.")});
+        
         $("#join-game").off('click');
         if(game.preload_complete){
             login();

@@ -11,7 +11,6 @@ var escapeHTML = require('./utils').escapeHTML;
 var Players = require('./Players');
 var Player = Players.Player;
 
-
 class GameManager{
     constructor(io){
         this.io = io;
