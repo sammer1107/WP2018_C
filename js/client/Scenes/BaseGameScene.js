@@ -16,10 +16,18 @@ export default class BaseGameScene extends Phaser.Scene{
         this.players = new Map();
         this.groups = [];
         this.delta_last_send_move = 0;
+        this.callbacks = new Map();
     }
     
+    init(){
+        this.local_player = null;
+        this.players = new Map();
+        this.groups = [];
+        this.delta_last_send_move = 0;
+        this.callbacks = new Map();
+    }
     
-    onSocketDisconnected(){
+    onDisconnect(){
         /*
         this.groups.forEach((group)=>{group.destroy()})
         this.players.forEach(function(elem){
@@ -58,14 +66,17 @@ export default class BaseGameScene extends Phaser.Scene{
             if(this.local_player.role == KURO){
                 this.input.on('pointerdown', this.moveToPointer, this);
             }
+            this.physics.add.collider(this.local_player.group, this.layer_wall)
         }
         
     }
     
     update(time, delta){
         var pointer = this.input.activePointer;
+        var player = this.local_player;
         this.delta_last_send_move += delta;
-        if(this.local_player && this.local_player.role == 'Kuro' && this.local_player.in_game ){
+        
+        if(player && player.role == 'Kuro' && player.in_game ){
             
             if(pointer.isDown && (time - pointer.downTime > 250)){
                 if( Math.pow( Math.pow(pointer.x/this.cameras.main.height-0.5, 2) + Math.pow(pointer.y/this.cameras.main.height-0.5, 2), 0.5) > 0.1){
@@ -73,24 +84,24 @@ export default class BaseGameScene extends Phaser.Scene{
                  }
             }
             
-            if(this.local_player.group.walking){
+            if(player.group.walking){
                 // stop smovement when kuro reached pointer movement's destination
-                let pos = this.local_player.getPosition();
-                let dest_vec = new Phaser.Math.Vector2(this.local_player.pointerDest).subtract(pos);
-                if( this.local_player.pointerVect.dot(dest_vec) <= 0){ // reached destination
-                    let partner = this.players.get(this.local_player.partner_id);
+                let pos = player.getPosition();
+                let dest_vec = new Phaser.Math.Vector2(player.pointerDest).subtract(pos);
+                if( dest_vec.dot(player.group.body.velocity) <= 0 || player.group.body.velocity.length() == 0){
+                    // reached destination or hit the wall
                     
-                    this.local_player.group.body.velocity.set(0,0);
+                    player.group.body.velocity.set(0,0);
                     this.game.socket.emit("playerMove", { pos: pos,
                                                           v: {x:0, y:0}})
                     
-                    this.local_player.pointerDest = null;
-                    this.local_player.group.walking = false;
-                    this.local_player.group.stopWalkAnimation();
+                    player.pointerDest = null;
+                    player.group.walking = false;
+                    player.group.stopWalkAnimation();
                 }else if(this.delta_last_send_move > MOVE_SEND_INTERVAL){ // keep moving
                     this.game.socket.emit("playerMove", { pos: pos,
-                                                          v: { x: this.local_player.pointerVect.x,
-                                                                  y: this.local_player.pointerVect.y, }});
+                                                          v: { x: player.group.body.velocity.x,
+                                                               y: player.group.body.velocity.y, }});
                     this.delta_last_send_move = 0;
                 }
             }
@@ -108,10 +119,13 @@ export default class BaseGameScene extends Phaser.Scene{
         this.players.forEach(function(player){
             if(player.in_game) player.anims.update(time, delta);
         })
+        
     }
       
     onPlayerMove(data){
         var group = this.players.get(data.id).group;
+        var p = this.players.get(data.id);
+        //console.log(`Player ${p.id} ${p.name} ${p.role} ${p.group}`);
         if(!group){
             console.warn(`Player ${data.id}(${this.players.get(data.id).name}) moved while not grouped.`)
             //console.log(this.players.get(data.id))
@@ -151,17 +165,17 @@ export default class BaseGameScene extends Phaser.Scene{
     }
     
     moveToPointer(pointer){
-        var dest, pos;
+        var dest, pos, vect;
 
         pos = this.local_player.getPosition();
         dest = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
         this.local_player.pointerDest = dest;
-        this.local_player.pointerVect = new Phaser.Math.Vector2(dest).subtract(pos);
-        if(this.local_player.pointerVect.length() > 10){
+        vect = new Phaser.Math.Vector2(dest).subtract(pos);
+        if(vect.length() > 10){
             this.physics.moveToObject(this.local_player.group, dest, MOVE_SPEED); // This will not stop when reached destination
 
             let facing, partner;
-            facing = getDirection(this.local_player.pointerVect);
+            facing = getDirection(this.local_player.group.body.velocity);
             partner = this.players.get(this.local_player.partner_id);
             
             if(facing != this.local_player.group.facing || !this.local_player.group.walking){
@@ -170,6 +184,32 @@ export default class BaseGameScene extends Phaser.Scene{
             
             this.local_player.group.facing = facing;
             this.local_player.group.walking = true;            
+        }
+    }
+    
+    listenToSocket(events){
+        // bind all event to its corresponding function by name
+        // we need to keep the binded functions in callbacks in order to remove them
+        if(events instanceof Array){
+            for(let e of events){
+                let func = this[`on${e[0].toUpperCase()}${e.substring(1)}`].bind(this);
+                this.game.socket.on(e, func);
+                this.callbacks.set(e, func);
+            }
+        }
+        else{
+            let func = this[`on${e[0].toUpperCase()}${e.substring(1)}`].bind(this);
+            this.game.socket.on(e, func);
+            this.callbacks.set(e, func);
+        }
+        
+    }
+    
+    detachSocket(){
+        // this function drops all listeners in this.callbacks
+        for(let c of this.callbacks.keys()){
+            this.game.socket.off(c, this.callbacks.get(c));
+            this.callbacks.delete(c);
         }
     }
 }

@@ -45,9 +45,9 @@ export default class Game extends Phaser.Game {
         // local_player
         this.local_player = this.players.get(this.local_player.id);
         this.current_scene.finish();
-        this.scene.stop(this.current_scene.key);
+        this.current_scene.sys.shutdown();
         this.scene.start(data.scene, data.scene_data);
-        this.scene.getScene(data.scene);
+        this.current_scene = this.scene.getScene(data.scene);
     }
     
     onNewPlayer(data){

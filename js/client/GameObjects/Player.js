@@ -27,6 +27,12 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.in_game = bool;
     }
     
+    destroy(){
+        if(this.group){
+            this.group.destroy();
+        }
+        super.destroy();
+    }
 }
 
 
@@ -43,6 +49,6 @@ export class LocalPlayer extends Player{
         this.pointerDest = null;
         // for storing the vector from the position when pointer clicked to the destination
         // so that the dot product can be calculated and stop the movement when the dot product is smaller than 0
-        this.pointerVect = null;
+        //this.pointerVect = null;
     }
 }

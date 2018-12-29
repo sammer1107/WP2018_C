@@ -47,7 +47,8 @@ else{
         stats:{
             colors: true,
             cached: false
-        }
+        },
+        logger: console
     }));
 }
 

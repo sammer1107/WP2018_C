@@ -1,9 +1,13 @@
 import {FRONT, BACK, RIGHT, LEFT} from '../constants.js'
 
 export default class Group extends Phaser.GameObjects.Container{
-    constructor(scene, muzi, kuro){
-        //console.log("create group", kuro.x, kuro.y)
-        super(scene, kuro.x, kuro.y);
+    constructor(scene, muzi, kuro, x=null, y=null){
+        if(x == null || y == null){
+            super(scene, kuro.x, kuro.y);            
+        }
+        else{
+            super(scene, x, y);
+        }
         this.facing = FRONT;
         this.walking = false;
         
@@ -14,11 +18,11 @@ export default class Group extends Phaser.GameObjects.Container{
         this.iterate((child)=>{
             child.setPosition(0,0);
             child.setInGame(true);
-            child.group = this;    
+            child.group = this; 
             child.setFrame(`front_${child.role}`)
         })
         
-        this.setSize(111,55);
+        this.setSize(90,55);
         this.scene.add.existing(this);
         this.scene.physics.world.enable(this);
         this.body.setOffset(0, -this.height/2)

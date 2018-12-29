@@ -9,19 +9,21 @@ export default class LobbyScene extends BaseGameScene{
     }
     
     create(){
-        var socket = this.game.socket;
-        socket.on("disconnect", this.onSocketDisconnected.bind(this));
-        socket.on("newPlayer", this.onNewPlayer.bind(this));
-        socket.on("updatePartner", this.onUpdatePartner.bind(this));
-        socket.on("playerMove", this.onPlayerMove.bind(this));
-        socket.on("destroyPlayer", this.onDestroyPlayer.bind(this));
+        this.listenToSocket(["disconnect", "newPlayer", "updatePartner", "playerMove", "destroyPlayer"]);
         
         // create map
+        var scale = 0.7;
         var map = this.make.tilemap({ key: 'map'});
-        var google_tile = map.addTilesetImage('google_tile');      // name as specified in map.json
-        var layer = map.createStaticLayer('map_layer_0', google_tile);
-        layer.setDepth(-1);
-        this.physics.world.setBounds(0,0,5000,5000);
+        var tileset = map.addTilesetImage('tileset_0');      // name as specified in map.json
+        this.layer_floor = map.createDynamicLayer('floor', tileset);
+        this.layer_floor.setDepth(-2);
+        this.layer_floor.setScale(scale);
+        this.layer_wall = map.createDynamicLayer('wall', tileset);
+        this.layer_wall.setDepth(-1);
+        this.layer_wall.setScale(scale);
+        this.layer_wall.setCollisionBetween(112,146);
+        this.cameras.main.roundPixels = true;
+        this.physics.world.setBounds(0,0,this.layer_floor.width*scale,this.layer_floor.height*scale);
         
         this.createSpritePlayers();
         
@@ -36,13 +38,13 @@ export default class LobbyScene extends BaseGameScene{
     }
     
     onNewPlayer(data){
-        // Before LocalPlayer created, there might be already some players sent to this client
-        if(this.players.has(data.id)) return;
         
         var new_player = new RemotePlayer(this, data.x, data.y, data.name, data.id, data.role, data.partner_id);
         this.players.set(new_player.id, new_player);
         var partner = this.players.get(new_player.partner_id);
         
+        // TODO: maybe remove this in the future
+        // because now the server only sends the new_player with no partner or position set
         if(partner && partner.partner_id == new_player.id){
             let group;
             if (new_player.role == MUZI){
@@ -56,6 +58,7 @@ export default class LobbyScene extends BaseGameScene{
                 this.cameras.main.startFollow(group);
                 this.cameras.main.setLerp(0.15,0.15);
                 group.setDepth(1);
+                this.physics.add.collider(group, this.layer_wall);
             }
             this.game.hud.resetBoard();
         }
@@ -73,14 +76,14 @@ export default class LobbyScene extends BaseGameScene{
             muzi.role = MUZI;
             kuro.role = KURO;
             let group;
-            group = new Group(this, muzi, kuro);
+            group = new Group(this, muzi, kuro, data.x, data.y);
             this.groups.push(group);
             
             if(muzi == this.local_player || kuro == this.local_player){
                 group.setDepth(1);
                 this.cameras.main.startFollow(group);
                 this.cameras.main.setLerp(0.15,0.15);
-                
+                this.physics.add.collider(group, this.layer_wall);
                 if(this.local_player.role == KURO){
                     this.input.on('pointerdown', this.moveToPointer, this);
                 }
@@ -91,8 +94,11 @@ export default class LobbyScene extends BaseGameScene{
         }
         else if(data.lonely){
             let lonely_player = this.players.get(data.lonely);
-            this.groups = this.groups.filter( g => g !== lonely_player.group );
-            lonely_player.group.destroy();
+            if(lonely_player.group){
+                // not sure if this is needed because it should have been destroyed in player.destroy
+                this.groups = this.groups.filter( g => g !== lonely_player.group );
+                lonely_player.group.destroy();
+            }
             lonely_player.partner_id = null;
         }
         
@@ -103,11 +109,7 @@ export default class LobbyScene extends BaseGameScene{
     }
     
     finish(){
-        var socket = this.game.socket;
-        socket.off("disconnect", this.onSocketDisconnected.bind(this));
-        socket.off("newPlayer", this.onNewPlayer.bind(this));
-        socket.off("updatePartner", this.onUpdatePartner.bind(this));
-        socket.off("playerMove", this.onPlayerMove.bind(this));
-        socket.off("destroyPlayer", this.onDestroyPlayer.bind(this));
+        this.detachSocket();
+        console.log(this.game.socket);
     }
 }

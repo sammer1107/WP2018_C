@@ -16,20 +16,22 @@ export default class MuziKuro extends BaseGameScene {
     
     create(data){
         var socket = this.game.socket;
-        socket.on("disconnect", this.onSocketDisconnected.bind(this));
-        socket.on("playerMove", this.onPlayerMove.bind(this));
-        socket.on("destroyPlayer", this.onDestroyPlayer.bind(this));
-        socket.on("updatePartner", this.onUpdatePartner.bind(this));
-        socket.on("notesUpdate", this.onNotesUpdate.bind(this));
-        socket.on("notesRemove", this.onNotesRemove.bind(this));
-        socket.on("tempoMeasurePast", this.onTempoMeasurePast.bind(this));
+        this.listenToSocket(["disconnect", "playerMove", "destroyPlayer", "updatePartner",
+                                "notesUpdate", "notesRemove", "tempoMeasurePast"])
 
         // create map
+        var scale = 0.7;
         var map = this.make.tilemap({ key: 'map'});
-        var google_tile = map.addTilesetImage('google_tile');      // name as specified in map.json
-        var layer = map.createStaticLayer('map_layer_0', google_tile);
-        layer.setDepth(-1);
-        this.physics.world.setBounds(0,0,5000,5000);
+        var tileset = map.addTilesetImage('tileset_0');      // name as specified in map.json
+        this.layer_floor = map.createDynamicLayer('floor', tileset);
+        this.layer_floor.setDepth(-2);
+        this.layer_floor.setScale(scale);
+        this.layer_wall = map.createDynamicLayer('wall', tileset);
+        this.layer_wall.setDepth(-1);
+        this.layer_wall.setScale(scale);
+        this.layer_wall.setCollisionBetween(112,146);
+        this.cameras.main.roundPixels = true;
+        this.physics.world.setBounds(0,0,this.layer_floor.width*scale,this.layer_floor.height*scale);
         
         // yeah musics
         this.sound.pauseOnBlur = false;
@@ -100,8 +102,8 @@ export default class MuziKuro extends BaseGameScene {
     }
     
     onUpdatePartner(data){
-        //console.log(`updatePartner: `, data);
-        
+        // only when player is set lonely will this be called
+        // no new groups will be made in this scene
         let lonely_player = this.players.get(data.lonely);
         this.groups = this.groups.filter( g => g !== lonely_player.group );
         lonely_player.group.destroy();
@@ -110,8 +112,7 @@ export default class MuziKuro extends BaseGameScene {
         
         this.game.hud.resetBoard();
         this.game.hud.updatePlayerState();
-        
-        //console.log("groups: ", this.groups)
+
     }
 
     onNotesUpdate(data) {
@@ -194,14 +195,6 @@ export default class MuziKuro extends BaseGameScene {
     }
 
     finish(){
-        var socket = this.game.socket;
-        socket.off("disconnect", this.onSocketDisconnected.bind(this));
-        socket.off("newPlayer", this.onNewPlayer.bind(this));
-        socket.off("playerMove", this.onPlayerMove.bind(this));
-        socket.off("destroyPlayer", this.onDestroyPlayer.bind(this));
-        socket.off("updatePartner", this.onUpdatePartner.bind(this));
-        socket.off("notesUpdate", this.onNotesUpdate.bind(this));
-        socket.off("notesRemove", this.onNotesRemove.bind(this));
-        socket.off("tempoMeasurePast", this.onTempoMeasurePast.bind(this));
+        this.detachSocket();
     }
 }

@@ -4,9 +4,9 @@ var shuffle = require('../utils').shuffle;
 var constants = require('../constants');
 var MUZI = constants.MUZI;
 var KURO = constants.KURO;
-const LOBBY_WAIT_TIME = 2*60*1000;
+//const LOBBY_WAIT_TIME = 2*60*1000;
 const CHECK_INTERVAL = 10*1000;
-const MAX_PLAYERS = 4;
+const MAX_PLAYERS = 2;
 
 class LobbyScene extends BaseScene{
     constructor(GameManager){
@@ -17,34 +17,15 @@ class LobbyScene extends BaseScene{
     
     init(){
         //regroup players and give them initial position here 重新分組與配對(第一場玩muzi的第二場也能玩muzi) 沒配到的玩家資料要設為NULL
-        var players = this.game.players;
-        var player_id = [];
+        var players = [...this.game.players.values()];
+        shuffle(players);
         var init_x, init_y;
-        for(let player of players.values()){
-            let id = player.id;
-            players.get(id).role = null;
-            players.get(id).partner_id = null;
-            player_id.push(id);
+        for(let player of players){
+            player.role = null;
+            player.partner_id = null;
         }
-        if( player_id[0] ){
-            //shuffle the player_id array
-            for (let i = player_id.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [player_id[i], player_id[j]] = [player_id[j], player_id[i]];
-            }
-            for(let i=0; i<player_id.length; i+=2){
-                if( i+1 == player_id.length ){ //if player number is odd. make him lonely.
-                    break;
-                } else {
-                    [init_x, init_y] = this.getRandomSpawnPoint();
-                    players.get(player_id[i]).role = "Muzi";
-                    players.get(player_id[i+1]).role = "Kuro";
-                    players.get(player_id[i]).partner_id = player_id[i+1];
-                    players.get(player_id[i+1]).partner_id = player_id[i];
-                    players.get(player_id[i]).setPosition(init_x, init_y);
-                    players.get(player_id[i+1]).setPosition(init_x, init_y);
-                }
-            } 
+        for(let i=0; i<Math.floor(players.length/2)*2; i+=2){
+            this.group(players[i], players[i+1]);
         }
 
     }
@@ -55,7 +36,7 @@ class LobbyScene extends BaseScene{
             // if paired player > MAX_PLAYERS
             this.timer += CHECK_INTERVAL;
             var num_player = this.game.players.size;
-            if(num_player >= MAX_PLAYERS || (this.timer >= LOBBY_WAIT_TIME && num_player >= 2 )){
+            if(num_player >= MAX_PLAYERS && num_player%2 == 0){
                 this.stop();
                 this.game.startScene("MuziKuro");
             }
@@ -79,36 +60,52 @@ class LobbyScene extends BaseScene{
     onLogin(socket, new_player){ // this will be called from GameManager.onLogin
         var lonely_player, init_x, init_y, partner_config={};
 
+        socket.broadcast.emit("newPlayer", new_player);
         // pair player
         for(let player of this.game.players.values()){
             if(player.partner_id == null){
                 lonely_player = player;
-                // decide player role
-                let roles = [MUZI, KURO];
-                let rand = randint(0,2);
-                lonely_player.role = roles[rand];
-                new_player.role = roles[1-rand];
-                new_player.partner_id = lonely_player.id;
-                lonely_player.partner_id = new_player.id;
-                partner_config[lonely_player.role] = lonely_player.id;
-                partner_config[new_player.role] = new_player.id;
+                socket.broadcast.emit("updatePartner", this.group(lonely_player, new_player));
                 break;
             }
         }
         
-        [init_x, init_y] = this.getRandomSpawnPoint();
-        new_player.setPosition(init_x, init_y);
-        socket.broadcast.emit("newPlayer", new_player);
-        if(lonely_player){
-            lonely_player.setPosition(init_x, init_y);
-            socket.broadcast.emit("updatePartner", partner_config);
-        }
         
         Log(`Created new player: name:${new_player.name}, role:${new_player.role}, partner:${lonely_player ? lonely_player.name : null}`);
     }
     
+    onDisconnect(socket){ // this will be called on GameManager's on Disconnect
+        var lonely_players;
+        lonely_players = [ ...this.game.players.values() ].filter( (p)=>{return p.partner_id==null} );
+        for(let i=0; i<Math.floor(lonely_players.length/2)*2; i+=2){
+            socket.broadcast.emit("updatePartner", this.group(lonely_players[i], lonely_players[i+1]));
+        }
+    } 
+    
     getRandomSpawnPoint(){
         return [randint(2525+100, 2525-100), randint(2525+100, 2525-100)];
+    }
+    
+    group(p1, p2){
+        // this function set the partner_id and roles for p1 and p2 and return
+        // the config for updatePartner event.
+        var roles = [MUZI, KURO];
+        var init_x, init_y;
+        var rand = Math.floor(Math.random()*2);
+        var partner_config = {};
+
+        p1.partner_id = p2.id; 
+        p2.partner_id = p1.id; 
+        [p1.role, p2.role] = [roles[rand], roles[1-rand]];
+        partner_config[p1.role] = p1.id;
+        partner_config[p2.role] = p2.id;
+        [init_x, init_y] = this.getRandomSpawnPoint();
+        p1.setPosition(init_x, init_y);
+        p2.setPosition(init_x, init_y);
+        partner_config.x = init_x;
+        partner_config.y = init_y;
+        
+        return partner_config
     }
 }
 

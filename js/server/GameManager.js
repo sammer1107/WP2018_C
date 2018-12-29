@@ -63,12 +63,17 @@ class GameManager{
             }
         }
         if(lonely_player){
+            // TODO: check if there's another lonely player and group them
             lonely_player.partner_id = null;
             Log(`${lonely_player.name} is now lonely.`)
             socket.broadcast.emit("updatePartner", {lonely: lonely_player.id});
         }
             
         socket.broadcast.emit("destroyPlayer", {id: socket.id});
+        
+        if(this.current_scene.onDisconnect){
+            this.current_scene.onDisconnect(socket);
+        }
         
         this.players.removeById(socket.id);
     }

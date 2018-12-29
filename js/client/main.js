@@ -29,7 +29,6 @@ $("#join-game").click( function(){
     
     if(name){
         game = new Game(config);
-        //console.log("Game: ", game);
         game.sound.context.resume().then(()=>{console.log("Sound on.")});
         
         $("#join-game").off('click');
@@ -54,7 +53,7 @@ window.addEventListener("resize", resize, false);
 function resize() {
     var canvas = document.querySelector("canvas");
     var windowRatio = window.innerWidth / window.innerHeight;
-    var gameRatio = game.config.width / game.config.height;
+    var gameRatio = config.width / config.height;
 
     
     if(windowRatio < gameRatio){
