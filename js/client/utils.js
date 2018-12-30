@@ -20,3 +20,9 @@ export function getDirection(vec){
             break
     }
 }
+
+export function log_func(ctx){
+    return function(message){
+        console.log(`[${ctx.name}] ${message||""}`);
+    };
+}

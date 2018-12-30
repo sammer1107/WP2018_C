@@ -1,9 +1,14 @@
-import {MUZI, KURO, NOTE_THRESHOLD_DIST, PHONOGRAPH_THRESHOLD_DIST} from '../constants.js'
+import {MUZI, KURO, NOTE_THRESHOLD_DIST, PHONO_RADIUS} from '../constants.js'
 import BaseGameScene from './BaseGameScene.js'
 import {LocalPlayer, RemotePlayer} from '../GameObjects/Player.js'
 import Group from '../GameObjects/Group.js'
 import Note from '../GameObjects/Note.js'
 import Phonograph from '../GameObjects/Phonograph.js'
+import {log_func} from '../utils.js'
+        
+// pianoKey consists of ['Key to Press', 'Note to Play', 'Start Time in Audio']
+// ertyuio -> Second Row of Keyboard
+const PIANO_CONFIG = [['E','C',0], ['R','D',1.5], ['T','E',3], ['Y','F',4.5], ['U','G',6], ['I','A',7.5], ['O','B',9]];
 
 export default class MuziKuro extends BaseGameScene {
     constructor(){
@@ -20,7 +25,7 @@ export default class MuziKuro extends BaseGameScene {
                                 "notesUpdate", "notesRemove", "tempoMeasurePast"])
 
         // create map
-        var scale = 0.7;
+        var scale = this.cache.tilemap.get("map").data.scale;
         var map = this.make.tilemap({ key: 'map'});
         var tileset = map.addTilesetImage('tileset_0');      // name as specified in map.json
         this.layer_floor = map.createDynamicLayer('floor', tileset);
@@ -45,12 +50,8 @@ export default class MuziKuro extends BaseGameScene {
         //this.onNotesUpdate(data.notes)
         
         // setup piano
-                
-        //pianoKey consists of ['Key to Press', 'Note to Play', 'Start Time in Audio']
-        //ertyuio -> Second Row of Keyboard
-        let pianoKeyIndi = [['E','C',0], ['R','D',1.5], ['T','E',3], ['Y','F',4.5], ['U','G',6], ['I','A',7.5], ['O','B',9]];
-        Note.setSoundPool(this, 'piano', pianoKeyIndi, 5);
-        for(const [key, note_name, st] of pianoKeyIndi) {
+        Note.setSoundPool(this, 'piano', PIANO_CONFIG, 5);
+        for(const [key, note_name, st] of PIANO_CONFIG) {
             this.playerPiano.addMarker({name: note_name, start: st, duration: 1.5});
             this.input.keyboard.on(`keydown_${key}`, () => {
                 this.playerPiano.play(note_name);
@@ -80,21 +81,21 @@ export default class MuziKuro extends BaseGameScene {
         this.game.hud.updatePlayerState();
         this.game.hud.resetBoard();
         
+
         //set record_player
-        //var phonographImage = this.add.image(2500, 2500, 'phonograph');
         this.phonograph = new Phonograph(this, 2500, 2500);
         this.add.existing(this.phonograph);
         this.phonograph.music_sheet = ["A","A","A","A","A","A","A","A"];
         this.physics.world.enable(this.phonograph, 0);
-        let th_wo_scale = PHONOGRAPH_THRESHOLD_DIST/0.4;
         
-        this.phonograph.body.setCircle(th_wo_scale, -th_wo_scale+(this.phonograph.displayWidth>>1), -th_wo_scale+(this.phonograph.displayHeight>>1));
+        this.phonograph.body.setCircle(PHONO_RADIUS, -PHONO_RADIUS+(this.phonograph.displayWidth>>1), -PHONO_RADIUS+(this.phonograph.displayHeight>>1));
         if(this.local_player && this.local_player.group) {
             this.physics.add.overlap(this.local_player.group, this.phonograph, (pl, ph) => {
-                    ph.changeVol((PHONOGRAPH_THRESHOLD_DIST-Phaser.Math.Distance.Between(pl.x, pl.y, ph.x, ph.y))/PHONOGRAPH_THRESHOLD_DIST);
-                }, null, this)
+                ph.changeVol((PHONOGRAPH_THRESHOLD_DIST-Phaser.Math.Distance.Between(pl.x, pl.y, ph.x, ph.y))/PHONOGRAPH_THRESHOLD_DIST);
+            }, null, this)
         }
         
+        this.sound.context.resume();
     }
     
     update(time, delta){
@@ -142,17 +143,17 @@ export default class MuziKuro extends BaseGameScene {
     }
         
     onNotesRemove(data) {
-        console.log("notes remove:", data);
+        Log("notes remove:", data);
         this.music_notes.remove(notes_list.get(data), true, true);
         this.notes_list.delete(data);
     }
 
     onTempoMeasurePast(beat_d) {
-        console.log("Beats!");
-        console.log(`Prev Keyin: ${this.user_keyin}`);
+        Log("Beats!");
+        //Log(`Prev Keyin: ${this.user_keyin}`);
         let ms_per_frame = beat_d>>1;
         this.beats_frame = 0;
-        this.drumbeat.play('0')
+        this.drumbeat.play('0');
         let tolerance = 100;
         this.user_keyin.fill('_');
         this.playNoteCheck(0, ms_per_frame);
@@ -175,6 +176,7 @@ export default class MuziKuro extends BaseGameScene {
     }
 
     collectNoteCheck() {
+        if(!this.sys.isActive()) return;
         for(const [id, note] of this.notes_list) {
             if(this.physics.overlap(this.local_player.group, note)) {
                 if(note.melody.every((value, index) => value === this.user_keyin[index])) {
@@ -195,6 +197,12 @@ export default class MuziKuro extends BaseGameScene {
     }
 
     finish(){
+        this.music_notes.destroy(true);
+        Note.clearSoundPool(this);
+        this.playerPiano.destroy();
+        this.drumbeat.destroy();
         this.detachSocket();
     }
 }
+
+var Log = log_func(MuziKuro);

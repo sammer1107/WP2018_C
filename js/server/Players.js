@@ -24,10 +24,23 @@ exports.Player = class Player{
         this.y;
         this.partner_id;
         this.role;
+        this.group;
+        this.warning=0;
     }
     
     setPosition(x,y){
         this.x = x;
         this.y = y;
+    }
+    
+    info(){
+        return {
+            name: this.name,
+            id: this.id,
+            x: this.x,
+            y: this.y,
+            partner_id: this.partner_id,
+            role: this.role,
+        }
     }
 }

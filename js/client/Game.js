@@ -1,6 +1,8 @@
 import io from 'socket.io-client'
 import HUD from './HUD.js'
+import {log_func} from './utils.js'
 import {RemotePlayer, LocalPlayer} from './GameObjects/Player.js'
+
 
 export default class Game extends Phaser.Game {
     constructor(config){
@@ -10,7 +12,7 @@ export default class Game extends Phaser.Game {
         this.local_player = null;
         this.preload_complete = false;
         this.events.once('preloadComplete', this.onPreloadComplete, this);
-        this.socket.on('connect', ()=>{console.log("socket connected.")})
+        this.socket.on('connect', ()=>{Log("socket connected.")})
         var events = ['gameInit', 'newPlayer', 'sceneTransition', 'updatePartner', 'destroyPlayer'];
         for(let e of events){
             this.socket.on(e, this[`on${e[0].toUpperCase()}${e.substring(1)}`].bind(this));
@@ -20,7 +22,7 @@ export default class Game extends Phaser.Game {
     }
     
     onPreloadComplete(){
-        console.log('preload complete.');
+        Log('preload complete.');
         this.preload_complete = true;
         this.scene.remove('Preload');
     }
@@ -48,6 +50,7 @@ export default class Game extends Phaser.Game {
         this.current_scene.sys.shutdown();
         this.scene.start(data.scene, data.scene_data);
         this.current_scene = this.scene.getScene(data.scene);
+        Log(`scene switched to ${data.scene}`);
     }
     
     onNewPlayer(data){
@@ -67,3 +70,5 @@ export default class Game extends Phaser.Game {
         }
     }
 }
+
+var Log = log_func(Game);

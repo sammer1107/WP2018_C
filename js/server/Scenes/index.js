@@ -1,6 +1,7 @@
 var Scenes = [
-    require('./MuziKuro'),
     require('./LobbyScene'),
+    require('./ComposeScene'),
+    require('./MuziKuro')
 ]
 
 module.exports = function(game){

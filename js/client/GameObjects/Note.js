@@ -13,7 +13,7 @@ export default class Note extends Phaser.Physics.Arcade.Sprite {
                 this.melody.push("_");
             }
         }
-        console.log(this.melody.length);
+        //console.log(this.melody.length);
         this.volume = 0;
     }
 
@@ -29,6 +29,13 @@ export default class Note extends Phaser.Physics.Arcade.Sprite {
         }
         //console.log(Note.soundPool);
     }
+    
+    static clearSoundPool(scene){
+        for(let sound of Note.soundPool){
+            scene.sound.remove(sound);
+        }
+    }
+    
     static getSoundFromPool() {
         for(let sound of Note.soundPool) {
             if(!sound.beOcupied) {

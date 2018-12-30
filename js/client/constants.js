@@ -6,7 +6,7 @@ export const MOVE_UPDATE_PER_SEC = 20;
 export const WALK_ANIM_DURATION = 500;
 
 export const NOTE_THRESHOLD_DIST = 300;
-export const PHONOGRAPH_THRESHOLD_DIST = 200;
+export const PHONO_RADIUS = 500;
 
 export const FRONT = 'front';
 export const LEFT = 'left';

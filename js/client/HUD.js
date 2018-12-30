@@ -6,14 +6,10 @@ export default class HUD {
     
     bind(scene) {
         this.currentScene = scene;
-        /*console.log(sceneData.local_player);
-        console.log(this.currentScene);
-        console.log(this.currentScene.local_player);*/
     }
   
     updatePlayerState(){
         if(this.currentScene){
-            /*console.log(this.currentScene);*/
             if(this.currentScene.local_player.id){
                 $("#game-container .local_playerName").html( this.currentScene.local_player.name );
                 /*if(this.currentScene.local_player.role == 'MUZI'){
@@ -39,7 +35,6 @@ export default class HUD {
     
     resetBoard() {
         if(this.currentScene){
-            /*console.log(this.currentScene);*/
             //clear the groupContainer
             $("#leaderBoard #groupsTable").find("div.groupContainer").remove();
             
@@ -49,7 +44,6 @@ export default class HUD {
                 var muzi = this.currentScene.groups[i].muzi.name;
                 var kuro = this.currentScene.groups[i].kuro.name;
                 
-                //console.log(`${muzi}_${kuro}`);
                 var item = `<div class="groupContainer">
                                 <div class="group">
                                     <div class="rank"> ${i+1} </div>

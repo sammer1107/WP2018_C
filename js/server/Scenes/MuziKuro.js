@@ -40,6 +40,10 @@ class MuziKuro extends BaseScene{
     }
     
     init(){
+        this.notes.list = {};
+        this.notes.num = 0;
+        this.timer=0;
+        // initialize position
         var init = {};
         for(let key of this.game.players.keys()){
             if(init[key] == true){
@@ -48,11 +52,13 @@ class MuziKuro extends BaseScene{
             let init_x, init_y, player, partner;
             player = this.game.players.get(key);
             partner = this.game.players.get(player.partner_id);
-            [init_x, init_y] = this.getRandomSpawnPoint();
-            player.setPosition(init_x, init_y);
-            partner.setPosition(init_x, init_y);
+            if(partner){
+                [init_x, init_y] = this.getRandomSpawnPoint();
+                player.setPosition(init_x, init_y);
+                partner.setPosition(init_x, init_y);                
+                init[partner.id] = true;
+            }
             init[player.id] = true;
-            init[partner.id] = true;
         }
     }
     

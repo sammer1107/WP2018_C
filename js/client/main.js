@@ -2,6 +2,7 @@
 //import Phaser from './lib/phaser.js'
 import PreloadScene from './Scenes/PreloadScene.js'
 import LobbyScene from './Scenes/LobbyScene.js'
+import ComposeScene from './Scenes/ComposeScene.js'
 import MuziKuro from './Scenes/Muzikuro.js'
 import Game from './Game.js'
 
@@ -14,7 +15,7 @@ var config = {
         default: 'arcade',
         arcade: {debug: true}
     },
-    scene: [PreloadScene, LobbyScene, MuziKuro],
+    scene: [PreloadScene, LobbyScene, ComposeScene, MuziKuro],
 };
 
 var game;
@@ -29,7 +30,8 @@ $("#join-game").click( function(){
     
     if(name){
         game = new Game(config);
-        game.sound.context.resume().then(()=>{console.log("Sound on.")});
+        window.game = game;
+        window.addEventListener("resize", resize, false);
         
         $("#join-game").off('click');
         if(game.preload_complete){
@@ -49,7 +51,6 @@ $(document).on("keypress", function(press){
     } 
 })
 
-window.addEventListener("resize", resize, false);
 function resize() {
     var canvas = document.querySelector("canvas");
     var windowRatio = window.innerWidth / window.innerHeight;

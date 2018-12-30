@@ -12,9 +12,9 @@ export default class LobbyScene extends BaseGameScene{
         this.listenToSocket(["disconnect", "newPlayer", "updatePartner", "playerMove", "destroyPlayer"]);
         
         // create map
-        var scale = 0.7;
+        var scale = this.cache.tilemap.get("map").data.scale;
         var map = this.make.tilemap({ key: 'map'});
-        var tileset = map.addTilesetImage('tileset_0');      // name as specified in map.json
+        var tileset = map.addTilesetImage('tileset_0');
         this.layer_floor = map.createDynamicLayer('floor', tileset);
         this.layer_floor.setDepth(-2);
         this.layer_floor.setScale(scale);
@@ -30,7 +30,8 @@ export default class LobbyScene extends BaseGameScene{
         this.game.hud.bind(this);
         this.game.hud.updatePlayerState();
         this.game.hud.resetBoard();
-
+        
+        this.sound.context.resume();
     }
     
     update(time, delta){
@@ -110,6 +111,5 @@ export default class LobbyScene extends BaseGameScene{
     
     finish(){
         this.detachSocket();
-        console.log(this.game.socket);
     }
 }
