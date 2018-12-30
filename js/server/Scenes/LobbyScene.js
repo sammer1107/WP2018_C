@@ -41,8 +41,6 @@ class LobbyScene extends BaseScene{
                     players.get(player_id[i+1]).role = "Kuro";
                     players.get(player_id[i]).partner_id = player_id[i+1];
                     players.get(player_id[i+1]).partner_id = player_id[i];
-                    Log(players.get(player_id[i]).partner_id);
-                    Log(players.get(player_id[i+1]).partner_id);
                     players.get(player_id[i]).setPosition(init_x, init_y);
                     players.get(player_id[i+1]).setPosition(init_x, init_y);
                 }

@@ -1,8 +1,9 @@
-import {MUZI, KURO, NOTE_THRESHOLD_DIST} from '../constants.js'
+import {MUZI, KURO, NOTE_THRESHOLD_DIST, PHONOGRAPH_THRESHOLD_DIST} from '../constants.js'
 import BaseGameScene from './BaseGameScene.js'
 import {LocalPlayer, RemotePlayer} from '../GameObjects/Player.js'
 import Group from '../GameObjects/Group.js'
 import Note from '../GameObjects/Note.js'
+import Phonograph from '../GameObjects/Phonograph.js'
 
 export default class MuziKuro extends BaseGameScene {
     constructor(){
@@ -71,12 +72,27 @@ export default class MuziKuro extends BaseGameScene {
                 }
             })
         }
-
+        
         // create hud
         this.game.hud.bind(this);
         this.game.hud.updatePlayerState();
         this.game.hud.resetBoard();
-        //console.log("muzikuro: ", this)
+        
+        //set record_player
+        //var phonographImage = this.add.image(2500, 2500, 'phonograph');
+        this.phonograph = new Phonograph(this, 2500, 2500);
+        this.add.existing(this.phonograph);
+        this.phonograph.music_sheet = ["A","A","A","A","A","A","A","A"];
+        this.physics.world.enable(this.phonograph, 0);
+        let th_wo_scale = PHONOGRAPH_THRESHOLD_DIST/0.4;
+        
+        this.phonograph.body.setCircle(th_wo_scale, -th_wo_scale+(this.phonograph.displayWidth>>1), -th_wo_scale+(this.phonograph.displayHeight>>1));
+        if(this.local_player && this.local_player.group) {
+            this.physics.add.overlap(this.local_player.group, this.phonograph, (pl, ph) => {
+                    ph.changeVol((PHONOGRAPH_THRESHOLD_DIST-Phaser.Math.Distance.Between(pl.x, pl.y, ph.x, ph.y))/PHONOGRAPH_THRESHOLD_DIST);
+                }, null, this)
+        }
+        
     }
     
     update(time, delta){

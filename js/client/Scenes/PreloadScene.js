@@ -10,6 +10,7 @@ export default class PreloadScene extends Phaser.Scene{
         this.load.atlas('character', 'character.png', 'character.json')
         this.load.tilemapTiledJSON('map', 'map.json');
         this.load.image('google_tile', 'tileset.png');
+        this.load.image('phonograph', 'phonograph.png');
         this.load.atlas('music_notes','music_notes.png', 'music_notes.json');
         this.load.audio('piano', 'piano_pitch4.ogg');
         this.load.audio('drumbeat', 'beat_0_115.mp3');
