@@ -11,7 +11,7 @@ const MAX_PLAYERS = 4;
 class LobbyScene extends BaseScene{
     constructor(GameManager){
         super(GameManager, "Lobby");
-        this.timer=0;
+        this.timer;
         this.check_interval;
     }
     
@@ -52,7 +52,7 @@ class LobbyScene extends BaseScene{
     }
     
     start(){
-        
+        this.timer=0;
         this.check_interval = setInterval(()=>{ // check for early start
             // if paired player > MAX_PLAYERS
             this.timer += CHECK_INTERVAL;

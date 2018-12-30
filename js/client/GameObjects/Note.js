@@ -1,7 +1,19 @@
 export default class Note extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y, melody) {
         super(scene, x, y, "music_notes", `${Math.floor(Math.random()*20)}`);
-        this.melody = melody.split(" ");
+        this.melody = new Array();
+        let melody_temp = melody.split(" ");
+        for(const note of melody_temp) {
+            //Use includes("#") to decide should the 2nd pos be preserved. Ex: C#
+            let note_name = note.slice(0, 1+(note.includes("#") | 0));
+            /* '-' means twice the time and '^' means half the time */
+            let note_space = (2**(note.split("-").length - note.split("^").length)) * 2;
+            this.melody.push(note_name);
+            for(let i = 1; i < note_space; i += 1) {
+                this.melody.push("_");
+            }
+        }
+        console.log(this.melody.length);
         this.volume = 0;
     }
 
@@ -53,22 +65,20 @@ export default class Note extends Phaser.Physics.Arcade.Sprite {
     playSpecificNote(index) {
         if(this.soundTmp) {
             let note = this.melody[index];
-            let note_name = note.slice(0, 1+(note.includes("#") | 0));
-            this.soundTmp.play(note_name, { volume: this.volume });
+            if(note != "_") {
+                this.soundTmp.play(note, { volume: this.volume });
+            }
         }
     }
 
     async playMelody(ms_per_note) {
         let sound = Note.getSoundFromPool();
         if(sound) {
+            let time_param = ms_per_note>>1;
             for (const note of this.melody) {
-                //Use includes("#") to decide should the 2nd pos be preserved. Ex: C#
-                let note_name = note.slice(0, 1+(note.includes("#") | 0));
-                let time_param = ms_per_note;
-                /* '-' means twice the time and '^' means half the time */
-                //time_param *= 2**(note.split("-").length - note.split("^").length);
-                //time_param *= (note.includes("."))? 1.5 : 1;
-                sound.play(note_name, { volume: this.volume });
+                if(note != "_") {
+                    sound.play(note, { volume: this.volume });
+                }
                 await Note.noteLasting(time_param);
             };
             Note.returnSoundToPool(sound);

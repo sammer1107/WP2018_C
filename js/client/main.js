@@ -12,7 +12,7 @@ var config = {
     parent: "game-container",
     physics: {
         default: 'arcade',
-        arcade: {debug: false}
+        arcade: {debug: true}
     },
     scene: [PreloadScene, LobbyScene, MuziKuro],
 };

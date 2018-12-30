@@ -58,8 +58,8 @@ class MuziKuro extends BaseScene{
     
     start(){
         this.noteLasting = 60/115*1000; // the drumbeat is 115 BPM
-        
-        this.notesUpdate();
+            
+        this.io.emit("notesUpdate", this.notesUpdate());
         this.noteUpdater = setInterval(() => {
             this.io.emit("notesUpdate", this.notesUpdate());
         }, 30000);
@@ -108,7 +108,5 @@ class MuziKuro extends BaseScene{
         return [randint(2525+100, 2525-100), randint(2525+100, 2525-100)];
     }
 }
-
-
 
 module.exports = MuziKuro;

@@ -9,8 +9,8 @@ export default class MuziKuro extends BaseGameScene {
         super({ key: 'MuziKuro'});
         this.notes_list = new Map();
         this.music_notes = null;
-        this.on_beats_user = false;
-        this.on_beats_index = 0;
+        this.on_beats_frame = 0;
+        this.user_keyin = new Array(8).fill('_');
     }
     
     create(data){
@@ -51,17 +51,18 @@ export default class MuziKuro extends BaseGameScene {
             this.playerPiano.addMarker({name: note_name, start: st, duration: 1.5});
             this.input.keyboard.on(`keydown_${key}`, () => {
                 this.playerPiano.play(note_name);
-                if(this.on_beats_user) {
-                    this.on_beats_user = false;
+                if(this.beats_frame > 8) {
+                    let frame_index = this.beats_frame - 8 - 1;
+                    this.user_keyin[frame_index] = note_name;
                     for(let [id, note] of this.notes_list) {
                         if(this.physics.overlap(this.local_player.group, note)) {
-                            if(note.melody[this.on_beats_index] == note_name) {
+                            if(note.melody[frame_index] == note_name) {
                                 this.tweens.add({
                                     targets: note,
-                                    props: { scaleX: 0.7, scaleY: 0.7, angle: (Math.random()-0.5)*40 },
+                                    props: { scaleX: 0.8, scaleY: 0.8, angle: (Math.random()-0.5)*40 },
                                     yoyo: true,
                                     repeat: 0,
-                                    duration: 150,
+                                    duration: 80,
                                     ease: "Sine",
                                 });
                             }
@@ -80,15 +81,6 @@ export default class MuziKuro extends BaseGameScene {
     
     update(time, delta){
         super.update(time, delta);
-    }
-    
-    collectMusicNote(player, music_note){
-        music_note.disableBody(true, true);
-        // maybe just call destroy()
-        // may also need to destroy the tweens associated with this note
-        this.game.socket.emit("noteCollected", `${music_note.x}_${music_note.y}`);
-        this.notes_list.delete(`${music_note.x}_${music_note.y}`);
-        this.music_notes.remove(music_note, true, true);
     }
     
     onUpdatePartner(data){
@@ -140,34 +132,49 @@ export default class MuziKuro extends BaseGameScene {
 
     onTempoMeasurePast(beat_d) {
         console.log("Beats!");
-        let ms_per_note = beat_d;
+        console.log(`Prev Keyin: ${this.user_keyin}`);
+        let ms_per_frame = beat_d>>1;
+        this.beats_frame = 0;
         this.drumbeat.play('0')
-        this.playNoteCheck(0);
-        setTimeout(() => { this.playNoteCheck(1, ms_per_note); }, ms_per_note);
-        setTimeout(() => { this.playNoteCheck(2, ms_per_note); }, ms_per_note*2);
-        setTimeout(() => { this.playNoteCheck(3, ms_per_note); }, ms_per_note*3);
         let tolerance = 100;
-        for(let i = 0; i < 4; i += 1) {
-            setTimeout(() => { this.triggerOnBeatsUser(i, tolerance<<1) }, ms_per_note*(4+i)-tolerance);
+        this.user_keyin.fill('_');
+        this.playNoteCheck(0, ms_per_frame);
+        setTimeout(() => { this.beats_frame += 1 }, (ms_per_frame*8)-tolerance);
+        for(let i = 1; i < 8; i += 1) {
+            setTimeout(() => { this.playNoteCheck(i, ms_per_frame) }, ms_per_frame*i);
+            setTimeout(() => { this.beats_frame += 1 }, ms_per_frame*(8+i)-tolerance);
         }
+        setTimeout(() => { this.collectNoteCheck() }, ms_per_frame*(8+8)-tolerance);
     }
 
-    triggerOnBeatsUser(index, tolerance) {
-        this.on_beats_index = index;
-        this.on_beats_user = true;
-        setTimeout(() => { this.on_beats_user = false }, tolerance);
-    }
-
-    playNoteCheck(index, ms_per_note) {
-        if(!this.local_player.in_game) return; // temporary fix?
-        let pl = this.local_player.getPosition();
+    playNoteCheck(index, ms_per_frame) {
+        this.beats_frame += 1;
         for(const [id, note] of this.notes_list) {
-            let dis = Phaser.Math.Distance.Between(pl.x, pl.y, note.x, note.y);
-            if(dis <= NOTE_THRESHOLD_DIST) {
-                note.requestSoundInInterval((ms_per_note*7)>>1); //=ms_per_note/3.5
+            if(this.physics.overlap(this.local_player.group, note)) {
+                note.requestSoundInInterval(ms_per_frame<<1); //=ms_per_frame*2
                 note.playSpecificNote(index);
             }
         }
+    }
+
+    collectNoteCheck() {
+        for(const [id, note] of this.notes_list) {
+            if(this.physics.overlap(this.local_player.group, note)) {
+                if(note.melody.every((value, index) => value === this.user_keyin[index])) {
+                    console.log(`Collected Note ID: ${id}`);
+                    this.collectMusicNote(id);
+                }
+            }
+        }
+    }
+
+    collectMusicNote(id){
+        //music_note.disableBody(true, true);
+        // maybe just call destroy()
+        // may also need to destroy the tweens associated with this note
+        this.game.socket.emit("noteCollected", id);
+        this.music_notes.remove(this.notes_list.get(id), true, true);
+        this.notes_list.delete(id);
     }
 
     finish(){
