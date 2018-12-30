@@ -1,3 +1,6 @@
+const path = require('path');
+var fs = require('fs');
+
 module.exports = {
     randint: function(min, max){
         return Math.floor(Math.random() * (max - min) + min);
@@ -23,6 +26,15 @@ module.exports = {
             .replace(/>/g, "&gt;")
             .replace(/"/g, "&quot;")
             .replace(/'/g, "&#039;");
+    },
+    
+    loadMap(asset){
+        var map = JSON.parse(fs.readFileSync(path.join(process.cwd(), '/assets', asset), 'utf8'));
+        map.realHeight = map.height * map.tileheight * map.scale;
+        map.realWidth = map.width * map.tilewidth * map.scale;
+        map.centerY = map.realHeight/2;
+        map.centerX = map.realWidth/2;
+        return map;
     },
 }
 
