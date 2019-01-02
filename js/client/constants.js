@@ -12,3 +12,5 @@ export const FRONT = 'front';
 export const LEFT = 'left';
 export const RIGHT = 'right';
 export const BACK = 'back';
+
+export const PIANO_CONFIG = [['E','C',0], ['R','D',1.5], ['T','E',3], ['Y','F',4.5], ['U','G',6], ['I','A',7.5], ['O','B',9]];

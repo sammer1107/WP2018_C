@@ -1,4 +1,4 @@
-import {MUZI, KURO, NOTE_THRESHOLD_DIST, PHONO_RADIUS} from '../constants.js'
+import {MUZI, KURO, NOTE_THRESHOLD_DIST, PHONO_RADIUS, PIANO_CONFIG} from '../constants.js'
 import BaseGameScene from './BaseGameScene.js'
 import {LocalPlayer, RemotePlayer} from '../GameObjects/Player.js'
 import Group from '../GameObjects/Group.js'
@@ -8,7 +8,6 @@ import {log_func} from '../utils.js'
         
 // pianoKey consists of ['Key to Press', 'Note to Play', 'Start Time in Audio']
 // ertyuio -> Second Row of Keyboard
-const PIANO_CONFIG = [['E','C',0], ['R','D',1.5], ['T','E',3], ['Y','F',4.5], ['U','G',6], ['I','A',7.5], ['O','B',9]];
 
 export default class MuziKuro extends BaseGameScene {
     constructor(){
@@ -43,7 +42,8 @@ export default class MuziKuro extends BaseGameScene {
         this.music_notes = this.physics.add.group();
         this.playerPiano = this.sound.add('piano');
         this.drumbeat = this.sound.add('drumbeat');
-        this.drumbeat.addMarker({name:'0', start:0, duration:60/115*1000*8})
+        this.drumbeat.addMarker({name:'0', start:0, duration:60/115*1000*8});
+        
         
         this.createSpritePlayers();
         
@@ -81,19 +81,12 @@ export default class MuziKuro extends BaseGameScene {
         this.game.hud.updatePlayerState();
         this.game.hud.resetBoard();
         
-
-        //set record_player
+        //set phonograph and phonoPiano
         this.phonograph = new Phonograph(this, 2500, 2500);
+        this.phonograph.addPhonoSoundMarker();
         this.add.existing(this.phonograph);
-        this.phonograph.music_sheet = ["A","A","A","A","A","A","A","A"];
-        this.physics.world.enable(this.phonograph, 0);
-        
-        this.phonograph.body.setCircle(PHONO_RADIUS, -PHONO_RADIUS+(this.phonograph.displayWidth>>1), -PHONO_RADIUS+(this.phonograph.displayHeight>>1));
-        if(this.local_player && this.local_player.group) {
-            this.physics.add.overlap(this.local_player.group, this.phonograph, (pl, ph) => {
-                ph.changeVol((PHONOGRAPH_THRESHOLD_DIST-Phaser.Math.Distance.Between(pl.x, pl.y, ph.x, ph.y))/PHONOGRAPH_THRESHOLD_DIST);
-            }, null, this)
-        }
+        this.phonograph.setSheet(["A","B","C","D","E","F","A","B"]);
+        this.physics.world.enable(this.phonograph, 1);
         
         this.sound.context.resume();
     }
@@ -157,9 +150,11 @@ export default class MuziKuro extends BaseGameScene {
         let tolerance = 100;
         this.user_keyin.fill('_');
         this.playNoteCheck(0, ms_per_frame);
+        this.phonoPlayCheck(0);
         setTimeout(() => { this.beats_frame += 1 }, (ms_per_frame*8)-tolerance);
         for(let i = 1; i < 8; i += 1) {
             setTimeout(() => { this.playNoteCheck(i, ms_per_frame) }, ms_per_frame*i);
+            setTimeout(() => { this.phonoPlayCheck(i) }, ms_per_frame*i);
             setTimeout(() => { this.beats_frame += 1 }, ms_per_frame*(8+i)-tolerance);
         }
         setTimeout(() => { this.collectNoteCheck() }, ms_per_frame*(8+8)-tolerance);
@@ -173,6 +168,14 @@ export default class MuziKuro extends BaseGameScene {
                 note.playSpecificNote(index);
             }
         }
+    }
+    
+    phonoPlayCheck(index){
+       let dist = Phaser.Math.Distance.Between(this.local_player.group.x, this.local_player.group.y, this.phonograph.x, this.phonograph.y);
+       if( dist < PHONO_RADIUS ){
+           this.phonograph.changeVol( Math.pow(10, (PHONO_RADIUS-dist)/PHONO_RADIUS-1 ));
+           this.phonograph.playSheet(index);
+       }
     }
 
     collectNoteCheck() {
@@ -195,11 +198,12 @@ export default class MuziKuro extends BaseGameScene {
         this.music_notes.remove(this.notes_list.get(id), true, true);
         this.notes_list.delete(id);
     }
-
+    
     finish(){
         this.music_notes.destroy(true);
         Note.clearSoundPool(this);
         this.playerPiano.destroy();
+        this.phonoPiano.destroy();
         this.drumbeat.destroy();
         this.detachSocket();
     }
