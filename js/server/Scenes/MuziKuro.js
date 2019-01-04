@@ -1,7 +1,8 @@
 const BaseScene = require('./BaseScene');
 const utils = require('../utils')
 const Melody = ['C D E G', 'A E G A', 'G A G F', 'D C E C', 'C C G G', 'F E D C', 'C D E C', 'B G A G'];
-const GAME_DURATION = 5*60*1000;
+const BACKUP_MELODIES = require('../constants.js').BACKUP_MELODIES;
+const GAME_DURATION = 30*1000;
 const CHECK_INTERVAL = 10*1000;
 
 var map = utils.loadMap('map_muzikuro.json');
@@ -44,28 +45,28 @@ class MuziKuro extends BaseScene{
         this.notes.list = {};
         this.notes.num = 0;
         this.timer = 0;
-        // initialize position
-        var init = {};
-        for(let key of this.game.players.keys()){
-            if(init[key] == true){
-                continue;
+        // exchange composition
+        var groups = this.game.groups;
+        if(groups.length >= 2){
+            utils.shuffle(groups);
+            var tmp = groups[0].composition;
+            for(let i=0;i<groups.length-1;i++){
+                groups[i].composition = groups[i+1].composition;
+                if(groups[i].composition == null){
+                    groups[i].composition == BACKUP_MELODIES[i%BACKUP_MELODIES.length].split("");
+                }
             }
-            let init_x, init_y, player, partner;
-            player = this.game.players.get(key);
-            partner = this.game.players.get(player.partner_id);
-            if(partner){
-                [init_x, init_y] = this.getRandomSpawnPoint();
-                player.setPosition(init_x, init_y);
-                partner.setPosition(init_x, init_y);                
-                init[partner.id] = true;
-            }
-            init[player.id] = true;
+            groups[groups.length-1].composition = tmp;
         }
+        //TODO: give composition to those dont have one
     }
     
     start(){
         this.noteLasting = 60/115*1000; // the drumbeat is 115 BPM
-            
+        
+        for(let p of this.game.players.values()){
+            if(p.group) p.socket.emit('setCompose', p.group.composition);
+        }
         this.io.emit("notesUpdate", this.notesUpdate());
         this.noteUpdater = setInterval(() => {
             this.io.emit("notesUpdate", this.notesUpdate());
@@ -91,13 +92,13 @@ class MuziKuro extends BaseScene{
         return;
     }
     
-    getInitData(){
+    getSceneState(){
         return {
             notes: Object.values(this.notes.list)
         };
     }
     
-    getStartData(){
+    getInitData(){
         return null;
     }
     

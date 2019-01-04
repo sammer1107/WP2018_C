@@ -7,13 +7,14 @@ var KURO = constants.KURO;
 var map = utils.loadMap('map_muzikuro.json');
 
 const CHECK_INTERVAL = 10*1000;
-const MAX_PLAYERS = 2;
+const MAX_PLAYERS = 4;
 
 class LobbyScene extends BaseScene{
     constructor(GameManager){
         super(GameManager, "Lobby");
         this.timer;
         this.check_interval;
+        this.process_login;
     }
     
     init(){
@@ -28,7 +29,7 @@ class LobbyScene extends BaseScene{
         for(let i=0; i<Math.floor(players.length/2)*2; i+=2){
             this.game.groups.push(new Group(players[i], players[i+1], ...this.getRandomSpawnPoint()));
         }
-
+        this.process_login = true;
     }
     
     start(){
@@ -38,15 +39,18 @@ class LobbyScene extends BaseScene{
             this.timer += CHECK_INTERVAL;
             var num_player = this.game.players.size;
             if(num_player >= MAX_PLAYERS && num_player%2 == 0){
+                // broadcast message
                 this.stop();
-                this.game.startScene("Compose");
+                this.game.startScene("Compose");;
             }
         }, CHECK_INTERVAL);
         
     }
     
     stop(){
+        Log('stopped scene.')
         clearInterval(this.check_interval);
+        this.process_login = false;
         return;
     }
     
@@ -54,11 +58,12 @@ class LobbyScene extends BaseScene{
         return null;
     }
     
-    getStartData(){
+    getSceneState(){
         return null;
     }
     
     onLogin(socket, new_player){ // this will be called from GameManager.onLogin
+        if(!this.process_login) return;
         var partner;
         socket.broadcast.emit("newPlayer", new_player.info());
         // pair player

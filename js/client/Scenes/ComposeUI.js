@@ -20,55 +20,60 @@ export default class ComposeUI extends Phaser.Scene {
         window.setOrigin(0,0);
         this.window = this.add.container((cam.width-window.width)/2, (cam.height-window.height)/2, window);
         
+        this.buttonClick = this.sound.add('buttonClick');
         var button_config = {
             cursor: 'pointer',
             pixelPrefect: true
         };
+        var button_effect = (button)=>{
+            return ()=>{
+                this.buttonClick.play();
+                // button animation
+            }
+        }
         // close button
         this.window.setSize(window.width, window.height);
-        this.close_btn = this.add.image(this.window.width-PAD.right+CLOSE_POS.x, PAD.top+CLOSE_POS.y, 'ComposeUI.close');
-        this.close_btn.setOrigin(1,0).setInteractive(button_config)
-            .on('pointerdown', ()=>Log('click!'), this)
+        this.close_btn = this.add.image(CLOSE_POS.x, CLOSE_POS.y, 'ComposeUI.close');
+        this.close_btn.setOrigin(0,0).setInteractive(button_config)
+            .on('pointerdown', button_effect(this.close_btn))
             .on('pointerup', this.close, this);
         this.window.add(this.close_btn);
         
-        // go button
-        this.go_btn = this.add.image(this.window.width-PAD.right+GO_POS.x, this.window.height-PAD.bottom+GO_POS.y, 'ComposeUI.go');
-        this.go_btn.setOrigin(1,1).setInteractive(button_config)
-            .on('pointerdown', ()=> Log('click!'), this)
+        // submit button
+        this.submit_btn = this.add.image(SUBMIT_POS.x, SUBMIT_POS.y, 'ComposeUI.submit');
+        this.submit_btn.setOrigin(0,0).setInteractive(button_config)
+            .on('pointerdown', button_effect(this.submit_btn))
             .on('pointerup', this.composeDone, this);
-        this.window.add(this.go_btn);
+        this.window.add(this.submit_btn);
         // reset button
-        this.reset_btn = this.add.image(this.go_btn.x-this.go_btn.width+RESET_POS.x, this.go_btn.y, 'ComposeUI.reset');
-        this.reset_btn.setOrigin(1,1).setInteractive(button_config)
-            .on('pointerdown', ()=>{Log('click!')})
+        this.reset_btn = this.add.image(RESET_POS.x, RESET_POS.y, 'ComposeUI.reset');
+        this.reset_btn.setOrigin(0,0).setInteractive(button_config)
+            .on('pointerdown', button_effect(this.reset_btn))
             .on('pointerup', this.reset, this);
         this.window.add(this.reset_btn);
         
         // play button
-        this.play_btn = this.add.image(PAD.left+PLAY_POS.x, this.window.height-PAD.bottom+PLAY_POS.y, 'ComposeUI.play');
-        this.play_btn.setOrigin(0,1).setInteractive(button_config)
-            .on('pointerdown', ()=>{Log('click!')})
+        this.play_btn = this.add.image(PLAY_POS.x, PLAY_POS.y, 'ComposeUI.play');
+        this.play_btn.setOrigin(0,0).setInteractive(button_config)
+            .on('pointerdown', button_effect(this.play_btn))
             .on('pointerup', this.playCompose, this);
         this.window.add(this.play_btn);
         
         // **calculate note positions** //
-        var zone_start, zone_end, grid_size, rect;
-        zone_start = PAD.left + NOTE_INPUT_START;
-        zone_end = this.window.width - PAD.right + NOTE_INPUT_END;
-        grid_size = (zone_end-zone_start)/COMPOSE_LEN;
+        var grid_size;
+        grid_size = (NOTE_INPUT_END-NOTE_INPUT_START)/COMPOSE_LEN;
         for(let i=0; i<COMPOSE_LEN; i++){
-            this.notes_pos[i] = zone_start + grid_size*(i+0.5);
+            this.notes_pos[i] = NOTE_INPUT_START + grid_size*(i+0.5);
         }
         var pitches = ["C","D","E","F","G","A","B"]
         for(let i=0; i<pitches.length; i++){
-            this.pitch_pos[pitches[i]] =  this.window.height-SHEET_BOTTOM-i*SHEET_SPACING_HALF;
+            this.pitch_pos[pitches[i]] =  SHEET_BOTTOM-i*SHEET_SPACING_HALF;
         }
         
         // initialize all input notes
         for(let i=0; i<COMPOSE_LEN; i++){
-            let note = this.add.image(this.notes_pos[i], 0, 'ComposeUI.note');
-            note.pitch = null;
+            let note = this.add.image(this.notes_pos[i], 0, 'ComposeUI.note').setDisplayOrigin(...NOTE_PIVOT);
+            note.pitch = '_';
             note.setVisible(false);
             this.input_notes[i] = note;
             this.window.add(note);
@@ -83,16 +88,21 @@ export default class ComposeUI extends Phaser.Scene {
                 this.setNote(this.current_note, note_name);
             })
         }
+        this.input.keyboard.on(`keydown_SPACE`, () => {
+            this.buttonClick.play()
+            this.setNote(this.current_note, '_');
+        })
         
-        this.note_indicator = this.add.circle(this.notes_pos[0], this.window.height-SHEET_BOTTOM-10*SHEET_SPACING_HALF, 5, 0x9c7f71);
-        this.window.add(this.note_indicator);
+        // note index
+        this.note_index = this.add.image(this.notes_pos[0], NOTE_INDEX_Y, 'ComposeUI.note_index');
+        this.window.add(this.note_index);
         this.tweens.add({
-            targets: this.note_indicator,
-            props: { fillAlpha: 0.5},
+            targets: this.note_index,
+            props: { y: NOTE_INDEX_Y+8},
             yoyo: true,
             repeat: -1,
             duration: 600,
-            ease: x => x*x,
+            ease: x => 1-x*x,
         })
         
         this.cursor_keys = this.input.keyboard.createCursorKeys();
@@ -111,6 +121,7 @@ export default class ComposeUI extends Phaser.Scene {
     
     finish(){
         this.playerPiano.destroy();
+        this.buttonClick.destroy();
     }
     
     /*
@@ -127,7 +138,7 @@ export default class ComposeUI extends Phaser.Scene {
         var note = this.input_notes[idx];
         note.pitch = pitch;
         
-        if(pitch == null){
+        if(pitch == '_'){
             note.setVisible(false);
         }
         else{
@@ -149,8 +160,8 @@ export default class ComposeUI extends Phaser.Scene {
 
     moveCurrentNote(i){
         this.current_note = i;
-        this.note_indicator.setVisible(true);
-        this.note_indicator.setX(this.notes_pos[i]);
+        this.note_index.setVisible(true);
+        this.note_index.setX(this.notes_pos[i]);
     }
     
     composeDone(){
@@ -171,61 +182,60 @@ export default class ComposeUI extends Phaser.Scene {
     
     playCompose(){
         this.input.enabled = false;
+        var note_len = 1000/(PLAY_BPM/60)/2;
         var count = 0;
         var play = ()=>{
             this.moveCurrentNote(count);
-            if(this.input_notes[count].pitch) this.playerPiano.play(this.input_notes[count].pitch);
+            if(this.input_notes[count].pitch &&
+            this.input_notes[count].pitch != '_'){
+               this.playerPiano.play(this.input_notes[count].pitch);
+            }
+            count++;
         }
-        play(); count++;
+        play();
         var interval_id = setInterval(()=>{
             play();
-            if(++count==COMPOSE_LEN){
-                console.log(this);
+            if(count==COMPOSE_LEN){
                 this.input.enabled = true;
-                this.moveCurrentNote(0);
                 clearInterval(interval_id);
+                setTimeout(()=>{ this.moveCurrentNote(0) }, note_len);
             }
-        }, 1000/(PLAY_BPM/60)/2)
+        }, note_len);
+        
     }
 }
 
-
-const PAD = { // transparency region in the window image
-    right: 31,
-    top: 25,
-    left: 22,
-    bottom: 36,
-}
-
 const CLOSE_POS = { // relative to top right
-    x: -30.3,
-    y: 33.2,
+    x: 1141,
+    y: 116,
 }
 
-const GO_POS = { // relative to bottom right
-    x: -74.1,
-    y: -56.2,
+const SUBMIT_POS = { // relative to bottom right
+    x: 1055,
+    y: 576,
 }
 
-const RESET_POS = { // relative to bottom left of go_btn
-    x: -9.1,
-    y: 0,
+const RESET_POS = { // relative to bottom left of submit_btn
+    x: 951,
+    y: 576,
 }
 
 const PLAY_POS = { // relative to bottom left
-    x: 73,
-    y: -53,
+    x: 185,
+    y: 576,
 }
 
 
-const NOTE_INPUT_START = 137.4;
-const NOTE_INPUT_END = -95.1;
+const NOTE_INPUT_START = 326;
+const NOTE_INPUT_END = 1087;
 
 const COMPOSE_LEN = 8;
 
-const SHEET_BOTTOM = 159;
-const SHEET_SPACING_HALF = 10;
+const SHEET_BOTTOM = 467;
+const SHEET_SPACING_HALF = 21.5;
 
-const NOTE_PIVOT = [10,33];
+const NOTE_PIVOT = [28,95];
+
+const NOTE_INDEX_Y = 510;
 
 var Log = log_func(ComposeUI);

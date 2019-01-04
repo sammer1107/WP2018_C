@@ -55,6 +55,7 @@ else{
 // *** routes *** //
 app.use(express.static(__dirname + '/public'));
 app.use('/client', express.static(__dirname + '/js/dist'));
+app.use('/jquery', express.static(__dirname + '/node_modules/jquery/dist'))
 app.use('/lib', express.static(__dirname + '/js/client/lib'))
 app.use('/assets', express.static(__dirname + '/assets'));
 app.get('/', function(req, res){

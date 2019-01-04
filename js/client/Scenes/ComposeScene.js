@@ -36,14 +36,16 @@ export default class ComposeScene extends BaseGameScene{
         this.sound.pauseOnBlur = false;
         
         this.createSpritePlayers();
-        this.phonograph = this.add.image((this.layer_floor.width+128)*scale/2, (this.layer_floor.height+128)*scale/2, 'phonograph');
+        this.phonograph = this.physics.add.staticImage((this.layer_floor.width+128)*scale/2, (this.layer_floor.height+128)*scale/2, 'phonograph');
         if(this.local_player.role == MUZI){
             this.phonograph.setInteractive({
                 cursor: 'pointer',
                 pixelPrefect: true
             }).on('pointerdown', this.onPhonoClicked, this)         
         }
-        
+        if(this.local_player.group){
+            this.physics.world.addCollider(this.local_player.group, this.phonograph);            
+        }
 
         this.game.hud.bind(this);
         this.game.hud.updatePlayerState();
@@ -72,9 +74,12 @@ export default class ComposeScene extends BaseGameScene{
         if(!pointer.leftButtonDown()) return;
         
         if(!this.UI) this.UI = this.scene.get('ComposeUI');
-        this.input.enabled = false;
+        //this.input.enabled = false;
         this.UI.events.once('composeClose', (done)=>{
-            this.input.enabled = true;
+            //this.input.enabled = true;
+            if(done){
+                this.input.clear(this.phonograph);
+            }
         });
         this.UI.sys.wake();
     }

@@ -19,7 +19,9 @@ export default class Phonograph extends Phaser.Physics.Arcade.Image {
     
     playSheet(index) {
         if(this.piano){
-            this.piano.play(this.music_sheet[index], { volume: this.volume });
+            if(this.music_sheet[index] != '_'){
+                this.piano.play(this.music_sheet[index], { volume: this.volume });
+            }
         }
     }
     

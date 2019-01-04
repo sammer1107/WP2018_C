@@ -7,8 +7,8 @@ module.exports = {
     },
     
     log_func: function(ctx){
-        return function(message){
-            console.log(`[${ctx.name}] ${message||""}`);
+        return function(...message){
+            console.log(`[${ctx.name}] `, ...message);
         };
     },
     

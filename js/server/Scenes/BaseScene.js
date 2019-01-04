@@ -8,10 +8,10 @@ var Abstract = new Error("\n\t Do not call this method in BaseScene,\
 
 
 class BaseScene{
-    constructor(game, key){
+    constructor(GameManager, key){
         this.key = key;
-        this.game = game;
-        this.io = game.io;
+        this.game = GameManager;
+        this.io = GameManager.io;
     }
     
     init(){
@@ -39,7 +39,7 @@ class BaseScene{
         throw Abstract;
     }
     
-    getInitData(){
+    getSceneState(){
         /*
         This function should return the necessary scene state (does not including the players) so that 
         the client just connected can sync the game state.
@@ -47,13 +47,25 @@ class BaseScene{
         throw Abstract;
     }
     
-    getStartData(){
+    getInitData(){
         /*
         This function should return the data needed for the client side to start one scene.
         Ex. regrouped players, new positions
 
         */
         throw Abstract
+    }
+    
+    socketOn(event, callback, in_game_only=false){
+        for(let p of this.game.players.values()){
+            if(p.group) p.socket.on(event, callback.bind(this, p.socket));
+        }
+    }
+    
+    socketOff(event){
+        for(let p of this.game.players.values()){
+            p.socket.removeAllListeners(event);
+        }
     }
 }
 

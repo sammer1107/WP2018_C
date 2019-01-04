@@ -4,6 +4,7 @@ var roles = [constants.MUZI, constants.KURO];
 class Group{
     constructor(p1, p2, x, y){
         this.players = [p1, p2];
+        this.composition; // melody created by muzi
         var rand = Math.floor(Math.random()*2);
 
         p1.partner_id = p2.id; 

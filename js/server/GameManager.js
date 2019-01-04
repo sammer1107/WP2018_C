@@ -33,13 +33,12 @@ class GameManager{
     
     onLogin(socket, data){
         var name = escapeHTML(data.name);
-        var new_player = new Player(name, socket.id);
+        var new_player = new Player(name, socket);
         
         if(this.current_scene.onLogin){
             this.current_scene.onLogin(socket, new_player);
         }
         
-        // remove group info
         var players_info = [];
         for(let p of this.players.values()){
             players_info.push(p.info());
@@ -47,7 +46,7 @@ class GameManager{
         
         socket.emit("gameInit",{
             scene: this.current_scene.key,
-            scene_state: this.current_scene.getInitData(),
+            scene_state: this.current_scene.getSceneState(),
             players: players_info,
             local_player: new_player.info(),
         })
@@ -113,7 +112,7 @@ class GameManager{
         }
         this.io.emit('sceneTransition', {
             scene: next.key,
-            scene_data: next.getStartData(),
+            scene_data: next.getInitData(),
             players: players_info,
         });
         next.start();

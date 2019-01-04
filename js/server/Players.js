@@ -17,9 +17,10 @@ exports.PlayerList = class PlayerList extends Map{
 }
 
 exports.Player = class Player{
-    constructor(name, socket_id){
+    constructor(name, socket){
         this.name = name;
-        this.id = socket_id;
+        this.socket = socket;
+        this.id = socket.id;
         this.x;
         this.y;
         this.partner_id;
