@@ -1,10 +1,10 @@
 var BaseScene = require('./BaseScene');
 var Group = require('../Group.js');
-var randint = require('../utils').randint;
-var shuffle = require('../utils').shuffle;
+var utils = require('../utils');
 var constants = require('../constants');
 var MUZI = constants.MUZI;
 var KURO = constants.KURO;
+var map = utils.loadMap('map_muzikuro.json');
 
 const CHECK_INTERVAL = 10*1000;
 const MAX_PLAYERS = 2;
@@ -17,12 +17,13 @@ class LobbyScene extends BaseScene{
     }
     
     init(){
+        this.timer = 0;
         for(let group of this.game.groups){
             group.destroy();
         }
         this.game.groups= [];
         var players = [...this.game.players.values()];
-        shuffle(players);
+        utils.shuffle(players);
         var init_x, init_y;
         for(let i=0; i<Math.floor(players.length/2)*2; i+=2){
             this.game.groups.push(new Group(players[i], players[i+1], ...this.getRandomSpawnPoint()));
@@ -86,7 +87,8 @@ class LobbyScene extends BaseScene{
     } 
     
     getRandomSpawnPoint(){
-        return [randint(2525+100, 2525-100), randint(2525+100, 2525-100)];
+        var radius = 5*map.tilewidth*map.scale;
+        return [utils.randint(map.centerX-radius, map.centerX+radius), utils.randint(map.centerY-radius, map.centerY+radius)];
     }
 }
 

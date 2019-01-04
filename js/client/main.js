@@ -3,19 +3,21 @@
 import PreloadScene from './Scenes/PreloadScene.js'
 import LobbyScene from './Scenes/LobbyScene.js'
 import ComposeScene from './Scenes/ComposeScene.js'
+import ComposeUI from './Scenes/ComposeUI.js'
 import MuziKuro from './Scenes/Muzikuro.js'
 import Game from './Game.js'
 
 var config = {
     type: Phaser.AUTO, // renderer setting
-    width: window.innerWidth,
-    height: window.innerHeight,
-    parent: "game-container",
+    width: window.innerWidth*window.devicePixelRatio,
+    height: window.innerHeight*window.devicePixelRatio,
+    canvas: document.getElementById('game'),
+    callbacks: {postBoot: resize},
     physics: {
         default: 'arcade',
         arcade: {debug: true}
     },
-    scene: [PreloadScene, LobbyScene, ComposeScene, MuziKuro],
+    scene: [PreloadScene, LobbyScene, ComposeScene, ComposeUI, MuziKuro],
 };
 
 var game;
@@ -27,11 +29,9 @@ $("#join-game").click( function(){
         $("#login").animate({bottom: "100vh"}, { complete: ()=> $("#login").css("display", "none") });
         game.socket.emit("login", { name: name });
     };
-    
+    if(!game) game = new Game(config);    
     if(name){
-        game = new Game(config);
         window.game = game;
-        window.addEventListener("resize", resize, false);
         
         $("#join-game").off('click');
         if(game.preload_complete){
@@ -51,8 +51,11 @@ $(document).on("keypress", function(press){
     } 
 })
 
+
+window.addEventListener("resize", resize, false);
 function resize() {
     var canvas = document.querySelector("canvas");
+    if(!canvas) return;
     var windowRatio = window.innerWidth / window.innerHeight;
     var gameRatio = config.width / config.height;
 

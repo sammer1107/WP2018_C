@@ -80,7 +80,7 @@ export default class BaseGameScene extends Phaser.Scene{
             
             if(pointer.isDown && (time - pointer.downTime > 250)){
                 if( Math.pow( Math.pow(pointer.x/this.cameras.main.height-0.5, 2) + Math.pow(pointer.y/this.cameras.main.height-0.5, 2), 0.5) > 0.1){
-                    this.moveToPointer({x: this.input.mousePointer.x, y: this.input.mousePointer.y});
+                    this.moveToPointer(pointer);
                  }
             }
             
@@ -166,6 +166,7 @@ export default class BaseGameScene extends Phaser.Scene{
     
     moveToPointer(pointer){
         var dest, pos, vect;
+        if(!pointer.leftButtonDown()) return;
 
         pos = this.local_player.getPosition();
         dest = this.cameras.main.getWorldPoint(pointer.x, pointer.y);

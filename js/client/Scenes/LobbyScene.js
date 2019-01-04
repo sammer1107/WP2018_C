@@ -22,7 +22,7 @@ export default class LobbyScene extends BaseGameScene{
         this.layer_wall.setDepth(-1);
         this.layer_wall.setScale(scale);
         this.layer_wall.setCollisionBetween(112,146);
-        this.cameras.main.roundPixels = true;
+        //this.cameras.main.roundPixels = true;
         this.physics.world.setBounds(0,0,this.layer_floor.width*scale,this.layer_floor.height*scale);
         
         this.createSpritePlayers();

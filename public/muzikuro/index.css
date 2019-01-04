@@ -1,6 +1,6 @@
 body {
     margin: 0;
-    overflow-x: hidden;
+    overflow: hidden;
     user-select: none;
 }
 
@@ -13,6 +13,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    overflow: hidden;
 }
 
 #login #background {

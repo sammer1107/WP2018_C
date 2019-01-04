@@ -1,19 +1,20 @@
 import BaseGameScene from './BaseGameScene.js'
-
-const PIANO_CONFIG = [['E','C',0], ['R','D',1.5], ['T','E',3], ['Y','F',4.5], ['U','G',6], ['I','A',7.5], ['O','B',9]];
+import {log_func} from '../utils.js'
+import {MUZI, KURO} from '../constants.js'
 
 export default class ComposeScene extends BaseGameScene{
     constructor(){
         super({ key: 'Compose'});
-        this.is_composing;
+        this.UI;
     }
     
     init(){
-        super.init()
+        super.init();
         this.is_composing = false;
     }
     
     create(){
+        this.scene.launch('ComposeUI');
         var socket = this.game.socket;
         this.listenToSocket(["disconnect", "playerMove", "destroyPlayer", "updatePartner"])
 
@@ -29,26 +30,26 @@ export default class ComposeScene extends BaseGameScene{
         this.layer_wall.setScale(scale);
         this.layer_wall.setCollisionBetween(112,146);
         this.physics.world.setBounds(0,0,this.layer_floor.width*scale,this.layer_floor.height*scale);
-        this.cameras.main.roundPixels = true;
+        //this.cameras.main.roundPixels = true;
         
         // yeah musics
         this.sound.pauseOnBlur = false;
-        this.playerPiano = this.sound.add('piano');
         
         this.createSpritePlayers();
-        
-        // setup piano
-        for(const [key, note_name, st] of PIANO_CONFIG) {
-            this.playerPiano.addMarker({name: note_name, start: st, duration: 1.5});
-            this.input.keyboard.on(`keydown_${key}`, () => {
-                this.playerPiano.play(note_name);
-                // TODO: put a note
-            })
+        this.phonograph = this.add.image((this.layer_floor.width+128)*scale/2, (this.layer_floor.height+128)*scale/2, 'phonograph');
+        if(this.local_player.role == MUZI){
+            this.phonograph.setInteractive({
+                cursor: 'pointer',
+                pixelPrefect: true
+            }).on('pointerdown', this.onPhonoClicked, this)         
         }
+        
 
         this.game.hud.bind(this);
         this.game.hud.updatePlayerState();
         this.game.hud.resetBoard();
+        this.UI = this.scene.get('ComposeUI');
+        this.scene.sleep('ComposeUI');
         
         this.sound.context.resume();
     }
@@ -67,8 +68,22 @@ export default class ComposeScene extends BaseGameScene{
 
     }
     
+    onPhonoClicked(pointer, local_x, local_y, stop){
+        if(!pointer.leftButtonDown()) return;
+        
+        if(!this.UI) this.UI = this.scene.get('ComposeUI');
+        this.input.enabled = false;
+        this.UI.events.once('composeClose', (done)=>{
+            this.input.enabled = true;
+        });
+        this.UI.sys.wake();
+    }
+    
     finish(){
-        this.playerPiano.destroy();
+        this.UI.finish();
+        this.UI.sys.shutdown();
         this.detachSocket();
     }
 }
+
+var Log = log_func(ComposeScene);

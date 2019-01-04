@@ -34,7 +34,7 @@ export default class MuziKuro extends BaseGameScene {
         this.layer_wall.setDepth(-1);
         this.layer_wall.setScale(scale);
         this.layer_wall.setCollisionBetween(112,146);
-        this.cameras.main.roundPixels = true;
+        //this.cameras.main.roundPixels = true;
         this.physics.world.setBounds(0,0,this.layer_floor.width*scale,this.layer_floor.height*scale);
         
         // yeah musics
@@ -161,6 +161,7 @@ export default class MuziKuro extends BaseGameScene {
     }
 
     playNoteCheck(index, ms_per_frame) {
+        if(!this.sys.isActive()) return;
         this.beats_frame += 1;
         for(const [id, note] of this.notes_list) {
             if(this.physics.overlap(this.local_player.group, note)) {

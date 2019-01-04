@@ -14,6 +14,16 @@ export default class PreloadScene extends Phaser.Scene{
         this.load.atlas('music_notes','music_notes.png', 'music_notes.json');
         this.load.audio('piano', 'piano_pitch4.ogg');
         this.load.audio('drumbeat', 'beat_0_115.mp3');
+        this.load.audio('buttonClick', 'button.wav');
+        
+        this.load.setPath('/assets/ComposeUI/');
+        this.load.setPrefix('ComposeUI.');
+        this.load.image('window', 'window.png');
+        this.load.spritesheet('close', 'close.png', {frameWidth:32, frameHeight:31})
+        this.load.spritesheet('go', 'go.png', {frameWidth:32, frameHeight:31})
+        this.load.spritesheet('reset', 'reset.png', {frameWidth:32, frameHeight:31})
+        this.load.spritesheet('play', 'play.png', {frameWidth:32, frameHeight:31})
+        this.load.image('note', 'note.png');
         
         this.load.start();
         this.load.once('complete', function(){

@@ -57,7 +57,7 @@ class GameManager{
     }
         
     onDisconnect(socket, reason){
-        Log(`socket ID: ${socket.id} disconnected.\t(${reason})`);
+        Log(`socket ID: ${socket.id} disconnected. (${reason})`);
         if(!this.players.has(socket.id)) return; // player disconnected before creating a player
         
         var lonely_player = this.players.get(this.players.get(socket.id).partner_id);

@@ -22,7 +22,11 @@ export function getDirection(vec){
 }
 
 export function log_func(ctx){
-    return function(message){
-        console.log(`[${ctx.name}] ${message||""}`);
+    return function(...message){
+        console.log(`[${ctx.name}] `, ...message);
     };
+}
+
+export function randint(min, max){
+    return Math.floor(Math.random() * (max - min) + min);
 }

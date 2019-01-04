@@ -1,10 +1,12 @@
 var BaseScene = require('./BaseScene.js');
 
-const GAME_DURATION = 2*60*1000;
+const GAME_DURATION = 300*1000;
+const CHECK_INTERVAL = 6*1000;
 
 class ComposeScene extends BaseScene{
     constructor(GameManager){
         super(GameManager, "Compose")
+        this.timer;
     }
         
     init(){
@@ -13,17 +15,26 @@ class ComposeScene extends BaseScene{
         + decide who's composition will be sent to whom
         + maybe reset player's position
         */
+        this.timer = 0;
     }
     
     start(){
         /*
         + listen on composition set
         */
-        setTimeout(()=>{
-            this.stop();
-            this.game.startScene("MuziKuro");
-        }, GAME_DURATION)
-        return;
+        this.check_interval = setInterval(()=>{
+            this.timer += CHECK_INTERVAL;
+            if( this.timer >= GAME_DURATION ){
+                this.stop();
+                this.game.startScene("MuziKuro");
+            }
+            if(this.game.players.size < 2){
+                this.stop();
+                this.game.startScene("Lobby");
+            }
+        }, CHECK_INTERVAL);
+        
+        
     }
     
     stop(){
@@ -31,6 +42,7 @@ class ComposeScene extends BaseScene{
         + stop looping intervals
         + stop listening to events
         */
+        clearInterval(this.check_interval);
         return;
     }
     

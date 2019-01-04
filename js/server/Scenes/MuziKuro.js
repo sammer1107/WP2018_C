@@ -1,9 +1,10 @@
-var BaseScene = require('./BaseScene');
-var randint = require('../utils').randint;
-
+const BaseScene = require('./BaseScene');
+const utils = require('../utils')
 const Melody = ['C D E G', 'A E G A', 'G A G F', 'D C E C', 'C C G G', 'F E D C', 'C D E C', 'B G A G'];
 const GAME_DURATION = 5*60*1000;
 const CHECK_INTERVAL = 10*1000;
+
+var map = utils.loadMap('map_muzikuro.json');
 
 function Note(note_id, x, y, melody) {
     this.x = x;
@@ -22,10 +23,10 @@ class MuziKuro extends BaseScene{
             create: function() {
                 let note, x, y;
                 do {
-                    x = randint(0, 5000);
-                    y = randint(0, 5000);
+                    x = utils.randint(0, map.realWidth);
+                    y = utils.randint(0, map.realHeight);
                 } while (typeof this.list[`${x}_${y}`] !== 'undefined');
-                note = new Note(`${x}_${y}`, x, y, Melody[randint(0, Melody.length)]);
+                note = new Note(`${x}_${y}`, x, y, Melody[utils.randint(0, Melody.length)]);
                 this.list[note.id] = note;
                 this.num += 1;
                 return note;
@@ -35,14 +36,14 @@ class MuziKuro extends BaseScene{
                 delete this.list[id];
             }
         };
-        this.timer=0;
+        this.timer = 0;
         this.check_interval;
     }
     
     init(){
         this.notes.list = {};
         this.notes.num = 0;
-        this.timer=0;
+        this.timer = 0;
         // initialize position
         var init = {};
         for(let key of this.game.players.keys()){
@@ -76,7 +77,7 @@ class MuziKuro extends BaseScene{
         
         this.check_interval = setInterval(()=>{
             this.timer += CHECK_INTERVAL;
-            if( this.timer >= GAME_DURATION ){
+            if( this.timer >= GAME_DURATION || this.game.players.size < 2){
                 this.stop();
                 this.game.startScene("Lobby");
             }
@@ -111,7 +112,8 @@ class MuziKuro extends BaseScene{
     }
     
     getRandomSpawnPoint(){
-        return [randint(2525+100, 2525-100), randint(2525+100, 2525-100)];
+        var radius = 5*map.tilewidth*map.scale;
+        return [utils.randint(map.centerX-radius, map.centerX+radius), utils.randint(map.centerY-radius, map.centerY+radius)];
     }
 }
 
