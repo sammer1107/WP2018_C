@@ -19,10 +19,10 @@ export default class PreloadScene extends Phaser.Scene{
         this.load.setPath('/assets/ComposeUI/');
         this.load.setPrefix('ComposeUI.');
         this.load.image('window', 'window.png');
-        this.load.image('close', 'close.png');
-        this.load.image('submit', 'submit.png');
-        this.load.image('reset', 'reset.png');
-        this.load.image('play', 'play.png');
+        this.load.spritesheet('close'   , 'close.png'   , {frameWidth: 69, frameHeight: 66});
+        this.load.spritesheet('submit'  , 'submit.png'  , {frameWidth: 74, frameHeight: 71});
+        this.load.spritesheet('reset'   , 'reset.png'   , {frameWidth: 74, frameHeight: 71});
+        this.load.spritesheet('play'    , 'play.png'    , {frameWidth: 74, frameHeight: 71});
         this.load.image('note_index', 'note_index.png')
         this.load.image('note', 'note.png');
         

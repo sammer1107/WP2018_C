@@ -25,38 +25,44 @@ export default class ComposeUI extends Phaser.Scene {
             cursor: 'pointer',
             pixelPrefect: true
         };
-        var button_effect = (button)=>{
+        var button_down = (button)=>{
             return ()=>{
                 this.buttonClick.play();
-                // button animation
+                button.setFrame(1);
             }
+        }
+        var button_action = (button, action)=>{
+            return (pointer)=>{
+                button.setFrame(0);
+                action.call(this, pointer);
+            };
         }
         // close button
         this.window.setSize(window.width, window.height);
         this.close_btn = this.add.image(CLOSE_POS.x, CLOSE_POS.y, 'ComposeUI.close');
         this.close_btn.setOrigin(0,0).setInteractive(button_config)
-            .on('pointerdown', button_effect(this.close_btn))
-            .on('pointerup', this.close, this);
+            .on('pointerdown', button_down(this.close_btn))
+            .on('pointerup', button_action(this.close_btn, this.close));
         this.window.add(this.close_btn);
         
         // submit button
         this.submit_btn = this.add.image(SUBMIT_POS.x, SUBMIT_POS.y, 'ComposeUI.submit');
         this.submit_btn.setOrigin(0,0).setInteractive(button_config)
-            .on('pointerdown', button_effect(this.submit_btn))
-            .on('pointerup', this.composeDone, this);
+            .on('pointerdown', button_down(this.submit_btn))
+            .on('pointerup', button_action(this.submit_btn, this.composeDone));
         this.window.add(this.submit_btn);
         // reset button
         this.reset_btn = this.add.image(RESET_POS.x, RESET_POS.y, 'ComposeUI.reset');
         this.reset_btn.setOrigin(0,0).setInteractive(button_config)
-            .on('pointerdown', button_effect(this.reset_btn))
-            .on('pointerup', this.reset, this);
+            .on('pointerdown', button_down(this.reset_btn))
+            .on('pointerup', button_action(this.reset_btn, this.reset));
         this.window.add(this.reset_btn);
         
         // play button
         this.play_btn = this.add.image(PLAY_POS.x, PLAY_POS.y, 'ComposeUI.play');
         this.play_btn.setOrigin(0,0).setInteractive(button_config)
-            .on('pointerdown', button_effect(this.play_btn))
-            .on('pointerup', this.playCompose, this);
+            .on('pointerdown', button_down(this.play_btn))
+            .on('pointerup', button_action(this.play_btn, this.playCompose));
         this.window.add(this.play_btn);
         
         // **calculate note positions** //
@@ -107,6 +113,7 @@ export default class ComposeUI extends Phaser.Scene {
         
         this.cursor_keys = this.input.keyboard.createCursorKeys();
         //this.events.on('wake', this.onWake, this);
+        console.log(this.reset_btn);
     }
     
     update(){
@@ -116,6 +123,13 @@ export default class ComposeUI extends Phaser.Scene {
         }
         else if(justDown(this.cursor_keys.left)){
             this.moveCurrentNote( (this.current_note+COMPOSE_LEN-1) % COMPOSE_LEN );
+        }
+        
+        var pointer = this.input.activePointer;
+        for(let button of [this.play_btn, this.reset_btn, this.submit_btn, this.close_btn]){
+            if(button.frame.name == 1 && !button.getBounds().contains(pointer.x, pointer.y)){
+                button.setFrame(0);
+            }
         }
     }
     
