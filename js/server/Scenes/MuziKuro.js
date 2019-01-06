@@ -19,23 +19,34 @@ function Note(note_id, x, y, melody) {
 }
 
 function NotesList(theme){
-    this.list = {};
-    this.num = 0;
+    this.list = new Map();
     this.MAX_NOTES = 30;
+    this._CENTER_ZONE_DIST = 1000;
+    this._GEN_XY_ZONE = [
+        {minX: 0, maxX: map.realWidth, minY: 0, maxY: map.centerY-this._CENTER_ZONE_DIST},
+        {minX: 0, maxX: map.centerX-this._CENTER_ZONE_DIST, minY: 0, maxY: map.realHeight},
+        {minX: 0, maxX: map.realWidth, minY: map.centerY+this._CENTER_ZONE_DIST, maxY: map.realHeight},
+        {minX: map.centerX+this._CENTER_ZONE_DIST, maxX: map.realWidth, minY: 0, maxY: map.realHeight}
+    ];
+    this._curr_zone_index = 0;
+    this._nextZone = function() {
+        this._curr_zone_index = (this._curr_zone_index < this._GEN_XY_ZONE.size-1)?
+            this._curr_zone_index+1 : 0;
+        return this._GEN_XY_ZONE[this._curr_zone_index];
+    }
     this.create = function(){
         let note, x, y;
+        let gen_zone = this._nextZone();
         do {
-            x = utils.randint(0, map.realWidth);
-            y = utils.randint(0, map.realHeight);
-        } while (typeof this.list[`${x}_${y}`] !== 'undefined');
+            x = utils.randint(gen_zone.minX, gen_zone.maxX);
+            y = utils.randint(gen_zone.minY, gen_zone.maxY);
+        } while (this.list.has(`${x}_${y}`));
         note = new Note(`${x}_${y}`, x, y, utils.randomSelect(theme));
-        this.list[note.id] = note;
-        this.num += 1;
+        this.list.set(note.id, note);
         return note;
     };
     this.removeById = function(id) {
-        this.num -= 1;
-        delete this.list[id];
+        this.list.delete(id);
     }
 }
 
@@ -110,7 +121,7 @@ class MuziKuro extends BaseScene{
     
     getSceneState(){
         return {
-            notes: Object.values(this.notes.list)
+            notes: Array.from(this.notes.list.values())
         };
     }
     
@@ -123,7 +134,7 @@ class MuziKuro extends BaseScene{
             this.collect_waiting = true;
             setTimeout(() => { this.collectHandle() }, 250);
         }
-        if(typeof this.notes.list[note_id] !== 'undefined') {
+        if(this.notes.list.has(note_id)) {
             let collected_pl;
             if(this.collect_wait_list.has(note_id)) {
                 collected_pl = this.collect_wait_list.get(note_id);
@@ -142,6 +153,7 @@ class MuziKuro extends BaseScene{
         for(const [note_id, pl_list] of this.collect_wait_list) {
             Log(`Notes Collected: ${note_id}, by ${pl_list}`);
             collect_notes.push(note_id);
+            this.notes.removeById(note_id);
             for(const id of pl_list) {
                 let player = this.game.players.get(id);
                 let pl_grp = player.group;
@@ -163,7 +175,7 @@ class MuziKuro extends BaseScene{
     
     notesUpdate() {
         let new_notes_tmp = [];
-        while(this.notes.num < this.notes.MAX_NOTES) {
+        while(this.notes.list.size < this.notes.MAX_NOTES) {
             let tmp = this.notes.create()
             new_notes_tmp.push(tmp);
             //console.log(`New Note at (${tmp.x}, ${tmp.y})`);
