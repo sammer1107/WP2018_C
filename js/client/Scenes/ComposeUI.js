@@ -14,11 +14,19 @@ export default class ComposeUI extends Phaser.Scene {
     
     create(){
         //  ** UI objects** //
-        var cam;
+        var cam, game;
         cam = this.cameras.main;
+        game = this.game;
         var window = this.add.image(0, 0, 'ComposeUI.window');
         window.setOrigin(0,0);
         this.window = this.add.container((cam.width-window.width)/2, (cam.height-window.height)/2, window);
+        this.window.fit = function(){
+            var scale = game.config.width/1920;
+            if(scale > 1) scale = 1;
+            this.setScale(scale);
+            this.setPosition((cam.width-window.width*scale)/2, (cam.height-window.height*scale)/2);
+        }
+        this.window.fit();
         
         this.buttonClick = this.sound.add('buttonClick');
         var button_config = {
@@ -112,8 +120,6 @@ export default class ComposeUI extends Phaser.Scene {
         })
         
         this.cursor_keys = this.input.keyboard.createCursorKeys();
-        //this.events.on('wake', this.onWake, this);
-        console.log(this.reset_btn);
     }
     
     update(){
@@ -134,19 +140,9 @@ export default class ComposeUI extends Phaser.Scene {
     }
     
     finish(){
-        this.playerPiano.destroy();
-        this.buttonClick.destroy();
+        if(this.playerPiano) this.playerPiano.destroy();
+        if(this.buttonClick) this.buttonClick.destroy();
     }
-    
-    /*
-    onWake(){
-        
-        // reset state:
-        // compositions
-        // indicator position
-        
-        return;
-    }*/
     
     setNote(idx, pitch){
         var note = this.input_notes[idx];

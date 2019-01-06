@@ -63,10 +63,29 @@ export default class Game extends Phaser.Game {
     
     onUpdatePartner(data){
         if(data.lonely){
-            this.players.get(data.lonely).partner_id = null;
+            let p = this.players.get(data.lonely);
+            if(p){
+                p.partner_id = null;
+            }
+            else{
+                console.warn(`${data.lonely} is set to be lonely but no such player exist.`)
+            }
         }else{
-            this.players.get(data.Kuro).partner_id = data.Muzi;
-            this.players.get(data.Muzi).partner_id = data.Kuro; 
+            let k,m;
+            k = this.players.get(data.Kuro);
+            if(k){
+                k.parnter_id = data.Muzi;
+            }
+            else{
+                console.warn(`${data.Kuro} is set to be Kuro but no such player exist.`)
+            }
+            m = this.players.get(data.Muzi);
+            if(m){
+                m.parnter_id = data.Kuro;
+            }
+            else{
+                console.warn(`${data.Muzi} is set to be Muzi but no such player exist.`)
+            }
         }
     }
 }

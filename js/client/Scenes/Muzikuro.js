@@ -7,6 +7,7 @@ import Phonograph from '../GameObjects/Phonograph.js'
 import {log_func} from '../utils.js'
         
 const COMPOSE_LEN = 8;
+const NOTE_SCALE = 0.6;
 
 export default class MuziKuro extends BaseGameScene {
     constructor(){
@@ -63,10 +64,10 @@ export default class MuziKuro extends BaseGameScene {
                             if(note.melody[frame_index] == note_name) {
                                 this.tweens.add({
                                     targets: note,
-                                    props: { scaleX: 0.8, scaleY: 0.8, angle: (Math.random()-0.5)*40 },
-                                    yoyo: true,
+                                    props: { scaleX: note.scaleX*1.05, scaleY: note.scaleX*1.05, angle: (Math.random()-0.5)*40 },
+                                    yoyo: false,
                                     repeat: 0,
-                                    duration: 80,
+                                    duration: 200,
                                     ease: "Sine",
                                 });
                             }
@@ -82,11 +83,14 @@ export default class MuziKuro extends BaseGameScene {
         this.game.hud.resetBoard();
         
         //set phonograph and phonoPiano
-        this.phonograph = new Phonograph(this, (this.layer_floor.width+128)*scale/2, (this.layer_floor.height+128)*scale/2);
+        this.phonograph = new Phonograph(this, (this.layer_floor.width+128)*scale/2, (this.layer_floor.height+128)*scale/2).setDepth(-1);
         this.phonograph.addPhonoSoundMarker();
         this.add.existing(this.phonograph);
         this.phonograph.setSheet(this.composition);
         this.physics.world.enable(this.phonograph, 1);
+        if(this.local_player.group){
+            this.physics.world.addCollider(this.local_player.group, this.phonograph);            
+        }
         
         this.sound.context.resume();
     }
@@ -119,7 +123,7 @@ export default class MuziKuro extends BaseGameScene {
 
     onNotesUpdate(data) {
         for(const note_d of data) {
-            let note = new Note(this, note_d.x, note_d.y, note_d.melody).setScale(0.6);
+            let note = new Note(this, note_d.x, note_d.y, note_d.melody).setScale(NOTE_SCALE);
             this.notes_list.set(`${note_d.x}_${note_d.y}`, note);
             this.music_notes.add(note, true);
             this.tweens.add({
@@ -132,7 +136,7 @@ export default class MuziKuro extends BaseGameScene {
                 duration: 1000 + (Math.random()-0.5)*600,
                 ease: t => Math.sin(Math.PI*(t-0.5))/2 + 0.5,
             });
-            let th_wo_scale = NOTE_THRESHOLD_DIST/0.6;
+            let th_wo_scale = NOTE_THRESHOLD_DIST/NOTE_SCALE;
             note.body.setCircle(th_wo_scale, -th_wo_scale+(note.displayWidth>>1), -th_wo_scale+(note.displayHeight>>1));
             if(this.local_player && this.local_player.group) {
                 this.physics.add.overlap(this.local_player.group, note, (pl, n) => {
@@ -191,11 +195,19 @@ export default class MuziKuro extends BaseGameScene {
     collectNoteCheck() {
         if(!this.sys.isActive()) return;
         for(const [id, note] of this.notes_list) {
-            if(this.physics.overlap(this.local_player.group, note)) {
-                if(note.melody.every((value, index) => value === this.user_keyin[index])) {
-                    console.log(`Collected Note ID: ${id}`);
-                    this.collectMusicNote(id);
-                }
+            if( this.physics.overlap(this.local_player.group, note) &&
+                note.melody.every((value, index) => value === this.user_keyin[index]) ) {
+                this.collectMusicNote(id);
+            }
+            else{
+                this.tweens.add({
+                    targets: note,
+                    props: { scaleX: NOTE_SCALE, scaleY: NOTE_SCALE, angle: 0 },
+                    yoyo: false,
+                    repeat: 0,
+                    duration: 400,
+                    ease: "Sine",
+                });
             }
         }
     }
@@ -204,6 +216,7 @@ export default class MuziKuro extends BaseGameScene {
         //music_note.disableBody(true, true);
         // maybe just call destroy()
         // may also need to destroy the tweens associated with this note
+        Log(`Collected Note ID: ${id}`);
         this.game.socket.emit("noteCollected", id);
         this.music_notes.remove(this.notes_list.get(id), true, true);
         this.notes_list.delete(id);

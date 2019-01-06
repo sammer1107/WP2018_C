@@ -36,7 +36,7 @@ export default class ComposeScene extends BaseGameScene{
         this.sound.pauseOnBlur = false;
         
         this.createSpritePlayers();
-        this.phonograph = this.physics.add.staticImage((this.layer_floor.width+128)*scale/2, (this.layer_floor.height+128)*scale/2, 'phonograph');
+        this.phonograph = this.physics.add.staticImage((this.layer_floor.width+128)*scale/2, (this.layer_floor.height+128)*scale/2, 'phonograph').setDepth(-1);
         if(this.local_player.role == MUZI){
             this.phonograph.setInteractive({
                 cursor: 'pointer',

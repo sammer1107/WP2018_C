@@ -4,7 +4,7 @@ export default class Note extends Phaser.Physics.Arcade.Sprite {
         this.melody = new Array();
         let melody_temp = melody.split(" ");
         for(const note of melody_temp) {
-            //Use includes("#") to decide should the 2nd pos be preserved. Ex: C#
+            // Use includes("#") to decide whether the 2nd pos should be preserved. Ex: C#
             let note_name = note.slice(0, 1+(note.includes("#") | 0));
             /* '-' means twice the time and '^' means half the time */
             let note_space = (2**(note.split("-").length - note.split("^").length)) * 2;
@@ -73,6 +73,7 @@ export default class Note extends Phaser.Physics.Arcade.Sprite {
         if(this.soundTmp) {
             let note = this.melody[index];
             if(note != "_") {
+                // FIXTHIS: what if notes with '#' are played
                 this.soundTmp.play(note, { volume: this.volume });
             }
         }

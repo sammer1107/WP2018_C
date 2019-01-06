@@ -1,9 +1,11 @@
 const BaseScene = require('./BaseScene');
 const utils = require('../utils')
-const Melody = ['C D E G', 'A E G A', 'G A G F', 'D C E C', 'C C G G', 'F E D C', 'C D E C', 'B G A G'];
-const BACKUP_MELODIES = require('../constants.js').BACKUP_MELODIES;
-const GAME_DURATION = 30*1000;
+const constants = require('../constants.js')
+const GAME_DURATION = 5*60*1000;
 const CHECK_INTERVAL = 10*1000;
+
+const BackupComposition = constants.BackupComposition;
+const ThemeSongs = constants.ThemeSongs;
 
 var map = utils.loadMap('map_muzikuro.json');
 
@@ -14,36 +16,40 @@ function Note(note_id, x, y, melody) {
     this.melody = melody;
 }
 
+function NotesList(theme){
+    this.list = {};
+    this.num = 0;
+    this.MAX_NOTES = 30;
+    this.create = function(){
+        let note, x, y;
+        do {
+            x = utils.randint(0, map.realWidth);
+            y = utils.randint(0, map.realHeight);
+        } while (typeof this.list[`${x}_${y}`] !== 'undefined');
+        note = new Note(`${x}_${y}`, x, y, utils.randomSelect(theme));
+        this.list[note.id] = note;
+        this.num += 1;
+        return note;
+    };
+    this.removeById = function(id) {
+        this.num -= 1;
+        delete this.list[id];
+    }
+}
+
 class MuziKuro extends BaseScene{
     constructor(GameManager){
         super(GameManager, "MuziKuro");
-        this.notes = {
-            list: {},
-            num: 0,
-            MAX_NOTES: 30,
-            create: function() {
-                let note, x, y;
-                do {
-                    x = utils.randint(0, map.realWidth);
-                    y = utils.randint(0, map.realHeight);
-                } while (typeof this.list[`${x}_${y}`] !== 'undefined');
-                note = new Note(`${x}_${y}`, x, y, Melody[utils.randint(0, Melody.length)]);
-                this.list[note.id] = note;
-                this.num += 1;
-                return note;
-            },
-            removeById: function(id) {
-                this.num -= 1;
-                delete this.list[id];
-            }
-        };
-        this.timer = 0;
+        this.notes;
+        this.timer;
         this.check_interval;
+        this.theme_song;
     }
     
     init(){
-        this.notes.list = {};
-        this.notes.num = 0;
+        //this.theme_song = utils.randomSelect(ThemeSongs);
+        this.theme_song = ThemeSongs.LittleBee;
+        this.notes = new NotesList(this.theme_song);
         this.timer = 0;
         // exchange composition
         var groups = this.game.groups;
@@ -53,12 +59,12 @@ class MuziKuro extends BaseScene{
             for(let i=0;i<groups.length-1;i++){
                 groups[i].composition = groups[i+1].composition;
                 if(groups[i].composition == null){
-                    groups[i].composition == BACKUP_MELODIES[i%BACKUP_MELODIES.length].split("");
+                    groups[i].composition == BackupComposition[i%BackupComposition.length].split("");
                 }
             }
             groups[groups.length-1].composition = tmp;
         }
-        //TODO: give composition to those dont have one
+        
     }
     
     start(){

@@ -12,6 +12,11 @@ module.exports = {
         };
     },
     
+    randomSelect(obj){
+        var keys = Object.keys(obj);
+        return obj[keys[this.randint(0, keys.length)]]
+    },
+    
     shuffle: function(array){
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
