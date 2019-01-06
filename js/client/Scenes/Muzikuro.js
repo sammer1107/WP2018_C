@@ -47,6 +47,7 @@ export default class MuziKuro extends BaseGameScene {
         this.sound.pauseOnBlur = false;
         this.music_notes = this.physics.add.group();
         this.playerPiano = this.sound.add('piano');
+        this.note_get_sfx = this.sound.add('note_get');
         this.drumbeat = this.sound.add('drumbeat');
         this.drumbeat.addMarker({name:'0', start:0, duration:60/115*1000*8});
         
@@ -174,7 +175,7 @@ export default class MuziKuro extends BaseGameScene {
     }
 
     onTempoMeasurePast(beat_d) {
-        Log("Beats!");
+        //Log("Beats!");
         //Log(`Prev Keyin: ${this.user_keyin}`);
         let ms_per_frame = beat_d>>1;
         this.beats_frame = 0;
@@ -197,8 +198,10 @@ export default class MuziKuro extends BaseGameScene {
         this.beats_frame += 1;
         for(const [id, note] of this.notes_list) {
             if(this.physics.overlap(this.local_player.group, note)) {
-                note.requestSoundInInterval(ms_per_frame<<1); //=ms_per_frame*2
-                note.playSpecificNote(index);
+                if(!this.notes_collect_tmp.includes(id)) {
+                    note.requestSoundInInterval(ms_per_frame<<1); //=ms_per_frame*2
+                    note.playSpecificNote(index);
+                }
             }
         }
     }
@@ -238,9 +241,21 @@ export default class MuziKuro extends BaseGameScene {
         // may also need to destroy the tweens associated with this note
         Log(`Collected Note ID: ${id}`);
         this.notes_collect_tmp.push(id);
-        this.game.socket.emit("noteCollect", id);
-        this.music_notes.remove(this.notes_list.get(id), true, true);
-        this.notes_list.delete(id);
+        let note = this.notes_list.get(id);
+        this.note_get_sfx.play();
+        this.tweens.add({
+            targets: note,
+            props: {y: note.y-20},
+            yoyo: true,
+            repeat: 0,
+            duration: 200,
+            ease: "CPower3",
+            onComplete: () => {
+                this.game.socket.emit("noteCollect", id);
+                this.music_notes.remove(note, true, true);
+                this.notes_list.delete(id);
+            }
+        })
     }
     
     finish(){
