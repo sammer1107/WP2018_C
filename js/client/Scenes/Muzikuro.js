@@ -1,4 +1,4 @@
-import {MUZI, KURO, NOTE_THRESHOLD_DIST, PHONO_RADIUS, PIANO_CONFIG} from '../constants.js'
+import {MUZI, KURO, NOTE_THRESHOLD_DIST, PHONO_RADIUS, NOTES_ITEM_NAME, PIANO_CONFIG} from '../constants.js'
 import BaseGameScene from './BaseGameScene.js'
 import {LocalPlayer, RemotePlayer} from '../GameObjects/Player.js'
 import Group from '../GameObjects/Group.js'
@@ -17,12 +17,17 @@ export default class MuziKuro extends BaseGameScene {
         this.on_beats_frame = 0;
         this.user_keyin = new Array(8).fill('_');
         this.composition = Array(8).fill('_');
+        this.score = 0;
+        this.notes_collect_tmp = new Array();
+        this.notes_item = new Map();
+        NOTES_ITEM_NAME.forEach((name) => { this.notes_item.set(name, 0) });
     }
     
     create(data){
         var socket = this.game.socket;
         this.listenToSocket(["disconnect", "playerMove", "destroyPlayer", "updatePartner",
-                                "notesUpdate", "notesRemove", "tempoMeasurePast", 'setCompose'])
+                                "notesUpdate", "notesRemove", "tempoMeasurePast", 'setCompose',
+                                "scoreUpdate"])
 
         // create map
         var scale = this.cache.tilemap.get("map").data.scale;
@@ -146,11 +151,26 @@ export default class MuziKuro extends BaseGameScene {
             //console.log(`Create Note at (${note_d.x}, ${note_d.y})`);
         }
     }
+
+    onScoreUpdate(reward) {
+        this.score = reward.score;
+        this.notes_item.set(reward.note_get, this.notes_item.get(reward.note_get)+1);
+        Log(`Score Update to ${reward.score}`);
+        Log(`Note Get: [${reward.note_get}]`);
+    }
         
     onNotesRemove(data) {
         Log("notes remove:", data);
-        this.music_notes.remove(notes_list.get(data), true, true);
-        this.notes_list.delete(data);
+        for(const note of data) {
+            let index;
+            if(index = this.notes_collect_tmp.indexOf(note) > -1) {
+                this.notes_collect_tmp.splice(index, 1);
+            }
+            else {
+                this.music_notes.remove(this.notes_list.get(note), true, true);
+                this.notes_list.delete(note);
+            }
+        }
     }
 
     onTempoMeasurePast(beat_d) {
@@ -217,7 +237,8 @@ export default class MuziKuro extends BaseGameScene {
         // maybe just call destroy()
         // may also need to destroy the tweens associated with this note
         Log(`Collected Note ID: ${id}`);
-        this.game.socket.emit("noteCollected", id);
+        this.notes_collect_tmp.push(id);
+        this.game.socket.emit("noteCollect", id);
         this.music_notes.remove(this.notes_list.get(id), true, true);
         this.notes_list.delete(id);
     }

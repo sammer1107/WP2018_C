@@ -12,6 +12,9 @@ class Group{
         [p1.role, p2.role] = [roles[rand], roles[1-rand]];
         p1.group = this;
         p2.group = this;
+        this.score = 0;
+        this.notes_item = new Map();
+        constants.NOTES_ITEM_NAME.forEach((name) => { this.notes_item.set(name, 0) });
         this.setPosition(x, y);
     }
     

@@ -6,7 +6,6 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         super(scene, init_x, init_y, 'character');
         this.name = name;
         this.role = role;
-        this.score = 0;
         this.id = id;
         this.partner_id = partner_id;
         this.in_game = false;

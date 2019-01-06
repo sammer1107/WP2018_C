@@ -2,7 +2,7 @@ module.exports = {
     MUZI: "Muzi",
     KURO: "Kuro",
     SCENE_TRANSITION_BUFFER_TIME: 8*1000,
-    
+    NOTES_ITEM_NAME: ['C', 'D', 'E', 'F', 'G', 'A', 'B'],
     BackupComposition: [
         'CDEFGEG_',
         'CCGGAAG_',
@@ -26,7 +26,10 @@ module.exports = {
             'C C G G',
             'F E D C',
             'C D E C',
-            'B G A G'
+            'B G A G',
+            'C^ C^ D^ C^ G G',
+            'G^ A^ G^ F^ E^ F^ G',
+            'B- A^ B^ G'
         ]
     }
 }
