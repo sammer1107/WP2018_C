@@ -1,12 +1,16 @@
 import { PIANO_CONFIG } from '../constants.js'
 
-export default class Phonograph extends Phaser.Physics.Arcade.Image {
+export default class Phonograph extends Phaser.Physics.Arcade.Sprite {
 
     constructor(scene, x, y){
         super(scene, x, y, "phonograph");
         this.volume = 0;
         this.music_sheet = new Array();
         this.piano = null;
+        this.setDisplayOrigin(193,327);
+        this.setDepth(-1);
+        scene.add.existing(this);
+        scene.physics.world.enable(this, 1);
     }
     
     setSheet(sheet) {

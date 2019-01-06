@@ -69,7 +69,6 @@ export default class LobbyScene extends BaseGameScene{
     onUpdatePartner(data){
         var muzi = this.players.get(data.Muzi);
         var kuro = this.players.get(data.Kuro);
-        //console.log(`updatePartner: `, data);
         
         if(muzi && kuro){
             muzi.partner_id = kuro.id;
@@ -105,8 +104,6 @@ export default class LobbyScene extends BaseGameScene{
         
         this.game.hud.resetBoard();
         this.game.hud.updatePlayerState();
-        
-        //console.log("groups: ", this.groups)
     }
     
     finish(){

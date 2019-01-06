@@ -101,7 +101,7 @@ class MuziKuro extends BaseScene{
         
         this.check_interval = setInterval(()=>{
             this.timer += CHECK_INTERVAL;
-            if( this.timer >= GAME_DURATION || this.game.players.size < 2){
+            if( this.timer >= GAME_DURATION || this.game.players.size < 2){ // check active players
                 this.stop();
                 this.game.startScene("Lobby");
             }

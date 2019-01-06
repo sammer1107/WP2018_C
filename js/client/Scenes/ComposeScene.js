@@ -1,4 +1,5 @@
 import BaseGameScene from './BaseGameScene.js'
+import Phonograph from '../GameObjects/Phonograph.js'
 import {log_func} from '../utils.js'
 import {MUZI, KURO} from '../constants.js'
 
@@ -10,7 +11,6 @@ export default class ComposeScene extends BaseGameScene{
     
     init(){
         super.init();
-        this.is_composing = false;
     }
     
     create(){
@@ -36,12 +36,14 @@ export default class ComposeScene extends BaseGameScene{
         this.sound.pauseOnBlur = false;
         
         this.createSpritePlayers();
-        this.phonograph = this.physics.add.staticImage((this.layer_floor.width+128)*scale/2, (this.layer_floor.height+128)*scale/2, 'phonograph').setDepth(-1);
+        //set phonograph and phonoPiano
+        this.phonograph = new Phonograph(this, (this.layer_floor.width+128)*scale/2, (this.layer_floor.height+128)*scale/2);
+        this.phonograph.play('phonograph_play');
         if(this.local_player.role == MUZI){
             this.phonograph.setInteractive({
                 cursor: 'pointer',
                 pixelPrefect: true
-            }).on('pointerdown', this.onPhonoClicked, this)         
+            }).on('pointerdown', this.onPhonoClicked, this)
         }
         if(this.local_player.group){
             this.physics.world.addCollider(this.local_player.group, this.phonograph);            

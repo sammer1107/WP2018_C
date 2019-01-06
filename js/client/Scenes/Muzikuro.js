@@ -8,6 +8,7 @@ import {log_func} from '../utils.js'
         
 const COMPOSE_LEN = 8;
 const NOTE_SCALE = 0.6;
+const BPM = 115;
 
 export default class MuziKuro extends BaseGameScene {
     constructor(){
@@ -16,7 +17,7 @@ export default class MuziKuro extends BaseGameScene {
         this.music_notes = null;
         this.on_beats_frame = 0;
         this.user_keyin = new Array(8).fill('_');
-        this.composition = Array(8).fill('_');
+        this.composition = new Array(8).fill('_');
         this.score = 0;
         this.notes_collect_tmp = new Array();
         this.notes_item = new Map();
@@ -49,7 +50,7 @@ export default class MuziKuro extends BaseGameScene {
         this.playerPiano = this.sound.add('piano');
         this.note_get_sfx = this.sound.add('note_get');
         this.drumbeat = this.sound.add('drumbeat');
-        this.drumbeat.addMarker({name:'0', start:0, duration:60/115*1000*8});
+        this.drumbeat.addMarker({name:'0', start:0, duration:60/BPM*1000*8});
         
         
         this.createSpritePlayers();
@@ -89,14 +90,28 @@ export default class MuziKuro extends BaseGameScene {
         this.game.hud.resetBoard();
         
         //set phonograph and phonoPiano
-        this.phonograph = new Phonograph(this, (this.layer_floor.width+128)*scale/2, (this.layer_floor.height+128)*scale/2).setDepth(-1);
+        this.phonograph = new Phonograph(this, (this.layer_floor.width+128)*scale/2, (this.layer_floor.height+128)*scale/2);
         this.phonograph.addPhonoSoundMarker();
-        this.add.existing(this.phonograph);
         this.phonograph.setSheet(this.composition);
-        this.physics.world.enable(this.phonograph, 1);
+        this.phonograph.play('phonograph_play');
         if(this.local_player.group){
             this.physics.world.addCollider(this.local_player.group, this.phonograph);            
         }
+        
+        var mininote = this.add.particles('mininotes');
+        mininote.createEmitter({
+            x: this.phonograph.x-43,
+            y: this.phonograph.y-182,
+            frequency: 1500,
+            lifespan: 5000,
+            frame: { frames: [0,1,2,3,4,5,6,7,8], cycle: false},
+            scale: { start: 0.4, end: 0.35 },
+            speed: { min: 30, max: 50 },
+            angle: { min: 180, max: 250 },
+            alpha: (particle, key, t) => 1-Math.max(0,t-0.9)/0.1 ,
+            rotate: (particle, key, t) => particle[key] = 25*Math.sin(8*t),
+            accelerationY: { min: -5, max: 10},
+        });
         
         this.sound.context.resume();
     }
@@ -194,7 +209,7 @@ export default class MuziKuro extends BaseGameScene {
     }
 
     playNoteCheck(index, ms_per_frame) {
-        if(!this.sys.isActive()) return;
+        if(!this.sys.isActive() || !this.local_player.group) return;
         this.beats_frame += 1;
         for(const [id, note] of this.notes_list) {
             if(this.physics.overlap(this.local_player.group, note)) {
@@ -207,7 +222,7 @@ export default class MuziKuro extends BaseGameScene {
     }
     
     phonoPlayCheck(index){
-        if(!this.sys.isActive()) return;
+        if(!this.sys.isActive() || !this.local_player.group) return;
         let dist = Phaser.Math.Distance.Between(this.local_player.group.x, this.local_player.group.y, this.phonograph.x, this.phonograph.y);
         if( dist < PHONO_RADIUS ){
             this.phonograph.changeVol( Math.pow(10, (PHONO_RADIUS-dist)/PHONO_RADIUS-1 ));
