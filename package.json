@@ -5,8 +5,8 @@
   "main": "server.js",
   "private": true,
   "scripts": {
-    "start": "set NODE_ENV=production&& node server.js",
-    "start-dev": "set NODE_ENV=development&& nodemon server.js -w js/server -w server.js",
+    "start": "cross-env NODE_ENV=production node server.js",
+    "start-dev": "cross-env NODE_ENV=development nodemon server.js -w js/server -w server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build:prod": "webpack --config webpack.prod.js",
     "build:dev": "webpack --config webpack.dev.js"
@@ -31,6 +31,7 @@
     "@babel/core": "^7.2.2",
     "@babel/preset-env": "^7.2.0",
     "babel-loader": "^8.0.4",
+    "cross-env": "^5.2.0",
     "uglifyjs-webpack-plugin": "^2.0.1",
     "webpack": "^4.28.3",
     "webpack-cli": "^3.1.2",

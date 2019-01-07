@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 
 module.exports = {
     entry: ['babel-polyfill', './js/client/main.js'],
@@ -31,5 +32,8 @@ module.exports = {
         ignored: /node_modules/
     },
     plugins:[
+        new webpack.DefinePlugin({
+            __LOG: true, 
+        }),
     ]
 };
