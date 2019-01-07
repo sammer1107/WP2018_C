@@ -1,6 +1,7 @@
 const BaseScene = require('./BaseScene');
-const utils = require('../utils')
-const constants = require('../constants.js')
+const NotesList = require('../Notes');
+const utils = require('../utils');
+const constants = require('../constants.js');
 const GAME_DURATION = 5*60*1000;
 const CHECK_INTERVAL = 10*1000;
 const NOTE_SCORE_BASE = 50;
@@ -10,45 +11,6 @@ const BackupComposition = constants.BackupComposition;
 const ThemeSongs = constants.ThemeSongs;
 
 var map = utils.loadMap('map_muzikuro.json');
-
-function Note(note_id, x, y, melody) {
-    this.x = x;
-    this.y = y;
-    this.id = note_id;
-    this.melody = melody;
-}
-
-function NotesList(theme){
-    this.list = new Map();
-    this.MAX_NOTES = 30;
-    this._CENTER_ZONE_DIST = 1000;
-    this._GEN_XY_ZONE = [
-        {minX: 0, maxX: map.realWidth, minY: 0, maxY: map.centerY-this._CENTER_ZONE_DIST},
-        {minX: 0, maxX: map.centerX-this._CENTER_ZONE_DIST, minY: 0, maxY: map.realHeight},
-        {minX: 0, maxX: map.realWidth, minY: map.centerY+this._CENTER_ZONE_DIST, maxY: map.realHeight},
-        {minX: map.centerX+this._CENTER_ZONE_DIST, maxX: map.realWidth, minY: 0, maxY: map.realHeight}
-    ];
-    this._curr_zone_index = 0;
-    this._nextZone = function() {
-        this._curr_zone_index = (this._curr_zone_index < this._GEN_XY_ZONE.size-1)?
-            this._curr_zone_index+1 : 0;
-        return this._GEN_XY_ZONE[this._curr_zone_index];
-    }
-    this.create = function(){
-        let note, x, y;
-        let gen_zone = this._nextZone();
-        do {
-            x = utils.randint(gen_zone.minX, gen_zone.maxX);
-            y = utils.randint(gen_zone.minY, gen_zone.maxY);
-        } while (this.list.has(`${x}_${y}`));
-        note = new Note(`${x}_${y}`, x, y, utils.randomSelect(theme));
-        this.list.set(note.id, note);
-        return note;
-    };
-    this.removeById = function(id) {
-        this.list.delete(id);
-    }
-}
 
 class MuziKuro extends BaseScene{
     constructor(GameManager){
@@ -64,7 +26,7 @@ class MuziKuro extends BaseScene{
     init(){
         //this.theme_song = utils.randomSelect(ThemeSongs);
         this.theme_song = ThemeSongs.LittleBee;
-        this.notes = new NotesList(this.theme_song);
+        this.notes = new NotesList(this.theme_song, map);
         this.timer = 0;
         // exchange composition
         var groups = this.game.groups;
@@ -121,7 +83,7 @@ class MuziKuro extends BaseScene{
     
     getSceneState(){
         return {
-            notes: Array.from(this.notes.list.values())
+            notes: Array.from(this.notes.values())
         };
     }
     
@@ -134,7 +96,7 @@ class MuziKuro extends BaseScene{
             this.collect_waiting = true;
             setTimeout(() => { this.collectHandle() }, 250);
         }
-        if(this.notes.list.has(note_id)) {
+        if(this.notes.has(note_id)) {
             let collected_pl;
             if(this.collect_wait_list.has(note_id)) {
                 collected_pl = this.collect_wait_list.get(note_id);
@@ -175,7 +137,7 @@ class MuziKuro extends BaseScene{
     
     notesUpdate() {
         let new_notes_tmp = [];
-        while(this.notes.list.size < this.notes.MAX_NOTES) {
+        while(this.notes.size < this.notes.MAX_NOTES) {
             let tmp = this.notes.create()
             new_notes_tmp.push(tmp);
             //console.log(`New Note at (${tmp.x}, ${tmp.y})`);
