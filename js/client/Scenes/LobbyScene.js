@@ -21,12 +21,12 @@ export default class LobbyScene extends Phaser.Scene{
         pad = cam.height*0.02;
         graphic.lineStyle(9, 'rgba(8,4,4)');
         graphic.strokeRoundedRect(pad, pad, cam.width-pad*2, cam.height-pad*2);
-        this.loading_text = text = this.add.text(cam.width/2, cam.height*2/3, "Waiting For Your Soulmate .", {
-            fontFamily: 'Varela Round',
+        this.loading_text = text = this.add.text(cam.width/2, cam.height*2/3, "配對中 .", {
+            fontFamily: 'Gen Jyuu Gothic P',
             fontSize: 64,
             color: '#fefefe'
         }).setOrigin(0,0);
-        text.setPosition(text.x-text.width/2, text.y-text.height/2)
+        text.setPosition(Math.round(text.x-text.width/2), Math.round(text.y-text.height/2));
     }
     
     update(time, delta){
@@ -34,7 +34,7 @@ export default class LobbyScene extends Phaser.Scene{
         if(this.dot_timer > DOT_INTERVAL){
             this.dot_timer -= DOT_INTERVAL;
             this.num_dot = (this.num_dot + 1) % 4;
-            this.loading_text.setText(`Waiting For Your Soulmate${' .'.repeat(this.num_dot)}`);
+            this.loading_text.setText(`配對中${' .'.repeat(this.num_dot)}`);
         }
     }
     

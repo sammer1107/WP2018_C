@@ -8,7 +8,8 @@ body::after{ /* for image preloading */
 }
 
 #project-page {
-	background-image: url('/res/project_bg.svg')
+	background-image: url('/res/project_bg.svg');
+	font-family: "Gen Jyuu Gothic P", 'Varela Round';
 }
 
 #team-page {
@@ -20,12 +21,10 @@ body::after{ /* for image preloading */
 	border-color: white;
 	border-style: solid;
 	color: ivory;
-	font-family: "Gen Jyuu Gothic P";
 }
 
 #project-page #play-button {
     color: ivory;
-	font-family: "Gen Jyuu Gothic P";
     cursor: pointer;
 }
 
@@ -62,7 +61,7 @@ body::after{ /* for image preloading */
 
 header {
 	background-color: white;
-	font-family: 'Varela Round', 'Kosugi Maru', sans-serif;
+	font-family: 'Varela Round', 'Gen Jyuu Gothic P', sans-serif;
 }
 
 header span {
