@@ -188,10 +188,12 @@ export default class MuziKuro extends BaseGameScene {
     
     onScoreUpdate(reward) {
         this.score = reward.score;
-        this.notes_item.set(reward.note_get, this.notes_item.get(reward.note_get)+1);
         Log(`Score Update to ${reward.score}`);
-        Log(`Note Get: [${reward.note_get}]`);
-        this.UI.addItem(reward.note_get);
+        if(reward.note_get !== null) {
+            this.notes_item.set(reward.note_get, this.notes_item.get(reward.note_get)+1);
+            Log(`Note Get: [${reward.note_get}]`);
+            this.UI.addItem(reward.note_get);
+        }
     }
         
     onNotesRemove(data) {

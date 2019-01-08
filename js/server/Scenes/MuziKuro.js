@@ -21,6 +21,7 @@ class MuziKuro extends BaseScene{
         this.theme_song;
         this.collect_waiting = false;
         this.collect_wait_list = new Map();
+        this.answered_group = new Array();
     }
     
     init(){
@@ -69,12 +70,12 @@ class MuziKuro extends BaseScene{
         }, this.noteLasting*8); //=noteLasting*4 *2(pause for 4 notes)
 
         this.socketOn('noteCollect', this.onCollectWaiting.bind(this));
+        this.socketOn('answerSubmit', this.onClientAnswerSubmit.bind(this));
         
         this.check_interval = setInterval(()=>{
             this.timer += CHECK_INTERVAL;
             if( this.timer >= GAME_DURATION || this.game.players.size < 2){ // check active players
-                this.stop();
-                this.game.startScene("Lobby");
+                this.gameFinish();
             }
         }, CHECK_INTERVAL);
 
@@ -87,6 +88,7 @@ class MuziKuro extends BaseScene{
         clearInterval(this.tempo);
         clearInterval(this.check_interval);
         this.socketOff('noteCollect');
+        this.socketOff('answerSubit');
         return;
     }
     
@@ -128,11 +130,12 @@ class MuziKuro extends BaseScene{
             for(const id of pl_list) {
                 let player = this.game.players.get(id);
                 let pl_grp = player.group;
-                pl_grp.score += utils.randint(NOTE_SCORE_BASE, NOTE_SCORE_BASE+NOTE_SCORE_BONUS+1);
+                let score = utils.randint(NOTE_SCORE_BASE, NOTE_SCORE_BASE+NOTE_SCORE_BONUS+1);
+                pl_grp.score += score;
                 let note_get = constants.NOTES_ITEM_NAME[utils.randint(0, constants.NOTES_ITEM_NAME.length)];
                 pl_grp.notes_item.set(note_get, pl_grp.notes_item.get(note_get)+1);
                 let reward = {
-                    score: pl_grp.score,
+                    score: score,
                     note_get: note_get
                 }
                 this.io.to(id).emit('scoreUpdate', reward);
@@ -143,6 +146,30 @@ class MuziKuro extends BaseScene{
         this.collect_wait_list.clear();
         this.io.emit('notesRemove', collect_notes);
     }
+
+    onClientAnswerSubmit(socket, answer) {
+        let player = this.game.players.get(socket.id);
+        let pl_grp = player.group;
+        if(!this.answered_group.includes(pl_grp)) {
+            let ques = pl_grp.composition;
+            let match_num = answer.filter((v, i) => ques[i] === v ).length;
+            let score = match_num*60;
+            if(match_num == answer.length) {
+                score *= 2;
+            }
+            pl_grp.score += score;
+            let reward = {
+                score: score,
+                note_get: null
+            };
+            this.io.to(socket.id).emit('scoreUpdate', reward);
+            this.io.to(player.partner_id).emit('scoreUpdate', reward);
+            this.answered_group.push(pl_grp);
+        }
+        if(answered_group.length == this.game.groups.length) {
+            this.gameFinish();
+        }
+    }
     
     notesUpdate() {
         let new_notes_tmp = [];
@@ -152,6 +179,12 @@ class MuziKuro extends BaseScene{
             //console.log(`New Note at (${tmp.x}, ${tmp.y})`);
         }
         return new_notes_tmp;
+    }
+
+    gameFinish() {
+        this.io.emit('gameFinish');
+        this.stop();
+        this.game.startScene("Lobby");
     }
     
     getRandomSpawnPoint(){
