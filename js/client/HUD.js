@@ -9,31 +9,34 @@ export default class HUD {
     }
   
     updatePlayerState(){
+        /*
         if(this.currentScene){
             if(this.currentScene.local_player.id){
                 $("#game-container .local_playerName").html( this.currentScene.local_player.name );
-                /*if(this.currentScene.local_player.role == 'MUZI'){
-                    $("#game-container .imageContainer").addClass('MuziFace');
+                if(this.currentScene.local_player.role == 'MUZI'){
+                        $("#game-container .imageContainer").addClass('MuziFace');
                 } else {
                     $("#game-container .imageContainer").addClass('KuroFace');
-                }*/
+                }
             }
             if(this.currentScene.local_player.partner_id){
                 $("#game-container .partnerName").html( this.currentScene.players.get(this.currentScene.local_player.partner_id).name );
-                /*if(this.currentScene.players[local_player.partner_id].role == 'MUZI'){
+                if(this.currentScene.players[local_player.partner_id].role == 'MUZI'){
                     $("#game-container .imageContainer").addClass('MuziFace');
                 } else {
                     $("#game-container .imageContainer").addClass('KuroFace');
-                }*/
+                }
             } else {
                 $("#game-container .partnerName").html( "No partner" );
             }
         }
         $("#game-container #scorebar").css("width", 50 + '%');
         $("#game-container #local_playerInfo").css("display", "block" );
+        */
     }
     
     resetBoard() {
+        /*
         if(this.currentScene){
             //clear the groupContainer
             $("#leaderBoard #groupsTable").find("div.groupContainer").remove();
@@ -64,17 +67,21 @@ export default class HUD {
                                     <div class="score"> ${this.currentScene.groups[i].muzi.score} </div>
                                 </div>
                             </div`;
-                /*groups[i].item = item;*/
                 $("#leaderBoard #groupsTable").append($(item));
             }
         }
+        */
     }
     
     showLeaderBoard(){
+        /*
         $("#leaderBoard").css("display", "block" );
+        */
     }
     
     hideLeaderBoard(){
+        /*
         $("#leaderBoard").css("display", "none" );
+        */
     }
 }

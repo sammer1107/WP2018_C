@@ -3,6 +3,7 @@
 import PreloadScene from './Scenes/PreloadScene.js'
 import LobbyScene from './Scenes/LobbyScene.js'
 import ComposeScene from './Scenes/ComposeScene.js'
+import FillSheetScene from './Scenes/FillSheetScene.js'
 import ComposeUI from './Scenes/ComposeUI.js'
 import MuziKuro from './Scenes/Muzikuro.js'
 import Game from './Game.js'
@@ -17,7 +18,7 @@ var config = {
         default: 'arcade',
         arcade: {debug: __DEBUG}
     },
-    scene: [PreloadScene, LobbyScene, ComposeScene, ComposeUI, MuziKuro],
+    scene: [PreloadScene, LobbyScene, ComposeScene, ComposeUI, MuziKuro, FillSheetScene],
 };
 
 var game;

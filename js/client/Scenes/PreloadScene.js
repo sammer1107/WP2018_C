@@ -19,15 +19,19 @@ export default class PreloadScene extends Phaser.Scene{
         this.load.spritesheet('waiting', 'lick.png', {frameWidth: 266, frameHeight: 157});
         this.load.spritesheet('phonograph', 'phonograph.png', {frameWidth: 293, frameHeight:381});
         
-        this.load.setPath('/assets/ComposeUI/');
-        this.load.setPrefix('ComposeUI.');
-        this.load.image('window', 'window.png');
+        this.load.setPath('/assets/UI/');
+        this.load.setPrefix('UI.');
+        this.load.image('windowCompose', 'windowCompose.png');
+        this.load.image('windowFill', 'windowFill.png');
         this.load.spritesheet('close'   , 'close.png'   , {frameWidth: 69, frameHeight: 66});
         this.load.spritesheet('submit'  , 'submit.png'  , {frameWidth: 74, frameHeight: 71});
         this.load.spritesheet('reset'   , 'reset.png'   , {frameWidth: 74, frameHeight: 71});
         this.load.spritesheet('play'    , 'play.png'    , {frameWidth: 74, frameHeight: 71});
-        this.load.image('note_index', 'note_index.png')
-        this.load.image('note', 'note.png');
+        this.load.spritesheet('item_notes'   , 'item_notes.png'   , {frameWidth: 57, frameHeight: 108, spacing: 1});
+        this.load.image('note_index', 'note_index.png');
+        this.load.image('black_note', 'black_note.png');
+        this.load.image('item_bar', 'item_bar.png');
+        
         
         this.load.start();
         this.load.once('complete', function(){

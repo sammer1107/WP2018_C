@@ -17,7 +17,7 @@ export default class ComposeUI extends Phaser.Scene {
         var cam, game;
         cam = this.cameras.main;
         game = this.game;
-        var window = this.add.image(0, 0, 'ComposeUI.window');
+        var window = this.add.image(0, 0, 'UI.windowCompose');
         window.setOrigin(0,0);
         this.window = this.add.container((cam.width-window.width)/2, (cam.height-window.height)/2, window);
         this.window.fit = function(){
@@ -31,7 +31,6 @@ export default class ComposeUI extends Phaser.Scene {
         this.buttonClick = this.sound.add('buttonClick');
         var button_config = {
             cursor: 'pointer',
-            pixelPrefect: true
         };
         var button_down = (button)=>{
             return ()=>{
@@ -47,27 +46,27 @@ export default class ComposeUI extends Phaser.Scene {
         }
         // close button
         this.window.setSize(window.width, window.height);
-        this.close_btn = this.add.image(CLOSE_POS.x, CLOSE_POS.y, 'ComposeUI.close');
+        this.close_btn = this.add.image(CLOSE_POS.x, CLOSE_POS.y, 'UI.close');
         this.close_btn.setOrigin(0,0).setInteractive(button_config)
             .on('pointerdown', button_down(this.close_btn))
             .on('pointerup', button_action(this.close_btn, this.close));
         this.window.add(this.close_btn);
         
         // submit button
-        this.submit_btn = this.add.image(SUBMIT_POS.x, SUBMIT_POS.y, 'ComposeUI.submit');
+        this.submit_btn = this.add.image(SUBMIT_POS.x, SUBMIT_POS.y, 'UI.submit');
         this.submit_btn.setOrigin(0,0).setInteractive(button_config)
             .on('pointerdown', button_down(this.submit_btn))
             .on('pointerup', button_action(this.submit_btn, this.composeDone));
         this.window.add(this.submit_btn);
         // reset button
-        this.reset_btn = this.add.image(RESET_POS.x, RESET_POS.y, 'ComposeUI.reset');
+        this.reset_btn = this.add.image(RESET_POS.x, RESET_POS.y, 'UI.reset');
         this.reset_btn.setOrigin(0,0).setInteractive(button_config)
             .on('pointerdown', button_down(this.reset_btn))
             .on('pointerup', button_action(this.reset_btn, this.reset));
         this.window.add(this.reset_btn);
         
         // play button
-        this.play_btn = this.add.image(PLAY_POS.x, PLAY_POS.y, 'ComposeUI.play');
+        this.play_btn = this.add.image(PLAY_POS.x, PLAY_POS.y, 'UI.play');
         this.play_btn.setOrigin(0,0).setInteractive(button_config)
             .on('pointerdown', button_down(this.play_btn))
             .on('pointerup', button_action(this.play_btn, this.playCompose));
@@ -86,7 +85,7 @@ export default class ComposeUI extends Phaser.Scene {
         
         // initialize all input notes
         for(let i=0; i<COMPOSE_LEN; i++){
-            let note = this.add.image(this.notes_pos[i], 0, 'ComposeUI.note').setDisplayOrigin(...NOTE_PIVOT);
+            let note = this.add.image(this.notes_pos[i], 0, 'UI.black_note').setDisplayOrigin(...NOTE_PIVOT);
             note.pitch = '_';
             note.setVisible(false);
             this.input_notes[i] = note;
@@ -108,7 +107,7 @@ export default class ComposeUI extends Phaser.Scene {
         })
         
         // note index
-        this.note_index = this.add.image(this.notes_pos[0], NOTE_INDEX_Y, 'ComposeUI.note_index');
+        this.note_index = this.add.image(this.notes_pos[0], NOTE_INDEX_Y, 'UI.note_index');
         this.window.add(this.note_index);
         this.tweens.add({
             targets: this.note_index,

@@ -17,6 +17,7 @@ export default class BaseGameScene extends Phaser.Scene{
         this.groups = [];
         this.delta_last_send_move = 0;
         this.callbacks = new Map();
+        this.allowHoldPointer = true;
     }
     
     init(){
@@ -76,9 +77,9 @@ export default class BaseGameScene extends Phaser.Scene{
         var player = this.local_player;
         this.delta_last_send_move += delta;
         
-        if(player && player.role == 'Kuro' && player.in_game ){
+        if(player && player.role == 'Kuro' && player.in_game){
             
-            if(pointer.isDown && (time - pointer.downTime > 250)){
+            if(pointer.isDown && (time - pointer.downTime > 250) && this.allowHoldPointer){
                 if( Math.pow( Math.pow(pointer.x/this.cameras.main.height-0.5, 2) + Math.pow(pointer.y/this.cameras.main.height-0.5, 2), 0.5) > 0.1){
                     this.moveToPointer(pointer);
                  }

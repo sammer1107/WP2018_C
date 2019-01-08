@@ -84,6 +84,10 @@ export default class MuziKuro extends BaseGameScene {
             })
         }
         
+        // start FillSheetScene
+        this.scene.launch('FillSheetScene');
+        this.UI = this.scene.get('FillSheetScene');
+        
         // create hud
         this.game.hud.bind(this);
         this.game.hud.updatePlayerState();
@@ -95,7 +99,13 @@ export default class MuziKuro extends BaseGameScene {
         this.phonograph.setSheet(this.composition);
         this.phonograph.play('phonograph_play');
         if(this.local_player.group){
-            this.physics.world.addCollider(this.local_player.group, this.phonograph);            
+            this.physics.world.addCollider(this.local_player.group, this.phonograph);
+        }
+        if(this.local_player.role == KURO){
+            this.phonograph.setInteractive({
+                cursor: 'pointer',
+                pixelPrefect: true
+            }).on('pointerdown', this.onPhonoClicked, this)         
         }
         
         var mininote = this.add.particles('mininotes');
@@ -114,6 +124,8 @@ export default class MuziKuro extends BaseGameScene {
         });
         
         this.sound.context.resume();
+        this.input.mouse.disableContextMenu();
+        //this.input.topOnly = false;
     }
     
     update(time, delta){
@@ -135,7 +147,6 @@ export default class MuziKuro extends BaseGameScene {
         this.groups = this.groups.filter( g => g !== lonely_player.group );
         lonely_player.group.destroy();
         lonely_player.partner_id = null;
-
         
         this.game.hud.resetBoard();
         this.game.hud.updatePlayerState();
@@ -167,12 +178,13 @@ export default class MuziKuro extends BaseGameScene {
             //console.log(`Create Note at (${note_d.x}, ${note_d.y})`);
         }
     }
-
+    
     onScoreUpdate(reward) {
         this.score = reward.score;
         this.notes_item.set(reward.note_get, this.notes_item.get(reward.note_get)+1);
         Log(`Score Update to ${reward.score}`);
         Log(`Note Get: [${reward.note_get}]`);
+        this.UI.addItem(reward.note_get);
     }
         
     onNotesRemove(data) {
@@ -273,6 +285,32 @@ export default class MuziKuro extends BaseGameScene {
         })
     }
     
+    onPhonoClicked(pointer, local_x, local_y, stop){
+        if(this.local_player.role!=KURO || !pointer.leftButtonDown()) return;
+        
+        if(!this.UI) this.UI = this.scene.get('FillSheetScene');
+        //this.input.enabled = false;
+        if(this.UI){
+            this.UI.events.emit("openWindow");
+            this.input.enabled = false;
+            this.allowHoldPointer = this.UI.allowHoldPointer;
+            this.UI.events.once("windowClose", (done)=>{
+                //this.input.enabled = true;
+                if(done){
+                    this.input.enabled = true;
+                    this.allowHoldPointer = this.UI.allowHoldPointer;
+                }
+            });
+            this.UI.events.once("fillDone", (done)=>{
+                //this.input.enabled = true;
+                if(done){
+                    this.input.clear(this.phonograph);
+                }
+            });
+        }
+        
+    }
+    
     finish(){
         if(this.phonograph.piano) this.phonograph.piano.destroy()
         this.music_notes.destroy(true);
@@ -280,6 +318,8 @@ export default class MuziKuro extends BaseGameScene {
         this.playerPiano.destroy();
         this.drumbeat.destroy();
         this.detachSocket();
+        this.UI.finish();
+        this.UI.sys.shutdown();
     }
 }
 
