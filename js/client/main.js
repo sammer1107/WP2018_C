@@ -15,7 +15,7 @@ var config = {
     callbacks: {postBoot: resize},
     physics: {
         default: 'arcade',
-        arcade: {debug: true}
+        arcade: {debug: __DEBUG}
     },
     scene: [PreloadScene, LobbyScene, ComposeScene, ComposeUI, MuziKuro],
 };
@@ -76,7 +76,7 @@ $(document).ready(function(){
     
     $("#start-button").click(function(){
         game = new Game(config);
-        window.game = game;
+        if(__DEBUG) window.game = game;
         $("#welcome").addClass("darken");
         $("#nickname").css("top",'0px');
         $("#nickname #enter").click(joinGame)

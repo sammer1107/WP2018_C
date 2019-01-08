@@ -19,6 +19,7 @@ body {
     align-items: center;
     overflow: hidden;
     perspective: 100px;
+    font-family: 'Varela Round', 'Kosugi Maru', sans-serif;
 }
 
 #welcome .background {
@@ -134,7 +135,6 @@ body {
     color: white;
     z-index: 2;
     margin: 0;
-    font-family: 'Varela Round', 'Kosugi Maru', sans-serif;
 }
 
 #welcome #nickname .input{
@@ -171,7 +171,18 @@ body {
     margin: 1rem 0 1rem 0;
 }
 
-#nickname input{margin:  auto;display: block;background: transparent;border: none;width: 80%;height: 70%;font-size: larger;text-align: center;}
+#nickname input{
+    margin:  auto;
+    display: block;
+    background: transparent;
+    border: none;
+    width: 80%;
+    height: 70%;
+    font-size: larger;
+    text-align: center;
+    font-family: inherit;
+    font-weight: bolder;
+}
 
 #game-container {
     position: absolute;

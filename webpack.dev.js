@@ -33,7 +33,7 @@ module.exports = {
     },
     plugins:[
         new webpack.DefinePlugin({
-            __LOG: true, 
+            __DEBUG: true, 
         }),
     ]
 };

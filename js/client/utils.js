@@ -22,7 +22,7 @@ export function getDirection(vec){
 }
 
 export function log_func(ctx){
-    if(__LOG){ 
+    if(__DEBUG){ 
         return function(...message){
             console.log(`[${ctx.name}] `, ...message);
         }

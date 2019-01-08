@@ -5,6 +5,7 @@ export const MOVE_SPEED = 300;
 export const MOVE_UPDATE_PER_SEC = 20; 
 export const WALK_ANIM_DURATION = 500;
 export const PHONO_ANIM_DURATION = 1000;
+export const LICK_ANIME_DURATION = 1000;
 
 export const NOTE_THRESHOLD_DIST = 300;
 export const PHONO_RADIUS = 500;

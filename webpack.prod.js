@@ -51,7 +51,7 @@ module.exports = {
     },
     plugins: [
         new webpack.DefinePlugin({
-            __LOG: false, 
+            __DEBUG: false, 
         }),
     ]
 };
