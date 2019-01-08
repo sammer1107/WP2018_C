@@ -22,35 +22,92 @@ var config = {
 
 var game;
 
-$("#player-name input").focus();
-$("#join-game").click( function(){
-    var name = $("#player-name input").val().substring(0,20);
+//$("#player-name input").focus();
+
+function Animation(update, duration){
+    this.duration = duration;
+    this.update = update;
+    this.start_t;
+    this.progress;
+    
+    return this
+}
+
+$(document).ready(function(){
+    var start_t,
+    logo=$("#welcome .logo"),
+    notes=$("#welcome #notes"),
+    light=$("#welcome #light");
+    
+    var logo_anim = new Animation(function(t){
+            if (!this.start_t) this.start_t = t;
+            this.progress = (t - this.start_t)/this.duration;
+            t = this.progress;
+            if(this.progress<=0.8){
+                logo.css("transform", `translate(-50%, -50%) scale(${2.625*t-1.6406*t*t})`);            
+            }else{
+                logo.css("transform", `translate(-50%, -50%) scale(${0.05*Math.cos(15/2*Math.PI*(t-0.8))*Math.exp(-12*(t-0.8))+1})`);
+            }
+            if (this.progress < 1) {
+                requestAnimationFrame(this.update.bind(this));
+            }
+        }, 300);
+        
+    var light_anim = new Animation(function(t) {
+            if (!this.start_t) this.start_t = t;
+            this.progress = (t - this.start_t)/this.duration;
+            t = this.progress
+            light.css("clip-path", `circle(${1000*t}px at 48% 39%)`)
+            if (this.progress < 1) {
+                requestAnimationFrame(this.update.bind(this));
+            }
+            else{
+                light.css("clip-path", "unset");
+            }
+        }, 250);
+    setTimeout(()=>requestAnimationFrame(logo_anim.update.bind(logo_anim)) , 500);
+    setTimeout(()=>requestAnimationFrame(light_anim.update.bind(light_anim)), 600);
+    setTimeout(()=>notes.css("transform", "scale(1)"), 800);
+    setTimeout(()=>$("#welcome #start-button").css("top", "80%"), 1800);
+    
+    notes.one('webkitTransitionEnd otransitionend oTransitionEnd msTransitionEnd transitionend', function(e) {
+        notes.addClass("float_anim");
+    });
+    
+    $("#start-button").click(function(){
+        game = new Game(config);
+        window.game = game;
+        $("#welcome").addClass("darken");
+        $("#nickname").css("top",'0px');
+        $("#nickname #enter").click(joinGame)
+        $(document).on("keypress", function(press){
+            if(press.which == 13){ // enter
+                $("#nickname #enter").click();
+                $(document).off("keypress");
+            } 
+        })
+    })
+})
+
+function joinGame(){
+    var name = $("#nickname input").val().substring(0,20);
     var login = function(){
-        $("#login").animate({bottom: "100vh"}, { complete: ()=> $("#login").css("display", "none") });
+        $("#welcome").animate({"opacity": "0"}, { complete: ()=> $("#welcome").css("display", "none") });
         game.socket.emit("login", { name: name });
     };
-    if(!game) game = new Game(config);    
+   
     if(name){
-        window.game = game;
-        
-        $("#join-game").off('click');
+        $("#start-button").off('click');
+        $("#nickname #enter").off('click')
         if(game.preload_complete){
             login();
         }
         else{
-            $("#join-game").html("Loading...");
-            game.events.once("preloadComplete", login)
+            $("#welcome .text").text("Loading...");
+            game.events.once("preloadComplete", login);
         }
     }
-});
-
-$(document).on("keypress", function(press){
-    if(press.which == 13){ // enter
-        $("#join-game").click();
-        $(document).off("keypress");
-    } 
-})
-
+}
 
 window.addEventListener("resize", resize, false);
 function resize() {

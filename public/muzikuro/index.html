@@ -10,16 +10,19 @@
         <script src="/lib/phaser.min.js"></script>
     </head>
     <body>
-        <div id="login">
-            <div id="background"></div>
-            <div id="form">
-                <h1>Muzi & Kuro</h1>
-                <div id="player-name">
-                    <h5>Enter your name:</h5>
-                    <input type="text">
+        <div id="welcome">
+            <div class="background"></div>
+            <div id="light" class='overlay'></div>
+            <div id="notes" class='overlay'></div>
+            <img src="./res/welcome_screen/logo.png" class="logo"></img>
+            <button id="start-button"></button>
+            <div id="nickname">
+                <div class="input">
+                    <input type="text" placeholder="輸入暱稱">
                 </div>
-                <button id="join-game">Join Game</button>
+                <button id="enter"></button>
             </div>
+            <p class="text"></p>
         </div>
         <div id="game-container">
             <div id="local_playerInfo">
