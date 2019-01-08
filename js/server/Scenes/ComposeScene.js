@@ -1,7 +1,7 @@
 var BaseScene = require('./BaseScene.js');
 var BUFFER_TIME = require('../constants.js').SCENE_TRANSITION_BUFFER_TIME;
 
-const GAME_DURATION = 60*1000;
+const GAME_DURATION = 5*60*1000;
 const CHECK_INTERVAL = 5*1000;
 
 class ComposeScene extends BaseScene{
