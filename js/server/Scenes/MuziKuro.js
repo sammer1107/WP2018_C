@@ -34,12 +34,21 @@ class MuziKuro extends BaseScene{
             utils.shuffle(groups);
             var tmp = groups[0].composition;
             for(let i=0;i<groups.length-1;i++){
-                groups[i].composition = groups[i+1].composition;
-                if(groups[i].composition == null){
-                    groups[i].composition == BackupComposition[i%BackupComposition.length].split("");
+                let comp = groups[i].composition;
+                if(comp == null || comp.every( note => note == "_" ) ){
+                    groups[i].composition = BackupComposition[i%BackupComposition.length].split("");
+                }
+                else{
+                    groups[i].composition = groups[i+1].composition;
                 }
             }
-            groups[groups.length-1].composition = tmp;
+            if(tmp == null || tmp.every( note => note == "_" )){
+                groups[groups.length-1].composition = BackupComposition[utils.randint(0, BackupComposition.length)];
+            }
+            else{
+                groups[groups.length-1].composition = tmp;
+            }
+            
         }
         
     }
