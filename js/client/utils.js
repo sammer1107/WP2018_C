@@ -35,3 +35,31 @@ export function log_func(ctx){
 export function randint(min, max){
     return Math.floor(Math.random() * (max - min) + min);
 }
+
+export class Animation{
+    constructor(update, duration, callback){
+        this.duration = duration;
+        this.update = update;
+        this.callback = callback;
+        this.start_t;
+        this.progress;        
+    }
+    
+    next(t){
+        if (!this.start_t) this.start_t = t;
+        this.progress = Math.min((t - this.start_t)/this.duration, 1);
+        this.update(this.progress);
+        if (this.progress < 1) {
+            requestAnimationFrame(this.next.bind(this));
+        }
+        else if(this.callback){
+            this.callback();
+        }
+    }
+    
+    start(delay){
+        if(delay) setTimeout( () => requestAnimationFrame(this.next.bind(this)) , delay);
+        else requestAnimationFrame(this.next.bind(this))
+        return this;
+    }
+}

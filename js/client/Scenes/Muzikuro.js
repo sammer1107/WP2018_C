@@ -4,7 +4,7 @@ import {LocalPlayer, RemotePlayer} from '../GameObjects/Player.js'
 import Group from '../GameObjects/Group.js'
 import Note from '../GameObjects/Note.js'
 import Phonograph from '../GameObjects/Phonograph.js'
-import {log_func} from '../utils.js'
+import {log_func, Animation} from '../utils.js'
         
 const COMPOSE_LEN = 8;
 const NOTE_SCALE = 0.6;
@@ -321,13 +321,28 @@ export default class MuziKuro extends BaseGameScene {
     }
 
     onGameFinish() {
-        document.getElementById('score').innerText = `${this.score}`;
-        document.getElementById('end_screen').style.display = 'initial';
-        document.getElementById('end-button-ok').addEventListener('click', () => {
+        var light = $('#end_screen #end_light'),
+            end_screen = $('#end_screen'),
+            light_anim;
+        end_screen.css({
+            'visibility': 'visible',
+            'opacity': 1
+        });
+        $('#score').text(`${this.score}`);
+        light_anim = new Animation((t)=>{
+            light.css("transform", `scale(${t*2.5})`)
+        }, 600, ()=> light.addClass('light_rotate')).start(200);
+
+        $('#end-button-ok').one('click', ()=>{
             this.game.socket.emit('return');
-            document.getElementById('end_screen').style.display = 'none';
-            document.getElementById('score').innerText = '0';
-        }, { once:true });
+            end_screen.css({
+                'opacity': 0,
+            }).one('transitionend', ()=>{
+                end_screen.css('visibility', 'hidden');                
+                light.removeClass('rotate_slow').css('transform', 'scale(0)');
+                $('#score').text('0');
+            });
+        });
     }
     
     finish(){
