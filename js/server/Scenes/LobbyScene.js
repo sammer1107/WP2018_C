@@ -74,7 +74,7 @@ class LobbyScene extends BaseScene{
 
     pairNewPlayer(socket, new_pl) {
         for(let player of this.game.players.getAvailable()){
-            if((player != new_pl) && (player.partner_id == null)){
+            if((player.id != new_pl.id) && (player.partner_id == null)){
                 let new_group = new Group(player, new_pl, ...this.getRandomSpawnPoint());
                 this.game.groups.push(new_group);
                 socket.broadcast.emit("updatePartner", new_group.info());
