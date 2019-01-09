@@ -23,7 +23,8 @@ export default class LobbyScene extends Phaser.Scene{
         graphic.strokeRoundedRect(pad, pad, cam.width-pad*2, cam.height-pad*2);
         this.loading_text = text = this.add.text(cam.width/2, cam.height*2/3, "配對中 .", {
             fontFamily: 'Gen Jyuu Gothic P',
-            fontSize: 64,
+            fontStyle: 'bold',
+            fontSize: 48,
             color: '#fefefe'
         }).setOrigin(0,0);
         text.setPosition(Math.round(text.x-text.width/2), Math.round(text.y-text.height/2));
