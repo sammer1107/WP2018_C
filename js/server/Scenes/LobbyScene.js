@@ -4,7 +4,7 @@ var utils = require('../utils');
 var map = utils.loadMap('map_muzikuro.json');
 
 const CHECK_INTERVAL = 10*1000;
-const MAX_PLAYERS = 2;
+const MAX_PLAYERS = 4;
 
 class LobbyScene extends BaseScene{
     constructor(GameManager){

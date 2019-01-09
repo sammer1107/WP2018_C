@@ -6,7 +6,6 @@ and make transition between game scenes.
 
 var constants = require('./constants');
 var MUZI = constants.MUZI;
-var KURO = constants.KURO;
 var escapeHTML = require('./utils').escapeHTML;
 var Players = require('./Players');
 var Player = Players.Player;
