@@ -29,6 +29,7 @@ class MuziKuro extends BaseScene{
         this.theme_song = ThemeSongs.LittleBee;
         this.notes = new NotesList(this.theme_song, map);
         this.timer = 0;
+        this.answered_group.length = 0;
         // exchange composition
         var groups = this.game.groups;
         if(groups.length >= 2){
@@ -88,7 +89,7 @@ class MuziKuro extends BaseScene{
         clearInterval(this.tempo);
         clearInterval(this.check_interval);
         this.socketOff('noteCollect');
-        this.socketOff('answerSubit');
+        this.socketOff('answerSubmit');
         return;
     }
     
@@ -148,11 +149,13 @@ class MuziKuro extends BaseScene{
     }
 
     onClientAnswerSubmit(socket, answer) {
+        Log(`Submit from: ${socket.id}`);
         let player = this.game.players.get(socket.id);
         let pl_grp = player.group;
         if(!this.answered_group.includes(pl_grp)) {
             let ques = pl_grp.composition;
-            let match_num = answer.filter((v, i) => ques[i] === v ).length;
+            Log(`${answer.filter((v, i) => ques[i] == v )}`);
+            let match_num = answer.filter((v, i) => ques[i] == v ).length;
             let score = match_num*60;
             if(match_num == answer.length) {
                 score *= 2;
@@ -162,11 +165,11 @@ class MuziKuro extends BaseScene{
                 score: score,
                 note_get: null
             };
-            this.io.to(socket.id).emit('scoreUpdate', reward);
+            socket.emit('scoreUpdate', reward);
             this.io.to(player.partner_id).emit('scoreUpdate', reward);
             this.answered_group.push(pl_grp);
         }
-        if(answered_group.length == this.game.groups.length) {
+        if(this.answered_group.length == this.game.groups.length) {
             this.gameFinish();
         }
     }
@@ -183,6 +186,11 @@ class MuziKuro extends BaseScene{
 
     gameFinish() {
         this.io.emit('gameFinish');
+        for(let grp of this.game.groups) {
+            for(let pl of grp.players) {
+                pl.setAvailable(false);
+            }
+        }
         this.stop();
         this.game.startScene("Lobby");
     }

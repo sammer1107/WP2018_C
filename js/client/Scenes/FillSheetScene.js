@@ -247,7 +247,7 @@ export default class FillSheetScene extends Phaser.Scene{
         this.window.setActive(false);
         this.close(pointer);
         this.events.emit('windowClose', true);
-        this.events.emit('answerSubmit', sheet);
+        this.game.socket.emit('answerSubmit', sheet);
         this.events.emit("fillDone", true);
     }
     

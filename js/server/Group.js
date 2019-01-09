@@ -40,6 +40,7 @@ class Group{
             p.x = null;
             p.y = null;
             p.partner_id = null;
+            p.group = null;
             p.role = null;
         }
     }

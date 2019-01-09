@@ -10,6 +10,10 @@ exports.PlayerList = class PlayerList extends Map{
     add(player){
         this.set(player.id, player);
     }
+
+    getAvailable() {
+        return Array.from(this.values()).filter(p => p.available);
+    }
     
     removeById(del_id){
         this.delete(del_id);
@@ -26,7 +30,18 @@ exports.Player = class Player{
         this.partner_id;
         this.role;
         this.group;
+        this.available = false;
         this.warning=0;
+    }
+
+    setAvailable(available) {
+        this.available = available;
+        if(available) {
+            this.socket.join('available');
+        }
+        else {
+            this.socket.leave('available');
+        }
     }
     
     setPosition(x,y){

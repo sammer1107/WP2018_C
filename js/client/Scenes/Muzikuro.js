@@ -28,7 +28,7 @@ export default class MuziKuro extends BaseGameScene {
         var socket = this.game.socket;
         this.listenToSocket(["disconnect", "playerMove", "destroyPlayer", "updatePartner",
                                 "notesUpdate", "notesRemove", "tempoMeasurePast", 'setCompose',
-                                "scoreUpdate"])
+                                "scoreUpdate", "gameFinish"])
 
         // create map
         var scale = this.cache.tilemap.get("map").data.scale;
@@ -188,7 +188,7 @@ export default class MuziKuro extends BaseGameScene {
     
     onScoreUpdate(reward) {
         this.score = reward.score;
-        Log(`Score Update to ${reward.score}`);
+        Log(`Score Update to ${this.score}`);
         if(reward.note_get !== null) {
             this.notes_item.set(reward.note_get, this.notes_item.get(reward.note_get)+1);
             Log(`Note Get: [${reward.note_get}]`);
@@ -318,6 +318,16 @@ export default class MuziKuro extends BaseGameScene {
             });
         }
         
+    }
+
+    onGameFinish() {
+        document.getElementById('score').innerText = `${this.score}`;
+        document.getElementById('end_screen').style.display = 'initial';
+        document.getElementById('end-button-ok').addEventListener('click', () => {
+            this.game.socket.emit('return');
+            document.getElementById('end_screen').style.display = 'none';
+            document.getElementById('score').innerText = '0';
+        }, { once:true });
     }
     
     finish(){

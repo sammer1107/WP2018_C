@@ -24,6 +24,7 @@ class GameManager{
         this.io.sockets.on('connection', function(socket){
             Log(`socket ID: ${socket.id} connected.`);
             this.bindSocket(socket, "login");
+            this.bindSocket(socket, "return");
             this.bindSocket(socket, "disconnect");
             this.bindSocket(socket, "playerMove");
             // other events will be handled in the scene level
@@ -34,6 +35,7 @@ class GameManager{
     onLogin(socket, data){
         var name = escapeHTML(data.name);
         var new_player = new Player(name, socket);
+        new_player.setAvailable(true);
         
         if(this.current_scene.onLogin){
             this.current_scene.onLogin(socket, new_player);
@@ -53,6 +55,23 @@ class GameManager{
 
         this.players.add(new_player);
 
+    }
+
+    onReturn(socket){
+        let player = this.players.get(socket.id);
+        player.setAvailable(true);
+        var players_info = [];
+        for(let p of this.players.values()){
+            players_info.push(p.info());
+        }
+        socket.emit('sceneTransition', {
+            scene: this.current_scene.key,
+            scene_data: this.current_scene.getSceneState(),
+            players: players_info,
+        });
+        if(this.current_scene.onReturn) {
+            this.current_scene.onReturn(socket, player);
+        }
     }
         
     onDisconnect(socket, reason){
@@ -91,7 +110,7 @@ class GameManager{
             player.warning += 1;
             if(player.warning > 100){
                 socket.disconnect(true);
-                Log('Disconnected ${socket.id} (${player.name}) : too much warning.');
+                Log(`Disconnected ${socket.id} (${player.name}) : too much warning.`);
             }
             return;
         }
@@ -110,7 +129,7 @@ class GameManager{
         for(let p of this.players.values()){
             players_info.push(p.info());
         }
-        this.io.emit('sceneTransition', {
+        this.io.to('available').emit('sceneTransition', {
             scene: next.key,
             scene_data: next.getInitData(),
             players: players_info,
