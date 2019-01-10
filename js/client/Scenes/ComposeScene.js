@@ -19,8 +19,8 @@ export default class ComposeScene extends BaseGameScene{
         this.listenToSocket(["disconnect", "playerMove", "destroyPlayer", "updatePartner"])
 
         // create map
-        var scale = this.cache.tilemap.get("map").data.scale;
         var map = this.make.tilemap({ key: 'map'});
+        var scale = map.properties.find(prop => prop.name == 'scale').value;
         var tileset = map.addTilesetImage('tileset_0');      // name as specified in map.json
         this.layer_floor = map.createDynamicLayer('floor', tileset);
         this.layer_floor.setDepth(-2);
@@ -28,15 +28,8 @@ export default class ComposeScene extends BaseGameScene{
         this.layer_wall = map.createDynamicLayer('wall', tileset);
         this.layer_wall.setDepth(-1);
         this.layer_wall.setScale(scale);
-        this.layer_floor.setCollisionBetween(106,176)
-                        .setCollisionBetween(78,81);
-        this.layer_wall.setCollisionBetween(22,29)
-                        .setCollisionBetween(33,36)
-                        .setCollisionBetween(40,41)
-                        .setCollisionBetween(43,52)
-                        .setCollisionBetween(78,81)
-                        .setCollision(69)
-                        .setCollisionBetween(106,176);
+        this.layer_floor.setCollisionByProperty({ collides: 1 });
+        this.layer_wall.setCollisionByProperty({ collides: 1 });
                         
         this.physics.world.setBounds(0,0,this.layer_floor.width*scale,this.layer_floor.height*scale);
         //this.cameras.main.roundPixels = true;
@@ -55,7 +48,9 @@ export default class ComposeScene extends BaseGameScene{
             }).on('pointerdown', this.onPhonoClicked, this)
         }
         if(this.local_player.group){
-            this.physics.world.addCollider(this.local_player.group, this.phonograph);            
+            this.physics.world.addCollider(this.local_player.group, this.phonograph);     
+            this.physics.add.collider(this.local_player.group, this.layer_wall);
+            this.physics.add.collider(this.local_player.group, this.layer_floor);            
         }
 
         this.game.hud.bind(this);

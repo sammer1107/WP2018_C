@@ -34,11 +34,15 @@ module.exports = {
     },
     
     loadMap(asset){
-        var map = JSON.parse(fs.readFileSync(path.join(process.cwd(), '/assets', asset), 'utf8'));
+        var map = JSON.parse(fs.readFileSync(path.join(process.cwd(), '/assets/maps', asset), 'utf8'));
+        for(let prop of map.properties){
+            map[prop.name] = prop.value;
+        }
         map.realHeight = map.height * map.tileheight * map.scale;
         map.realWidth = map.width * map.tilewidth * map.scale;
         map.centerY = map.realHeight/2;
         map.centerX = map.realWidth/2;
+        console.log(map.centerX, map.centerY)
         return map;
     },
 }

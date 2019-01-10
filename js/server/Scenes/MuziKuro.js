@@ -10,7 +10,7 @@ const NOTE_SCORE_BONUS = 10;
 const BackupComposition = constants.BackupComposition;
 const ThemeSongs = constants.ThemeSongs;
 
-var map = utils.loadMap('map_muzikuro.json');
+var map = utils.loadMap('muzikuro.json');
 
 class MuziKuro extends BaseScene{
     constructor(GameManager){

@@ -25,7 +25,7 @@ export default class Group extends Phaser.GameObjects.Container{
         this.setSize(90,55);
         this.scene.add.existing(this);
         this.scene.physics.world.enable(this);
-        this.body.setOffset(0, -this.height/2)
+        this.body.setSize(45,45).setOffset(22.5,-15);
         this.body.setCollideWorldBounds(true)
         // need this so when frames are flipped using scaleX
         this.body.transform = new Phaser.GameObjects.Components.TransformMatrix(1,0,0,1,0,0); 

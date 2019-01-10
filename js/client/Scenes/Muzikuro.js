@@ -31,8 +31,8 @@ export default class MuziKuro extends BaseGameScene {
                                 "scoreUpdate", "gameFinish"])
 
         // create map
-        var scale = this.cache.tilemap.get("map").data.scale;
         var map = this.make.tilemap({ key: 'map'});
+        var scale = map.properties.find(prop => prop.name == 'scale').value;
         var tileset = map.addTilesetImage('tileset_0');      // name as specified in map.json
         this.layer_floor = map.createDynamicLayer('floor', tileset);
         this.layer_floor.setDepth(-2);
@@ -40,15 +40,8 @@ export default class MuziKuro extends BaseGameScene {
         this.layer_wall = map.createDynamicLayer('wall', tileset);
         this.layer_wall.setDepth(-1);
         this.layer_wall.setScale(scale);
-        this.layer_floor.setCollisionBetween(106,176)
-                        .setCollisionBetween(78,81);
-        this.layer_wall.setCollisionBetween(22,29)
-                        .setCollisionBetween(33,36)
-                        .setCollisionBetween(40,41)
-                        .setCollisionBetween(43,52)
-                        .setCollisionBetween(78,81)
-                        .setCollision(69)
-                        .setCollisionBetween(106,176);
+        this.layer_floor.setCollisionByProperty({ collides: 1 });
+        this.layer_wall.setCollisionByProperty({ collides: 1 });
         this.physics.world.setBounds(0,0,this.layer_floor.width*scale,this.layer_floor.height*scale);
         
         // yeah musics
@@ -106,7 +99,9 @@ export default class MuziKuro extends BaseGameScene {
         this.phonograph.setSheet(this.composition);
         this.phonograph.play('phonograph_play');
         if(this.local_player.group){
-            this.physics.world.addCollider(this.local_player.group, this.phonograph);
+            this.physics.world.addCollider(this.local_player.group, this.phonograph);     
+            this.physics.add.collider(this.local_player.group, this.layer_wall);
+            this.physics.add.collider(this.local_player.group, this.layer_floor);            
         }
         if(this.local_player.role == KURO){
             this.phonograph.setInteractive({
@@ -141,10 +136,10 @@ export default class MuziKuro extends BaseGameScene {
     
     onSetCompose(data){
         var i;
+        Log(`received composition`, data);
         for(i=0;i<COMPOSE_LEN;i++){
             this.composition[i] = data[i];            
         }
-        Log(`received composition`, this.composition);
     }
     
     onUpdatePartner(data){

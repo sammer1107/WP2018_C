@@ -9,8 +9,6 @@ export default class PreloadScene extends Phaser.Scene{
         this.load.setPath('/assets/')
         this.load.atlas('character', 'character.png', 'character.json')
         this.load.spritesheet('mininotes', 'mininotes.png', {frameWidth: 132, frameHeight:190})
-        this.load.tilemapTiledJSON('map', 'map_muzikuro.json');
-        this.load.image('tileset_0', 'tileset_0.png');
         this.load.atlas('music_notes','music_notes.png', 'music_notes.json');
         this.load.audio('piano', 'piano_pitch4.ogg');
         this.load.audio('drumbeat', 'beat_0_115.mp3');
@@ -19,6 +17,9 @@ export default class PreloadScene extends Phaser.Scene{
         this.load.spritesheet('waiting', 'lick.png', {frameWidth: 266, frameHeight: 157});
         this.load.spritesheet('phonograph', 'phonograph.png', {frameWidth: 293, frameHeight:381});
         
+        this.load.tilemapTiledJSON('map', 'maps/muzikuro.json');
+        this.load.image('tileset_0', 'maps/tileset_0.png');
+
         this.load.setPath('/assets/UI/');
         this.load.setPrefix('UI.');
         this.load.image('windowCompose', 'windowCompose.png');

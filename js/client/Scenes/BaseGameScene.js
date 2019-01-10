@@ -67,7 +67,6 @@ export default class BaseGameScene extends Phaser.Scene{
             if(this.local_player.role == KURO){
                 this.input.on('pointerdown', this.moveToPointer, this);
             }
-            this.physics.add.collider(this.local_player.group, this.layer_wall)
         }
         
     }

@@ -11,6 +11,7 @@ export default class Phonograph extends Phaser.Physics.Arcade.Sprite {
         this.setDepth(-1);
         scene.add.existing(this);
         scene.physics.world.enable(this, 1);
+        this.body.setSize(200,100).setOffset(90,270);
     }
     
     setSheet(sheet) {

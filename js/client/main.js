@@ -36,13 +36,11 @@ $(document).ready(function(){
             }else{
                 logo.css("transform", `translate(-50%, -50%) scale(${0.05*Math.cos(15/2*Math.PI*(t-0.8))*Math.exp(-12*(t-0.8))+1})`);
             }
-        }, 300);
+        }, 300).start(500);
         
     var light_anim = new Animation(function(t) {
             light.css("clip-path", `circle(${1000*t}px at 48% 39%)`)
-        }, 250, ()=>light.css("clip-path", "unset") );
-    setTimeout( ()=> logo_anim.start() , 500);
-    setTimeout( ()=> light_anim.start() , 600);
+        }, 250, ()=>light.css("clip-path", "unset") ).start(600);
     setTimeout( ()=> notes.css("transform", "scale(1)"), 800);
     setTimeout( ()=> $("#welcome #start-button").css("top", "80%"), 1800);
     
