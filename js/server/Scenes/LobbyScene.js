@@ -21,7 +21,7 @@ class LobbyScene extends BaseScene{
         }
         this.game.groups.length = 0;
         var players = this.game.players.getAvailable();
-        Log(players);
+        //Log(players);
         utils.shuffle(players);
         for(let i=0; i<Math.floor(players.length/2)*2; i+=2){
             this.game.groups.push(new Group(players[i], players[i+1], ...this.getRandomSpawnPoint()));

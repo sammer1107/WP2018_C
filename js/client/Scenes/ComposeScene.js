@@ -1,12 +1,13 @@
 import BaseGameScene from './BaseGameScene.js'
 import Phonograph from '../GameObjects/Phonograph.js'
-import {log_func} from '../utils.js'
+import {log_func, getValueByName} from '../utils.js'
 import {MUZI, KURO} from '../constants.js'
 
 export default class ComposeScene extends BaseGameScene{
     constructor(){
         super({ key: 'Compose'});
         this.UI;
+        this.phonograph;
     }
     
     init(){
@@ -14,32 +15,19 @@ export default class ComposeScene extends BaseGameScene{
     }
     
     create(){
+        var collide_objects, collide_layers, map_scale;
         this.scene.launch('ComposeUI');
-        var socket = this.game.socket;
         this.listenToSocket(["disconnect", "playerMove", "destroyPlayer", "updatePartner"])
 
-        // create map
-        var map = this.make.tilemap({ key: 'map'});
-        var scale = map.properties.find(prop => prop.name == 'scale').value;
-        var tileset = map.addTilesetImage('tileset_0');      // name as specified in map.json
-        this.layer_floor = map.createDynamicLayer('floor', tileset);
-        this.layer_floor.setDepth(-2);
-        this.layer_floor.setScale(scale);
-        this.layer_wall = map.createDynamicLayer('wall', tileset);
-        this.layer_wall.setDepth(-1);
-        this.layer_wall.setScale(scale);
-        this.layer_floor.setCollisionByProperty({ collides: 1 });
-        this.layer_wall.setCollisionByProperty({ collides: 1 });
-                        
-        this.physics.world.setBounds(0,0,this.layer_floor.width*scale,this.layer_floor.height*scale);
-        //this.cameras.main.roundPixels = true;
+        collide_layers = this.createTileMap('muzikuro');
+        collide_objects = this.createMapObjects();
+        this.physics.world.setBounds(0, 0, this.map.realWidth, this.map.realHeight);
         
-        // yeah musics
-        this.sound.pauseOnBlur = false;
         
         this.createSpritePlayers();
+        map_scale = getValueByName('scale', this.map.properties) || 1;
         //set phonograph and phonoPiano
-        this.phonograph = new Phonograph(this, (this.layer_floor.width+128)*scale/2, (this.layer_floor.height+128)*scale/2);
+        this.phonograph = new Phonograph(this, (this.map.widthInPixels+128)*map_scale/2, (this.map.heightInPixels+128)*map_scale/2);
         this.phonograph.play('phonograph_play');
         if(this.local_player.role == MUZI){
             this.phonograph.setInteractive({
@@ -47,10 +35,11 @@ export default class ComposeScene extends BaseGameScene{
                 pixelPrefect: true
             }).on('pointerdown', this.onPhonoClicked, this)
         }
+        
         if(this.local_player.group){
-            this.physics.world.addCollider(this.local_player.group, this.phonograph);     
-            this.physics.add.collider(this.local_player.group, this.layer_wall);
-            this.physics.add.collider(this.local_player.group, this.layer_floor);            
+            this.physics.add.collider(this.local_player.group, this.phonograph);     
+            this.physics.add.collider(this.local_player.group, collide_layers);
+            this.physics.add.collider(this.local_player.group, collide_objects);
         }
 
         this.game.hud.bind(this);

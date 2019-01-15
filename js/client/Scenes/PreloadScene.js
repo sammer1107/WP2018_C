@@ -9,16 +9,22 @@ export default class PreloadScene extends Phaser.Scene{
         this.load.setPath('/assets/')
         this.load.atlas('character', 'character.png', 'character.json')
         this.load.spritesheet('mininotes', 'mininotes.png', {frameWidth: 132, frameHeight:190})
-        this.load.atlas('music_notes','music_notes.png', 'music_notes.json');
         this.load.audio('piano', 'piano_pitch4.ogg');
         this.load.audio('drumbeat', 'beat_0_115.mp3');
         this.load.audio('buttonClick', 'button.wav');
         this.load.audio('note_get', 'note_get.ogg');
         this.load.spritesheet('waiting', 'lick.png', {frameWidth: 266, frameHeight: 157});
+        this.load.atlas('music_notes','music_notes.png', 'music_notes.json');
         this.load.spritesheet('phonograph', 'phonograph.png', {frameWidth: 293, frameHeight:381});
         
-        this.load.tilemapTiledJSON('map', 'maps/muzikuro.json');
-        this.load.image('tileset_0', 'maps/tileset_0.png');
+        this.load.setPath('/assets/maps/');
+        this.load.setPrefix('map.');
+        this.load.tilemapTiledJSON('muzikuro', 'muzikuro.json');
+        this.load.image('tileset_0', 'tileset_0.png');
+        
+        this.load.setPath('/assets/maps/objects/');
+        this.load.atlas('objects', 'objects.png', 'objects.json');
+        this.load.json('objects.config', 'config.json');
 
         this.load.setPath('/assets/UI/');
         this.load.setPrefix('UI.');

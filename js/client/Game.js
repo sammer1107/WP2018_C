@@ -25,6 +25,11 @@ export default class Game extends Phaser.Game {
         Log('preload complete.');
         this.preload_complete = true;
         this.scene.remove('Preload');
+        this.setup();
+    }
+    
+    setup(){
+        this.sound.pauseOnBlur = false;
     }
     
     onGameInit(data){

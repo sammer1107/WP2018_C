@@ -15,6 +15,7 @@ export default class Note extends Phaser.Physics.Arcade.Sprite {
         }
         //console.log(this.melody.length);
         this.volume = 0;
+        this.setDepth(y/scene.map.realHeight).setOrigin(0.5,1);
     }
 
     static setSoundPool(scene, asset_key, markers, amount) {

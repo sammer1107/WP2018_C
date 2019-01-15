@@ -73,4 +73,10 @@ export default class Group extends Phaser.GameObjects.Container{
         this.removeAll();
         super.destroy();
     }
+    
+    update(time, delta){
+        this.muzi.anims.update(time, delta);
+        this.kuro.anims.update(time, delta);
+        this.depth = this.y / this.scene.map.realHeight;
+    }
 }

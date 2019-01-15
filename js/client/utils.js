@@ -36,6 +36,12 @@ export function randint(min, max){
     return Math.floor(Math.random() * (max - min) + min);
 }
 
+export function getValueByName(name, properties){
+    // this function is used to retrieve value from Tiled's format of custom properties
+    var prop = properties.find(prop => prop.name == name);
+    return prop ? prop.value : undefined;
+}
+
 export class Animation{
     constructor(update, duration, callback){
         this.duration = duration;

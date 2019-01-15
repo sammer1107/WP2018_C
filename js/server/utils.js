@@ -42,7 +42,6 @@ module.exports = {
         map.realWidth = map.width * map.tilewidth * map.scale;
         map.centerY = map.realHeight/2;
         map.centerX = map.realWidth/2;
-        console.log(map.centerX, map.centerY)
         return map;
     },
 }

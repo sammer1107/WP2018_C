@@ -1,0 +1,186 @@
+{
+	"textures": [
+		{
+			"image": "objects.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 656,
+				"h": 656
+			},
+			"scale": 1,
+			"frames": [
+				{
+					"filename": "apple_tree", 
+					"rotated": false, 
+					"trimmed": true, 
+					"sourceSize": { 
+						"w": 165, 
+						"h": 280 
+					}, 
+					"spriteSourceSize": { 
+						"x": 0, 
+						"y": 0, 
+						"w": 165, 
+						"h": 280 
+					}, 
+					"frame": { 
+						"x": 367, 
+						"y": 0, 
+						"w": 165, 
+						"h": 280 
+					} 
+				},
+				{
+					"filename": "flat_cactus", 
+					"rotated": false, 
+					"trimmed": true, 
+					"sourceSize": { 
+						"w": 233, 
+						"h": 144 
+					}, 
+					"spriteSourceSize": { 
+						"x": 0, 
+						"y": 0, 
+						"w": 233, 
+						"h": 144 
+					}, 
+					"frame": { 
+						"x": 300, 
+						"y": 285, 
+						"w": 233, 
+						"h": 144 
+					} 
+				},
+				{
+					"filename": "giant_cactus", 
+					"rotated": false, 
+					"trimmed": true, 
+					"sourceSize": { 
+						"w": 305, 
+						"h": 375 
+					}, 
+					"spriteSourceSize": { 
+						"x": 3, 
+						"y": 1, 
+						"w": 298, 
+						"h": 369 
+					}, 
+					"frame": { 
+						"x": 0, 
+						"y": 285, 
+						"w": 298, 
+						"h": 369 
+					} 
+				},
+				{
+					"filename": "rock", 
+					"rotated": false, 
+					"trimmed": true, 
+					"sourceSize": { 
+						"w": 227, 
+						"h": 139 
+					}, 
+					"spriteSourceSize": { 
+						"x": 0, 
+						"y": 0, 
+						"w": 227, 
+						"h": 139 
+					}, 
+					"frame": { 
+						"x": 300, 
+						"y": 431, 
+						"w": 227, 
+						"h": 139 
+					} 
+				},
+				{
+					"filename": "round_cactus", 
+					"rotated": false, 
+					"trimmed": true, 
+					"sourceSize": { 
+						"w": 125, 
+						"h": 121 
+					}, 
+					"spriteSourceSize": { 
+						"x": 0, 
+						"y": 0, 
+						"w": 125, 
+						"h": 121 
+					}, 
+					"frame": { 
+						"x": 529, 
+						"y": 431, 
+						"w": 125, 
+						"h": 121 
+					} 
+				},
+				{
+					"filename": "tent", 
+					"rotated": false, 
+					"trimmed": true, 
+					"sourceSize": { 
+						"w": 365, 
+						"h": 283 
+					}, 
+					"spriteSourceSize": { 
+						"x": 0, 
+						"y": 0, 
+						"w": 365, 
+						"h": 283 
+					}, 
+					"frame": { 
+						"x": 0, 
+						"y": 0, 
+						"w": 365, 
+						"h": 283 
+					} 
+				},
+				{
+					"filename": "pine_tree", 
+					"rotated": false, 
+					"trimmed": true, 
+					"sourceSize": { 
+						"w": 128, 
+						"h": 270 
+					}, 
+					"spriteSourceSize": { 
+						"x": 5, 
+						"y": 4, 
+						"w": 117, 
+						"h": 265 
+					}, 
+					"frame": { 
+						"x": 534, 
+						"y": 0, 
+						"w": 117, 
+						"h": 265 
+					} 
+				},
+				{
+					"filename": "weed", 
+					"rotated": false, 
+					"trimmed": true, 
+					"sourceSize": { 
+						"w": 109, 
+						"h": 102 
+					}, 
+					"spriteSourceSize": { 
+						"x": 0, 
+						"y": 0, 
+						"w": 109, 
+						"h": 102 
+					}, 
+					"frame": { 
+						"x": 535, 
+						"y": 267, 
+						"w": 109, 
+						"h": 102 
+					} 
+				}
+			]
+		}
+	],
+	"meta": {
+		"app": "shoebox"
+	}
+}

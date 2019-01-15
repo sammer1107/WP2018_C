@@ -1,0 +1,54 @@
+{
+    "giant_cactus":{
+        "collides": true, 
+        "collide_w": 194,
+        "collide_h": 128,
+        "collide_offset_x": 66,
+        "collide_offset_y": 242
+    },
+    "apple_tree":{
+        "collides": true, 
+        "collide_w": 128,
+        "collide_h": 94,
+        "collide_offset_x": 18,
+        "collide_offset_y": 173
+    },
+    "pine_tree":{
+        "collides": true, 
+        "collide_w": 96,
+        "collide_h": 64,
+        "collide_offset_x": 16,
+        "collide_offset_y": 200
+    },
+    "rock":{
+        "collides": true, 
+        "collide_w": 216,
+        "collide_h": 46,
+        "collide_offset_x": 7,
+        "collide_offset_y": 80
+    },
+    "flat_cactus":{
+        "collides": true, 
+        "collide_w": 233,
+        "collide_h": 45,
+        "collide_offset_x": 0,
+        "collide_offset_y": 91
+    },
+    "tent":{
+        "collides": true, 
+        "collide_w": 350,
+        "collide_h": 167,
+        "collide_offset_x": 10,
+        "collide_offset_y": 94
+    },
+    "round_cactus":{
+        "collides": true, 
+        "collide_w": 125,
+        "collide_h": 33,
+        "collide_offset_x": 0,
+        "collide_offset_y": 83
+    },
+    "weed":{
+        "collides": false 
+    }
+}

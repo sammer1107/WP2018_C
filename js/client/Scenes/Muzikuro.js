@@ -4,7 +4,7 @@ import {LocalPlayer, RemotePlayer} from '../GameObjects/Player.js'
 import Group from '../GameObjects/Group.js'
 import Note from '../GameObjects/Note.js'
 import Phonograph from '../GameObjects/Phonograph.js'
-import {log_func, Animation} from '../utils.js'
+import {log_func, Animation, getValueByName} from '../utils.js'
         
 const COMPOSE_LEN = 8;
 const NOTE_SCALE = 0.6;
@@ -25,27 +25,17 @@ export default class MuziKuro extends BaseGameScene {
     }
     
     create(data){
-        var socket = this.game.socket;
+        var collide_layers, collide_objects, map_scale;
         this.listenToSocket(["disconnect", "playerMove", "destroyPlayer", "updatePartner",
                                 "notesUpdate", "notesRemove", "tempoMeasurePast", 'setCompose',
                                 "scoreUpdate", "gameFinish"])
 
-        // create map
-        var map = this.make.tilemap({ key: 'map'});
-        var scale = map.properties.find(prop => prop.name == 'scale').value;
-        var tileset = map.addTilesetImage('tileset_0');      // name as specified in map.json
-        this.layer_floor = map.createDynamicLayer('floor', tileset);
-        this.layer_floor.setDepth(-2);
-        this.layer_floor.setScale(scale);
-        this.layer_wall = map.createDynamicLayer('wall', tileset);
-        this.layer_wall.setDepth(-1);
-        this.layer_wall.setScale(scale);
-        this.layer_floor.setCollisionByProperty({ collides: 1 });
-        this.layer_wall.setCollisionByProperty({ collides: 1 });
-        this.physics.world.setBounds(0,0,this.layer_floor.width*scale,this.layer_floor.height*scale);
+        collide_layers = this.createTileMap('muzikuro');
+        collide_objects = this.createMapObjects();
+        this.physics.world.setBounds(0, 0, this.map.realWidth, this.map.realHeight);
+
         
         // yeah musics
-        this.sound.pauseOnBlur = false;
         this.music_notes = this.physics.add.group();
         this.playerPiano = this.sound.add('piano');
         this.note_get_sfx = this.sound.add('note_get');
@@ -93,15 +83,16 @@ export default class MuziKuro extends BaseGameScene {
         this.game.hud.updatePlayerState();
         this.game.hud.resetBoard();
         
+        map_scale = getValueByName('scale', this.map.properties) || 1;
         //set phonograph and phonoPiano
-        this.phonograph = new Phonograph(this, (this.layer_floor.width+128)*scale/2, (this.layer_floor.height+128)*scale/2);
+        this.phonograph = new Phonograph(this, (this.map.widthInPixels+128)*map_scale/2, (this.map.heightInPixels+128)*map_scale/2);
         this.phonograph.addPhonoSoundMarker();
         this.phonograph.setSheet(this.composition);
         this.phonograph.play('phonograph_play');
         if(this.local_player.group){
-            this.physics.world.addCollider(this.local_player.group, this.phonograph);     
-            this.physics.add.collider(this.local_player.group, this.layer_wall);
-            this.physics.add.collider(this.local_player.group, this.layer_floor);            
+            this.physics.add.collider(this.local_player.group, this.phonograph);     
+            this.physics.add.collider(this.local_player.group, collide_objects);
+            this.physics.add.collider(this.local_player.group, collide_layers);            
         }
         if(this.local_player.role == KURO){
             this.phonograph.setInteractive({
@@ -110,7 +101,8 @@ export default class MuziKuro extends BaseGameScene {
             }).on('pointerdown', this.onPhonoClicked, this)         
         }
         
-        var mininote = this.add.particles('mininotes');
+        // TODO: move this into the phonograph
+        var mininote = this.add.particles('mininotes').setDepth(1);
         mininote.createEmitter({
             x: this.phonograph.x-43,
             y: this.phonograph.y-182,
@@ -187,6 +179,7 @@ export default class MuziKuro extends BaseGameScene {
         if(reward.note_get !== null) {
             this.notes_item.set(reward.note_get, this.notes_item.get(reward.note_get)+1);
             Log(`Note Get: [${reward.note_get}]`);
+            // TODO: directly set the item number should be better
             this.UI.addItem(reward.note_get);
         }
     }

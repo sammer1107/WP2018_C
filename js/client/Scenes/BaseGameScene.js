@@ -1,11 +1,13 @@
 /*
-This is a BaseGameScene that allow players to be created, moving with animation and toggling UI using Q.
+This is a BaseGameScene that does:
++ creating player
++ creating map
 */
 import {MOVE_SPEED, WALK_ANIM_DURATION, MOVE_UPDATE_PER_SEC, 
         FRONT, LEFT, RIGHT, BACK, MUZI, KURO} from '../constants.js'
 import {LocalPlayer, RemotePlayer} from '../GameObjects/Player.js'
 import Group from '../GameObjects/Group.js'
-import {getDirection} from '../utils.js'
+import {getDirection, getValueByName} from '../utils.js'
 
 const MOVE_SEND_INTERVAL = 1000/MOVE_UPDATE_PER_SEC;
 
@@ -61,7 +63,6 @@ export default class BaseGameScene extends Phaser.Scene{
             }
         }
         if(this.local_player.group){
-            this.local_player.group.setDepth(1);
             this.cameras.main.startFollow(this.local_player.group);
             this.cameras.main.setLerp(0.15,0.15);
             if(this.local_player.role == KURO){
@@ -116,10 +117,7 @@ export default class BaseGameScene extends Phaser.Scene{
             this.game.hud.hideLeaderBoard();
         }
         
-        this.players.forEach(function(player){
-            if(player.in_game) player.anims.update(time, delta);
-        })
-        
+        this.groups.forEach( g => g.update(time, delta))        
     }
       
     onPlayerMove(data){
@@ -212,5 +210,112 @@ export default class BaseGameScene extends Phaser.Scene{
             this.game.socket.off(c, this.callbacks.get(c));
             this.callbacks.delete(c);
         }
+    }
+    
+    setEdgeCollisionByProperty(tile){
+        /*
+        tile.properties.collides is define in the map
+        It is a binary number consists of four bit
+        each bit represent whether the direction has collisions
+        The value is the decimal form of the four bits
+        decimal values for each direction:
+            left  right  up  down
+            8     4      2   1
+        */
+        var collides = tile.properties.collides,
+            layer = tile.tilemapLayer,
+            left, right, up, down;
+            
+        if(collides == 15 || !collides){
+            return;
+        }
+        
+        collides = collides.toString(2).padStart(4, '0');
+        left = collides[0];
+        right = collides[1];
+        up = collides[2];
+        down = collides[3];
+            
+        if(left === '1'){
+            let neighbor = layer.getTileAt(tile.x-1, tile.y, true);
+            tile.collideLeft = true;
+            tile.faceLeft = true;
+            neighbor.collideRight = true;
+            neighbor.faceRight = true;
+        }
+        if(right === '1'){
+            let neighbor = layer.getTileAt(tile.x+1, tile.y, true);
+            tile.collideRight = true;
+            tile.faceRight = true;
+            neighbor.collideLeft = true;
+            neighbor.faceLeft = true;
+        }
+        if(up === '1'){
+            let neighbor = layer.getTileAt(tile.x, tile.y-1, true);
+            tile.collideUp = true;
+            tile.faceTop = true;
+            neighbor.collideDown = true;
+            neighbor.faceBottom = true;
+        }
+        if(down === '1'){
+            let neighbor = layer.getTileAt(tile.x, tile.y+1, true);
+            tile.collideDown = true;
+            tile.faceBottom = true;
+            neighbor.collideUp = true;
+            neighbor.faceTop = true;
+        }
+    }
+    
+    createMapObjects(){
+        let obj_config = this.cache.json.get('map.objects.config'),
+            map_scale = getValueByName('scale', this.map.properties) || 1,
+            collide_objects = [];
+        for(let obj_layer of this.map.objects){
+            for(let obj of obj_layer.objects){
+                let obj_scale = map_scale;
+                if(obj.properties){
+                    obj_scale *= (getValueByName('scale', obj.properties) || 1);
+                }
+                obj = this.add.image(obj.x*map_scale, obj.y*map_scale,'map.objects', obj.name).setName(obj.name);
+                obj.setOrigin(0.5,1).setScale(obj_scale);
+                obj.depth = obj.y/this.map.realHeight;
+                if(obj_config[obj.name].collides){
+                    this.physics.add.existing(obj, true);
+                    let collide_w = obj_config[obj.name].collide_w,
+                        collide_h = obj_config[obj.name].collide_h,
+                        offset_x = obj_config[obj.name].collide_offset_x,
+                        offset_y = obj_config[obj.name].collide_offset_y;
+                        
+                    obj.body.setSize(collide_w*obj_scale, collide_h*obj_scale)
+                            .setOffset( (offset_x - obj.width * 0.5) * obj_scale + obj.width * 0.5,
+                                        (offset_y - obj.height) * obj_scale + obj.height);                    
+                    collide_objects.push(obj);
+                }
+            }
+        }
+        
+        return collide_objects;
+    }
+    
+    createTileMap(key){
+        var map, tileset, map_scale, collide_layers = []; 
+        
+        this.map = map = this.make.tilemap({ key: `map.${key}`});
+        tileset = map.addTilesetImage('tileset_0', 'map.tileset_0');
+        
+        map_scale = getValueByName('scale', map.properties) || 1;
+        map.realHeight = map.heightInPixels*map_scale;
+        map.realWidth = map.widthInPixels*map_scale;
+        for(let i=0; i<map.layers.length; i++){
+            let layer = map.createDynamicLayer(i, tileset)
+                .setDepth(-map.layers.length+i)
+                .setScale(map_scale)
+                .setCollisionByProperty({ collides: 15 });
+            // advanced collision setting
+            layer.forEachTile(this.setEdgeCollisionByProperty)
+            collide_layers.push(layer);
+        }
+        
+        return collide_layers;
     }
 }
