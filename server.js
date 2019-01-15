@@ -1,6 +1,7 @@
 const webpack = require('webpack');
 const middleware = require('webpack-dev-middleware');
 const express = require("express");
+const path = require('path');
 const app = express();
 const port = process.env.PORT || 11070;
 
@@ -53,7 +54,7 @@ else{
 }
 
 // *** routes *** //
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(path.join(__dirname, 'public')));
 app.use('/client', express.static(__dirname + '/js/dist'));
 app.use('/jquery', express.static(__dirname + '/node_modules/jquery/dist'))
 app.use('/lib', express.static(__dirname + '/js/client/lib'))
