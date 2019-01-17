@@ -4,7 +4,8 @@ import {LocalPlayer, RemotePlayer} from '../GameObjects/Player.js'
 import Group from '../GameObjects/Group.js'
 import Note from '../GameObjects/Note.js'
 import Phonograph from '../GameObjects/Phonograph.js'
-import {log_func, Animation, getValueByName} from '../utils.js'
+import {log_func, getValueByName} from '../utils.js'
+import Animation from '../lib/Animation.js'
         
 const COMPOSE_LEN = 8;
 const NOTE_SCALE = 0.6;
@@ -304,14 +305,22 @@ export default class MuziKuro extends BaseGameScene {
         var light = $('#end-screen #end-light'),
             end_screen = $('#end-screen'),
             light_anim;
+            
         end_screen.css({
             'visibility': 'visible',
             'opacity': 1
         });
+        
         $('#score').text(`${this.score}`);
-        light_anim = new Animation((t)=>{
-            light.css("transform", `scale(${t*2.5})`)
-        }, 600, ()=> light.addClass('light-rotate')).start(200);
+        
+        light_anim = new Animation({
+            duration: 600,
+            delay: 200,
+            update: (t)=>{
+                light.css("transform", `scale(${t*2.5})`)
+            },
+            callback: () => light.addClass('light-rotate')
+        }).start();
 
         $('#end-button-ok').one('click', ()=>{
             this.game.socket.emit('return');

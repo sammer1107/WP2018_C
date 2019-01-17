@@ -1,13 +1,12 @@
 "use strict";
-//import Phaser from './lib/phaser.js'
 import PreloadScene from './Scenes/PreloadScene.js'
 import LobbyScene from './Scenes/LobbyScene.js'
 import ComposeScene from './Scenes/ComposeScene.js'
-import FillSheetScene from './Scenes/FillSheetScene.js'
 import ComposeUI from './Scenes/ComposeUI.js'
 import MuziKuro from './Scenes/Muzikuro.js'
+import FillSheetScene from './Scenes/FillSheetScene.js'
 import Game from './Game.js'
-import {Animation} from './utils.js'
+import Animation from './lib/Animation.js'
 
 var config = {
     type: Phaser.AUTO, // renderer setting
@@ -24,28 +23,37 @@ var config = {
 
 var game;
 
-$(document).ready(function(){
-    var start_t,
-    logo=$("#welcome .logo"),
-    notes=$("#welcome #notes"),
-    light=$("#welcome #light");
+$(document).ready( function(){
+    var logo=$("#welcome .logo"),
+        notes=$("#welcome #notes"),
+        light=$("#welcome #light");
     
-    var logo_anim = new Animation(function(t){
-            if(t<=0.8){
+    var logo_anim = new Animation({
+        duration: 300,
+        delay: 500,
+        update: (t)=>{
+            if(t <= 0.8){
                 logo.css("transform", `translate(-50%, -50%) scale(${2.625*t-1.6406*t*t})`);            
             }else{
                 logo.css("transform", `translate(-50%, -50%) scale(${0.05*Math.cos(15/2*Math.PI*(t-0.8))*Math.exp(-12*(t-0.8))+1})`);
             }
-        }, 300).start(500);
+        }
+    }).start();
         
-    var light_anim = new Animation(function(t) {
+    var light_anim = new Animation({
+        duration: 250,
+        delay: 600,
+        update: (t)=>{
             light.css("clip-path", `circle(${1000*t}px at 48% 39%)`)
-        }, 250, ()=>light.css("clip-path", "unset") ).start(600);
+        },
+        callback: () => light.css("clip-path", "unset") 
+    }).start();
+    
     setTimeout( ()=> notes.css("transform", "scale(1)"), 800);
     setTimeout( ()=> $("#welcome #start-button").css("top", "80%"), 1800);
     
     notes.one('transitionend', function(e) {
-        notes.addClass("float_anim");
+        notes.addClass("float-anim");
     });
     
     $("#start-button").click(function(){
@@ -57,7 +65,6 @@ $(document).ready(function(){
         $(document).on("keypress", function(press){
             if(press.which == 13){ // enter
                 $("#nickname #enter").click();
-                $(document).off("keypress");
             } 
         })
     })
@@ -66,13 +73,16 @@ $(document).ready(function(){
 function joinGame(){
     var name = $("#nickname input").val().substring(0,20);
     var login = function(){
-        $("#welcome").animate({"opacity": "0"}, { complete: ()=> $("#welcome").css("display", "none") });
+        $("#welcome").animate({"opacity": "0"}, {
+            complete: ()=> $("#welcome").css("display", "none")
+        });
         game.socket.emit("login", { name: name });
     };
    
     if(name){
         $("#start-button").off('click');
         $("#nickname #enter").off('click')
+        $(document).off("keypress");
         if(game.preload_complete){
             login();
         }

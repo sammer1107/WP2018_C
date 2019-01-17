@@ -41,31 +41,3 @@ export function getValueByName(name, properties){
     var prop = properties.find(prop => prop.name == name);
     return prop ? prop.value : undefined;
 }
-
-export class Animation{
-    constructor(update, duration, callback){
-        this.duration = duration;
-        this.update = update;
-        this.callback = callback;
-        this.start_t;
-        this.progress;        
-    }
-    
-    next(t){
-        if (!this.start_t) this.start_t = t;
-        this.progress = Math.min((t - this.start_t)/this.duration, 1);
-        this.update(this.progress);
-        if (this.progress < 1) {
-            requestAnimationFrame(this.next.bind(this));
-        }
-        else if(this.callback){
-            this.callback();
-        }
-    }
-    
-    start(delay){
-        if(delay) setTimeout( () => requestAnimationFrame(this.next.bind(this)) , delay);
-        else requestAnimationFrame(this.next.bind(this))
-        return this;
-    }
-}
