@@ -301,8 +301,8 @@ export default class MuziKuro extends BaseGameScene {
     }
 
     onGameFinish() {
-        var light = $('#end_screen #end_light'),
-            end_screen = $('#end_screen'),
+        var light = $('#end-screen #end-light'),
+            end_screen = $('#end-screen'),
             light_anim;
         end_screen.css({
             'visibility': 'visible',
@@ -311,7 +311,7 @@ export default class MuziKuro extends BaseGameScene {
         $('#score').text(`${this.score}`);
         light_anim = new Animation((t)=>{
             light.css("transform", `scale(${t*2.5})`)
-        }, 600, ()=> light.addClass('light_rotate')).start(200);
+        }, 600, ()=> light.addClass('light-rotate')).start(200);
 
         $('#end-button-ok').one('click', ()=>{
             this.game.socket.emit('return');
@@ -319,7 +319,7 @@ export default class MuziKuro extends BaseGameScene {
                 'opacity': 0,
             }).one('transitionend', ()=>{
                 end_screen.css('visibility', 'hidden');                
-                light.removeClass('rotate_slow').css('transform', 'scale(0)');
+                light.removeClass('light-rotate').css('transform', 'scale(0)');
                 $('#score').text('0');
             });
         });

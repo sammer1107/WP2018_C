@@ -11,11 +11,11 @@
         <script src="/lib/phaser.min.js"></script>
     </head>
     <body>
-        <div id="welcome">
-            <div class="background"></div>
-            <div id="light" class='overlay'></div>
-            <div id="notes" class='overlay'></div>
-            <img src="./res/welcome_screen/logo.png" class="logo"></img>
+        <div id="welcome" class="full-viewport">
+            <div class="background fill-parent"></div>
+            <div id="light" class="overlay fill-parent"></div>
+            <div id="notes" class="overlay fill-parent"></div>
+            <img src="/assets/welcome_screen/logo.png" class="logo"></img>
             <button id="start-button"></button>
             <div id="nickname">
                 <div class="input">
@@ -25,15 +25,15 @@
             </div>
             <p class="text"></p>
         </div>
-        <div id="end_screen">
-            <div class="background"></div>
-            <div id="end_light" class="overlay"></div>
-            <div id="score_window" class="overlay">
+        <div id="end-screen" class="full-viewport">
+            <div class="background fill-parent"></div>
+            <div id="end-light" class="overlay fill-parent"></div>
+            <div id="score-window" class="overlay fill-parent">
                 <div id="score"></div>
                 <button id="end-button-ok"></button>
             </div>
         </div>
-        <div id="game-container">
+        <div id="game-container" class="full-viewport">
             <canvas id="game"></canvas>
         </div> 
     </body>
