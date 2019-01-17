@@ -78,11 +78,6 @@ export default class MuziKuro extends BaseGameScene {
         this.scene.launch('FillSheetScene');
         this.UI = this.scene.get('FillSheetScene');
         
-        // create hud
-        this.game.hud.bind(this);
-        this.game.hud.updatePlayerState();
-        this.game.hud.resetBoard();
-        
         map_scale = getValueByName('scale', this.map.properties) || 1;
         //set phonograph and phonoPiano
         this.phonograph = new Phonograph(this, (this.map.widthInPixels+128)*map_scale/2, (this.map.heightInPixels+128)*map_scale/2);
@@ -141,9 +136,6 @@ export default class MuziKuro extends BaseGameScene {
         this.groups = this.groups.filter( g => g !== lonely_player.group );
         lonely_player.group.destroy();
         lonely_player.partner_id = null;
-        
-        this.game.hud.resetBoard();
-        this.game.hud.updatePlayerState();
 
     }
 

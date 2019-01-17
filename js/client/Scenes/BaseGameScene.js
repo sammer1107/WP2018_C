@@ -109,14 +109,6 @@ export default class BaseGameScene extends Phaser.Scene{
             
         }
         
-        var keyQ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
-        if(Phaser.Input.Keyboard.JustDown(keyQ)) {
-            this.game.hud.showLeaderBoard();
-        }
-        if(Phaser.Input.Keyboard.JustUp(keyQ)) {
-            this.game.hud.hideLeaderBoard();
-        }
-        
         this.groups.forEach( g => g.update(time, delta))        
     }
       
@@ -156,9 +148,6 @@ export default class BaseGameScene extends Phaser.Scene{
             let player = this.players.get(data.id);
             player.destroy(); 
             this.players.delete(data.id)
-            //console.log("deleted player: ", this.players)
-            this.game.hud.resetBoard();
-            this.game.hud.updatePlayerState();
         }
     }
     

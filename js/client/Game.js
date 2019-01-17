@@ -1,5 +1,4 @@
 import io from 'socket.io-client'
-import HUD from './HUD.js'
 import {log_func} from './utils.js'
 import {RemotePlayer, LocalPlayer} from './GameObjects/Player.js'
 
@@ -18,7 +17,6 @@ export default class Game extends Phaser.Game {
             this.socket.on(e, this[`on${e[0].toUpperCase()}${e.substring(1)}`].bind(this));
         }
         
-        this.hud = new HUD();
     }
     
     onPreloadComplete(){

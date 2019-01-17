@@ -42,9 +42,6 @@ export default class ComposeScene extends BaseGameScene{
             this.physics.add.collider(this.local_player.group, collide_objects);
         }
 
-        this.game.hud.bind(this);
-        this.game.hud.updatePlayerState();
-        this.game.hud.resetBoard();
         this.UI = this.scene.get('ComposeUI');
         this.scene.sleep('ComposeUI');
         
@@ -58,10 +55,6 @@ export default class ComposeScene extends BaseGameScene{
         this.groups = this.groups.filter( g => g !== lonely_player.group );
         lonely_player.group.destroy();
         lonely_player.partner_id = null;
-
-        
-        this.game.hud.resetBoard();
-        this.game.hud.updatePlayerState();
 
     }
     
