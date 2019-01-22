@@ -1,29 +1,10 @@
-const path = require('path');
-const webpack = require('webpack');
+const webpack = require('webpack')
+const webpackMerge = require('webpack-merge')
+const common = require('./webpack.common.js')
 
-module.exports = {
-    entry: ['babel-polyfill', './js/client/main.js'],
+module.exports = webpackMerge(common, {
     mode: 'development',
-    output: {
-        filename: '[name].js',
-        path: path.resolve(__dirname, 'js/dist')
-    },
-    module: {
-        rules: [
-            {
-                test: /\.js$/,
-                exclude: [/node_modules/, /phaser.js/],
-                use: {
-                    loader: 'babel-loader',
-                    options: {
-                        presets: ['@babel/preset-env'],
-                        cacheDirectory: true,
-                    }
-                }
-            }
-        ]
-    },
-    devtool: "source-map",
+    devtool: 'source-map',
     optimization: {
         minimize: false
     },
@@ -36,4 +17,4 @@ module.exports = {
             __DEBUG: true, 
         }),
     ]
-};
+})

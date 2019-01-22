@@ -1,0 +1,193 @@
+body::after{ /* for image preloading */
+    position:absolute; width:0; height:0; overflow:hidden; z-index:-1;
+    content:url('/assets/about_us/icons/facebook-hover.png') url('/assets/about_us/icons/twitter-hover.png') url('/assets/about_us/icons/mail-hover.png') url('/assets/about_us/icons/github-hover.png');
+}
+
+#piano-page {
+	background-color: #f4b430;	
+}
+
+#project-page {
+	background-image: url('/assets/about_us/project_bg.svg');
+	font-family: "Gen Jyuu Gothic P", 'Varela Round';
+}
+
+#team-page {
+	background-color: #FBFBF9;
+}
+
+#project-page #text-area {
+	border-width: 0 0 0 1px;
+	border-color: white;
+	border-style: solid;
+	color: ivory;
+}
+
+#project-page #play-button {
+    color: ivory;
+    cursor: pointer;
+}
+
+#project-page #play-button a:visited{
+    color: inherit;
+    text-decoration: none;
+}
+#project-page #play-button a:link{
+    color: inherit;
+    text-decoration: none;
+}
+
+#project-page #play-button h1 span {
+    opacity: 0;
+    animation: twinkle 2s infinite;
+}
+
+@keyframes twinkle{
+    0%   {opacity:0;}
+    40%  {opacity:1;}
+    60%  {opacity:1;}
+    100% {opacity:0;}
+}
+
+#team-page footer {
+	background-color: #F1F1F1;
+}
+
+#team-container .button {
+    border: solid #B0B0AE;
+    border-width: 0 3px 3px 0;
+	cursor: pointer;
+}
+
+header {
+	background-color: white;
+	font-family: 'Varela Round', 'Gen Jyuu Gothic P', sans-serif;
+}
+
+header span {
+	font-size: 1rem;
+    font-weight: 300;
+}
+
+
+.button#left {
+	visibility: hidden;
+}
+
+#team-container .card {
+	background-color: red;
+}
+
+.icon {
+	/* background-color: #CAC0C0; */
+	border-radius: 50%;
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center;
+	cursor: pointer;
+}
+
+.icon#github {
+	background-image: url("/assets/about_us/icons/github.png");
+}
+.icon#github:hover {
+	background-image: url("/assets/about_us/icons/github-hover.png");
+}
+
+.icon#facebook {
+	background-image: url("/assets/about_us/icons/facebook.png");
+}
+.icon#facebook:hover {
+	background-image: url("/assets/about_us/icons/facebook-hover.png");
+}
+
+.icon#twitter {
+	background-image: url("/assets/about_us/icons/twitter.png");
+}
+.icon#twitter:hover {
+	background-image: url("/assets/about_us/icons/twitter-hover.png");
+}
+
+.icon#mail {
+	background-image: url("/assets/about_us/icons/mail.png");
+}
+.icon#mail:hover {
+	background-image: url("/assets/about_us/icons/mail-hover.png");
+}
+
+#title-container hr {
+	border: solid #DCDCDA 3px;
+}
+
+
+/* PIANO STYLE */
+#piano .keys {
+    background-color: #f4b430;
+    display: flex;
+    justify-content: center;
+}
+
+#piano .keys .key {
+    background-color: white;
+    border-radius: 0.2rem;
+    cursor: pointer;
+    height: 10rem;
+    margin: 0.1rem;
+    transition: background-color 0.3s;
+    width: 3rem;
+}
+
+#piano .keys .black {
+    width: 0;
+    margin: 0;
+    z-index: 2;
+}
+
+#piano .keys .black::before {
+    background-color: #f4b430;
+    border-radius: 0 0 0.2rem 0.2rem;
+    content: "";
+    display: block;
+    height: 6rem;
+    left: -0.9rem;
+    position: relative;
+    top: 0;
+    transition: background-color 0.3s;
+    width: 1.8rem;
+}
+
+#piano .key.indicate {
+    animation-name: indicate;
+	animation-duration: 1.5s;
+	animation-iteration-count: infinite;
+}
+
+#piano .key.black.indicate::before {
+	animation-name: indicate;
+	animation-duration: 1.5s;
+	animation-iteration-count: infinite;
+}
+
+#piano .key.pressed { /* for auto replay */
+	background-color: #8D4898;
+}
+#piano .key:active { /* for human hand play */
+	background-color: #8D4898;
+}
+
+#piano .key.black.pressed::before{
+	background-color: black;
+}
+#piano .key.black:active::before {
+	background-color: black;
+}
+
+@keyframes indicate {
+	0%   {}
+	25%  {background-color: #7bdece}
+	50%  {background-color: #7bdece}
+	85%  {}
+	100% {}
+}
+
+/* END OF PIANO STYLE */

@@ -1,29 +1,10 @@
-const path = require('path');
-const webpack = require('webpack');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const webpack = require('webpack')
+const webpackMerge = require('webpack-merge')
+const common = require('./webpack.common.js')
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 
-module.exports = {
-    entry: ['babel-polyfill', './js/client/main.js'],
+module.exports = webpackMerge(common, {
     mode: 'production',
-    output: {
-        filename: '[name].js',
-        path: path.resolve(__dirname, 'js/dist')
-    },
-    module: {
-        rules: [
-            {
-                test: /\.js$/,
-                exclude: [/node_modules/, /phaser.js/],
-                use: {
-                    loader: 'babel-loader',
-                    options: {
-                        presets: ['@babel/preset-env'],
-                        cacheDirectory: true,
-                    }
-                }
-            }
-        ]
-    },
     optimization: {
         minimizer: [
             new UglifyJsPlugin({
@@ -54,4 +35,4 @@ module.exports = {
             __DEBUG: false, 
         }),
     ]
-};
+})
