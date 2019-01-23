@@ -41,21 +41,21 @@ if (process.env.NODE_ENV === 'production') {
     config = require('./webpack.dev.js')
     var compiler = webpack(config)
     app.use(middleware(compiler, {
-        publicPath: '/dist/muzikuro',
+        publicPath: '/muzikuro/',
         stats: {
             colors: true,
             cached: false
         },
-        writeToDisk: true,
+        writeToDisk: false,
         logger: console
     }))
 }
 
 // *** routes *** //
-app.use('/', express.static(path.join(__dirname, 'dist')))
 app.use('/about_us', express.static(path.join(__dirname, 'src/about_us')))
 app.use('/jquery', express.static(path.join(__dirname, 'node_modules/jquery/dist')))
 app.use('/assets', express.static(path.join(__dirname, 'assets')))
+app.use('/', express.static(path.join(__dirname, 'dist')))
 app.get('/', function (req, res) {
     res.redirect('/about_us')
 })

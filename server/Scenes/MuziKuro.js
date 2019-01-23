@@ -33,6 +33,7 @@ class MuziKuro extends BaseScene{
         // exchange composition
         var groups = this.game.groups
         if(groups.length >= 2){
+            // exchange compositions
             utils.shuffle(groups)
             var tmp = groups[0].composition
             for(let i=0;i<groups.length-1;i++){

@@ -1,5 +1,7 @@
 export default class Animation{
     constructor(config){
+        this.start_t
+        this.progress        
         this.update = config.update
         this.duration = config.duration
         this.callback = config.callback
@@ -12,9 +14,6 @@ export default class Animation{
         if(!this.duration){
             console.warn('Duration of the Animation is not valid.')
         }
-
-        this.start_t
-        this.progress        
     }
     
     next(t){
@@ -30,7 +29,11 @@ export default class Animation{
     }
     
     start(){
-        if(this.delay) setTimeout( () => requestAnimationFrame(this.next.bind(this)), this.delay)
+        if(this.delay){
+            setTimeout( () => {
+                requestAnimationFrame(this.next.bind(this))
+            }, this.delay)
+        }
         else requestAnimationFrame(this.next.bind(this))
         return this
     }

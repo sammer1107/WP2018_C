@@ -1,49 +1,44 @@
 /*
 This is a BaseGameScene that does:
-+ creating player
++ creating player (with movement controll)
 + creating map
 */
 import Phaser from 'phaser'
-import {MOVE_SPEED, MOVE_UPDATE_PER_SEC, MUZI, KURO} from '../constants.js'
+import {MOVE_SPEED, MOVE_UPDATE_PER_SEC,
+    MUZI, KURO, PTR_MOVEMENT_THRESHHOLD} from '../constants.js'
 import {LocalPlayer, RemotePlayer} from '../GameObjects/Player.js'
 import Group from '../GameObjects/Group.js'
 import {getDirection, getValueByName} from '../utils.js'
 
-const MOVE_SEND_INTERVAL = 1000/MOVE_UPDATE_PER_SEC
+const MOVE_EVENT_INTERVAL = 1000/MOVE_UPDATE_PER_SEC
 
 export default class BaseGameScene extends Phaser.Scene{
     constructor(config){
         super(config)
-        this.local_player = null
-        this.players = new Map()
-        this.groups = []
-        this.delta_last_send_move = 0
-        this.callbacks = new Map()
-        this.allowHoldPointer = true
+        this.local_player   // LocalPlayer
+        this.players        // Map id => Player
+        this.groups         // Array [Group,...]
+        this.delta_last_move_event      // number
+        this.callbacks = new Map()      // Map event_name => callback
+        this.allowMoveToPointer         // bool
     }
     
     init(){
         this.local_player = null
         this.players = new Map()
         this.groups = []
-        this.delta_last_send_move = 0
+        this.delta_last_move_event = 0
         this.callbacks = new Map()
+        this.allowMoveToPointer = true
     }
     
     onDisconnect(){
-        /*
-        this.groups.forEach((group)=>{group.destroy()})
-        this.players.forEach(function(elem){
-            elem.destroy() 
-        });
-        this.players.clear();
-        */
         this.physics.pause()
     }
     
     createSpritePlayers(){
         /*
-        This function creates player sprites from the existing value in Game object
+        This function creates player sprites from the existing value in this.game
         */
         for(let player of this.game.players.values()){
             if(player.id === this.game.local_player.id){
@@ -75,35 +70,43 @@ export default class BaseGameScene extends Phaser.Scene{
     update(time, delta){
         var pointer = this.input.activePointer
         var player = this.local_player
-        this.delta_last_send_move += delta
+        this.delta_last_move_event += delta
         
         if(player && player.role === KURO && player.in_game){
             
-            if(pointer.isDown && (time - pointer.downTime > 250) && this.allowHoldPointer){
-                if( Math.pow( Math.pow(pointer.x/this.cameras.main.height-0.5, 2) + Math.pow(pointer.y/this.cameras.main.height-0.5, 2), 0.5) > 0.1){
-                    this.moveToPointer(pointer)
-                }
+            if( pointer.isDown &&
+                (time - pointer.downTime > PTR_MOVEMENT_THRESHHOLD) &&
+                this.allowMoveToPointer ){
+                //if( Math.pow( Math.pow(pointer.x/this.cameras.main.height-0.5, 2) + Math.pow(pointer.y/this.cameras.main.height-0.5, 2), 0.5) > 0.1){
+                this.moveToPointer(pointer)
+                //}
             }
             
             if(player.group.walking){
-                // stop smovement when kuro reached pointer movement's destination
+                // stop movement when kuro reached pointer movement's destination
                 let pos = player.getPosition()
                 let dest_vec = new Phaser.Math.Vector2(player.pointerDest).subtract(pos)
                 if( dest_vec.dot(player.group.body.velocity) <= 0 || player.group.body.velocity.length() === 0){
                     // reached destination or hit the wall
                     
                     player.group.body.velocity.set(0,0)
-                    this.game.socket.emit('playerMove', { pos: pos,
-                        v: {x:0, y:0}})
-                    
+                    this.game.socket.emit('playerMove', {
+                        pos: pos,
+                        v: {x:0, y:0}
+                    })
                     player.pointerDest = null
                     player.group.walking = false
                     player.group.stopWalkAnimation()
-                }else if(this.delta_last_send_move > MOVE_SEND_INTERVAL){ // keep moving
-                    this.game.socket.emit('playerMove', { pos: pos,
-                        v: { x: player.group.body.velocity.x,
-                            y: player.group.body.velocity.y, }})
-                    this.delta_last_send_move = 0
+                }else if(this.delta_last_move_event > MOVE_EVENT_INTERVAL){
+                    // keep moving
+                    this.game.socket.emit('playerMove', {
+                        pos: pos,
+                        v: {
+                            x: player.group.body.velocity.x,
+                            y: player.group.body.velocity.y
+                        }
+                    })
+                    this.delta_last_move_event = 0
                 }
             }
             
@@ -136,9 +139,9 @@ export default class BaseGameScene extends Phaser.Scene{
             
             if(facing !== group.facing || !group.walking){
                 group.playWalkAnimation(facing)
+                group.walking = true
+                group.facing = facing
             }
-            group.walking = true
-            group.facing = facing
         }
         
     }
@@ -153,25 +156,24 @@ export default class BaseGameScene extends Phaser.Scene{
     
     moveToPointer(pointer){
         var dest, pos, vect
-        if(!pointer.leftButtonDown()) return
+        if(!pointer.leftButtonDown() || !this.allowMoveToPointer) return
 
         pos = this.local_player.getPosition()
         dest = this.cameras.main.getWorldPoint(pointer.x, pointer.y)
         this.local_player.pointerDest = dest
         vect = new Phaser.Math.Vector2(dest).subtract(pos)
-        if(vect.length() > 10){
+        if(vect.length() > 20){
             this.physics.moveToObject(this.local_player.group, dest, MOVE_SPEED) // This will not stop when reached destination
 
-            let facing, partner
+            let facing
             facing = getDirection(this.local_player.group.body.velocity)
-            partner = this.players.get(this.local_player.partner_id)
             
             if(facing !== this.local_player.group.facing || !this.local_player.group.walking){
                 this.local_player.group.playWalkAnimation(facing)
+                this.local_player.group.facing = facing
+                this.local_player.group.walking = true            
             }
             
-            this.local_player.group.facing = facing
-            this.local_player.group.walking = true            
         }
     }
     
@@ -196,65 +198,12 @@ export default class BaseGameScene extends Phaser.Scene{
     
     detachSocket(){
         // this function drops all listeners in this.callbacks
-        for(let c of this.callbacks.keys()){
-            this.game.socket.off(c, this.callbacks.get(c))
-            this.callbacks.delete(c)
+        for(let [event, callback] of this.callbacks){
+            this.game.socket.off(event, callback)
+            this.callbacks.delete(event)
         }
     }
     
-    setEdgeCollisionByProperty(tile){
-        /*
-        tile.properties.collides is define in the map
-        It is a binary number consists of four bit
-        each bit represent whether the direction has collisions
-        The value is the decimal form of the four bits
-        decimal values for each direction:
-            left  right  up  down
-            8     4      2   1
-        */
-        var collides = tile.properties.collides,
-            layer = tile.tilemapLayer,
-            left, right, up, down
-            
-        if(collides === 15 || !collides){
-            return
-        }
-        
-        collides = collides.toString(2).padStart(4, '0')
-        left = collides[0]
-        right = collides[1]
-        up = collides[2]
-        down = collides[3]
-            
-        if(left === '1'){
-            let neighbor = layer.getTileAt(tile.x-1, tile.y, true)
-            tile.collideLeft = true
-            tile.faceLeft = true
-            neighbor.collideRight = true
-            neighbor.faceRight = true
-        }
-        if(right === '1'){
-            let neighbor = layer.getTileAt(tile.x+1, tile.y, true)
-            tile.collideRight = true
-            tile.faceRight = true
-            neighbor.collideLeft = true
-            neighbor.faceLeft = true
-        }
-        if(up === '1'){
-            let neighbor = layer.getTileAt(tile.x, tile.y-1, true)
-            tile.collideUp = true
-            tile.faceTop = true
-            neighbor.collideDown = true
-            neighbor.faceBottom = true
-        }
-        if(down === '1'){
-            let neighbor = layer.getTileAt(tile.x, tile.y+1, true)
-            tile.collideDown = true
-            tile.faceBottom = true
-            neighbor.collideUp = true
-            neighbor.faceTop = true
-        }
-    }
     
     createMapObjects(){
         let obj_config = this.cache.json.get('map.objects.config'),
@@ -277,7 +226,8 @@ export default class BaseGameScene extends Phaser.Scene{
                         offset_y = obj_config[obj.name].collide_offset_y
                         
                     obj.body.setSize(collide_w*obj_scale, collide_h*obj_scale)
-                        .setOffset( (offset_x - obj.width * 0.5) * obj_scale + obj.width * 0.5,
+                        .setOffset(
+                            (offset_x - obj.width * 0.5) * obj_scale + obj.width * 0.5,
                             (offset_y - obj.height) * obj_scale + obj.height)                    
                     collide_objects.push(obj)
                 }
@@ -301,11 +251,65 @@ export default class BaseGameScene extends Phaser.Scene{
                 .setDepth(-map.layers.length+i)
                 .setScale(map_scale)
                 .setCollisionByProperty({ collides: 15 })
-            // advanced collision setting
-            layer.forEachTile(this.setEdgeCollisionByProperty)
+                // advanced collision setting
+            layer.forEachTile(setEdgeCollisionByProperty)
             collide_layers.push(layer)
         }
         
         return collide_layers
+    }
+}
+
+function setEdgeCollisionByProperty(tile){
+    /*
+    tile.properties.collides is define in the map
+    It is a binary number consists of four bit
+    each bit represent whether the direction has collisions
+    The value is the decimal form of the four bits
+    decimal values for each direction:
+        left  right  up  down
+        8     4      2   1
+    */
+    var collides = tile.properties.collides,
+        layer = tile.tilemapLayer,
+        left, right, up, down
+        
+    if(collides === 15 || !collides){
+        return
+    }
+    
+    collides = collides.toString(2).padStart(4, '0')
+    left = collides[0]
+    right = collides[1]
+    up = collides[2]
+    down = collides[3]
+        
+    if(left === '1'){
+        let neighbor = layer.getTileAt(tile.x-1, tile.y, true)
+        tile.collideLeft = true
+        tile.faceLeft = true
+        neighbor.collideRight = true
+        neighbor.faceRight = true
+    }
+    if(right === '1'){
+        let neighbor = layer.getTileAt(tile.x+1, tile.y, true)
+        tile.collideRight = true
+        tile.faceRight = true
+        neighbor.collideLeft = true
+        neighbor.faceLeft = true
+    }
+    if(up === '1'){
+        let neighbor = layer.getTileAt(tile.x, tile.y-1, true)
+        tile.collideUp = true
+        tile.faceTop = true
+        neighbor.collideDown = true
+        neighbor.faceBottom = true
+    }
+    if(down === '1'){
+        let neighbor = layer.getTileAt(tile.x, tile.y+1, true)
+        tile.collideDown = true
+        tile.faceBottom = true
+        neighbor.collideUp = true
+        neighbor.faceTop = true
     }
 }

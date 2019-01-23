@@ -5,14 +5,14 @@ import {RIGHT, LEFT, FRONT, BACK} from './constants.js'
 export function getDirection(vec){
     var angle = new Phaser.Math.Vector2(vec).angle() * Phaser.Math.RAD_TO_DEG
     switch(true){
-    case (angle <= 45 || angle > 315):
-        return RIGHT
-    case (angle <= 135):
-        return FRONT
-    case (angle <= 225):
-        return LEFT
-    case (angle <= 315):
-        return BACK
+        case (angle <= 45 || angle > 315):
+            return RIGHT
+        case (angle <= 135):
+            return FRONT
+        case (angle <= 225):
+            return LEFT
+        case (angle <= 315):
+            return BACK
     }
 }
 
@@ -22,12 +22,16 @@ export function log_func(ctx){
             console.log(`[${ctx.name}] `, ...message)
         }
     }
-    else{
+    else {
         return () => null 
     }
 }
 
 export function randint(min, max){
+    /*
+    min: included
+    max: excluded
+    */
     return Math.floor(Math.random() * (max - min) + min)
 }
 

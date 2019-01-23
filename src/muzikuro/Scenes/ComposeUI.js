@@ -45,6 +45,7 @@ export default class ComposeUI extends Phaser.Scene {
                 action.call(this, pointer)
             }
         }
+
         // close button
         this.window.setSize(window.width, window.height)
         this.close_btn = this.add.image(CLOSE_POS.x, CLOSE_POS.y, 'UI.close')
@@ -59,6 +60,7 @@ export default class ComposeUI extends Phaser.Scene {
             .on('pointerdown', button_down(this.submit_btn))
             .on('pointerup', button_action(this.submit_btn, this.composeDone))
         this.window.add(this.submit_btn)
+
         // reset button
         this.reset_btn = this.add.image(RESET_POS.x, RESET_POS.y, 'UI.reset')
         this.reset_btn.setOrigin(0,0).setInteractive(button_config)
@@ -97,15 +99,13 @@ export default class ComposeUI extends Phaser.Scene {
         this.playerPiano = this.sound.add('piano')
         for(const [key, note_name, st] of PIANO_CONFIG) {
             this.playerPiano.addMarker({name: note_name, start: st, duration: 1.5})
+            // had to add the key so that it's only called on first down
+            this.input.keyboard.addKey(key)
             this.input.keyboard.on(`keydown_${key}`, () => {
                 this.playerPiano.play(note_name)
                 this.setNote(this.current_note, note_name)
             })
         }
-        this.input.keyboard.on('keydown_SPACE', () => {
-            this.buttonClick.play()
-            this.setNote(this.current_note, '_')
-        })
         
         // note index
         this.note_index = this.add.image(this.notes_pos[0], NOTE_INDEX_Y, 'UI.note_index')
@@ -124,11 +124,16 @@ export default class ComposeUI extends Phaser.Scene {
     
     update(){
         var justDown = Phaser.Input.Keyboard.JustDown
+
         if(justDown(this.cursor_keys.right)){
             this.moveCurrentNote( (this.current_note+1) % COMPOSE_LEN )
         }
         else if(justDown(this.cursor_keys.left)){
             this.moveCurrentNote( (this.current_note+COMPOSE_LEN-1) % COMPOSE_LEN )
+        }
+        else if(justDown(this.cursor_keys.space)){
+            this.buttonClick.play()
+            this.setNote(this.current_note, '_')
         }
         
         var pointer = this.input.activePointer
@@ -152,8 +157,8 @@ export default class ComposeUI extends Phaser.Scene {
             note.setVisible(false)
         }
         else{
-            note.setVisible(true)
             note.setY(this.pitch_pos[pitch])
+            note.setVisible(true)
         }
         // select next note
         this.current_note = (this.current_note+1)%COMPOSE_LEN

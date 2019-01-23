@@ -6,14 +6,14 @@ import {MUZI, KURO} from '../constants.js'
 export default class ComposeScene extends BaseGameScene{
     constructor(){
         super({ key: 'Compose'})
-        this.UI
-        this.phonograph
+        this.UI             // ComposeUI Scene
+        this.phonograph     // Class Phonograph
     }
-    
+    /*
     init(){
         super.init()
     }
-    
+    */
     create(){
         var collide_objects, collide_layers, map_scale
         this.scene.launch('ComposeUI')
@@ -28,7 +28,7 @@ export default class ComposeScene extends BaseGameScene{
         map_scale = getValueByName('scale', this.map.properties) || 1
         //set phonograph and phonoPiano
         this.phonograph = new Phonograph(this, (this.map.widthInPixels+128)*map_scale/2, (this.map.heightInPixels+128)*map_scale/2)
-        this.phonograph.play('phonograph_play')
+        this.phonograph.startAnim()
         if(this.local_player.role === MUZI){
             this.phonograph.setInteractive({
                 cursor: 'pointer',
@@ -63,9 +63,9 @@ export default class ComposeScene extends BaseGameScene{
         
         if(!this.UI) this.UI = this.scene.get('ComposeUI')
         //this.input.enabled = false;
-        this.UI.events.once('composeClose', (done)=>{
+        this.UI.events.once('composeClose', (composeDone)=>{
             //this.input.enabled = true;
-            if(done){
+            if(composeDone){
                 this.input.clear(this.phonograph)
             }
         })

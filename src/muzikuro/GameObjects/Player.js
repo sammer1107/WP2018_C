@@ -46,8 +46,5 @@ export class LocalPlayer extends Player{
         super(scene, init_x, init_y, name, id, role, partner_id)
         // for storing pointer movement destination
         this.pointerDest = null
-        // for storing the vector from the position when pointer clicked to the destination
-        // so that the dot product can be calculated and stop the movement when the dot product is smaller than 0
-        //this.pointerVect = null;
     }
 }

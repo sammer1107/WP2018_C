@@ -2,7 +2,7 @@ import Phaser from 'phaser'
 
 export default class Note extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y, melody) {
-        super(scene, x, y, 'music_notes', `${Math.floor(Math.random()*20)}`)
+        super(scene, x, y, 'music_notes', `${(x+y)%20}`)
         this.melody = new Array()
         let melody_temp = melody.split(' ')
         for(const note of melody_temp) {
@@ -17,7 +17,7 @@ export default class Note extends Phaser.Physics.Arcade.Sprite {
         }
         //console.log(this.melody.length);
         this.volume = 0
-        this.setDepth(y/scene.map.realHeight).setOrigin(0.5,1)
+        this.setDepth(y/scene.map.realHeight)
     }
 
     static setSoundPool(scene, asset_key, markers, amount) {
@@ -48,6 +48,7 @@ export default class Note extends Phaser.Physics.Arcade.Sprite {
         }
         return null
     }
+
     static returnSoundToPool(sound) {
         sound.beOcupied = false
     }
@@ -72,11 +73,11 @@ export default class Note extends Phaser.Physics.Arcade.Sprite {
             this.soundTmp = null
         }, interval)
     }
+
     playSpecificNote(index) {
         if(this.soundTmp) {
             let note = this.melody[index]
             if(note !== '_') {
-                // FIXTHIS: what if notes with '#' are played
                 this.soundTmp.play(note, { volume: this.volume })
             }
         }

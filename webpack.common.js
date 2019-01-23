@@ -12,7 +12,8 @@ module.exports = {
     output: {
         filename: '[name].[chunkhash:8].js',
         chunkFilename: '[name].[chunkhash:8].js',
-        path: outputDir
+        path: outputDir,
+        publicPath: '/muzikuro/'
     },
     module: {
         rules: [
