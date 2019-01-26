@@ -5,11 +5,17 @@ import {PIANO_CONFIG} from '../constants.js'
 export default class FillSheetScene extends Phaser.Scene{
     constructor(){
         super({ key: 'FillSheetScene'})
-        this.space_info = []   // store the x, y position, center_x, y position, note name
-        this.bar_items = new Map() //store the x, y position, frame and number of specific pitch on bar
-        this.space_notes = []   // store the note image created on space
+        this.space_info   // Array => Object, store the x, y position, center x,y position, note name
+        this.bar_items    // Map string => Object, store the x, y position, frame and number of specific pitch on bar
+        this.space_notes  // store the note image created on space
     }
     
+    init(){
+        this.space_info = []
+        this.bar_items = new Map() 
+        this.space_notes = [] 
+    }
+
     create(){
         //  ** Fill Sheet UI objects ** //
         var cam, game

@@ -9,14 +9,15 @@ export default class ComposeScene extends BaseGameScene{
         this.UI             // ComposeUI Scene
         this.phonograph     // Class Phonograph
     }
-    /*
+
     init(){
+        this.scene.launch('ComposeUI')
+        this.UI = this.scene.get('ComposeUI')
         super.init()
     }
-    */
+
     create(){
         var collide_objects, collide_layers, map_scale
-        this.scene.launch('ComposeUI')
         this.listenToSocket(['disconnect', 'playerMove', 'destroyPlayer', 'updatePartner'])
 
         collide_layers = this.createTileMap('muzikuro')
@@ -42,7 +43,6 @@ export default class ComposeScene extends BaseGameScene{
             this.physics.add.collider(this.local_player.group, collide_objects)
         }
 
-        this.UI = this.scene.get('ComposeUI')
         this.scene.sleep('ComposeUI')
         
         this.sound.context.resume()

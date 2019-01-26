@@ -17,10 +17,10 @@ export default class BaseGameScene extends Phaser.Scene{
         super(config)
         this.local_player   // LocalPlayer
         this.players        // Map id => Player
-        this.groups         // Array [Group,...]
-        this.delta_last_move_event      // number
-        this.callbacks = new Map()      // Map event_name => callback
-        this.allowMoveToPointer         // bool
+        this.groups         // Array => Group
+        this.delta_last_move_event  // number
+        this.callbacks              // Map event_name => callback
+        this.allowMoveToPointer     // bool
     }
     
     init(){
@@ -213,7 +213,7 @@ export default class BaseGameScene extends Phaser.Scene{
             for(let obj of obj_layer.objects){
                 let obj_scale = map_scale
                 if(obj.properties){
-                    obj_scale *= (getValueByName('scale', obj.properties) || 1)
+                    obj_scale *= (getValueByName('secondary_scale', obj.properties) || 1)
                 }
                 obj = this.add.image(obj.x*map_scale, obj.y*map_scale,'map.objects', obj.name).setName(obj.name)
                 obj.setOrigin(0.5,1).setScale(obj_scale)

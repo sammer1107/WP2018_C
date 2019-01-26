@@ -10,8 +10,10 @@ export const WALK_ANIM_DURATION = 500
 export const PHONO_ANIM_DURATION = 1000
 export const LICK_ANIME_DURATION = 1000
 
-export const NOTE_THRESHOLD_DIST = 300
-export const PHONO_RADIUS = 500
+// with tile size as unit
+export const NOTE_RADIUS = 4
+export const PHONO_RADIUS = 10
+export const NOTE_SCALE = 0.6
 
 export const FRONT = 'front'
 export const LEFT = 'left'

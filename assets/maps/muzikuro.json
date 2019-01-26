@@ -24,7 +24,7 @@
          "width":100,
          "x":0,
          "y":0
-        },
+        }, 
         {
          "draworder":"topdown",
          "id":4,
@@ -1938,7 +1938,7 @@
                  "point":true,
                  "properties":[
                         {
-                         "name":"scale",
+                         "name":"secondary_scale",
                          "type":"float",
                          "value":0.8
                         }],
@@ -2078,7 +2078,7 @@
         {
          "columns":7,
          "firstgid":1,
-         "image":"tileset_0.png",
+         "image":"WP2018C\/map\/tileset_0.png",
          "imageheight":3432,
          "imagewidth":924,
          "margin":2,

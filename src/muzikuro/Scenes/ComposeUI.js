@@ -7,8 +7,15 @@ const PLAY_BPM = 80
 export default class ComposeUI extends Phaser.Scene {
     constructor(){
         super({key: 'ComposeUI'})
-        this.notes_pos = [] // note's x positions corresponding to the 8 notes
-        this.pitch_pos = {} // note's y position corresponding to each pitch
+        this.notes_pos      // Array  => note's x positions corresponding to the 8 notes
+        this.pitch_pos      // Object => note's y position corresponding to each pitch
+        this.input_notes    // Array  => note objects representing the composition
+        this.current_note   // number => current index on the composition
+    }
+
+    init(){
+        this.notes_pos = []
+        this.pitch_pos = {}
         this.input_notes = []
         this.current_note = 0
     }

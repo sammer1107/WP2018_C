@@ -59,4 +59,9 @@ export default class Phonograph extends Phaser.Physics.Arcade.Sprite {
                 accelerationY: { min: -5, max: 10},
             })
     }
+
+    destroy(){
+        if(this.piano) this.piano.destroy()
+        super.destroy()
+    }
 }

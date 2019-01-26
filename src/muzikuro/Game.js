@@ -54,7 +54,14 @@ export default class Game extends Phaser.Game {
         }
         // local_player
         this.local_player = this.players.get(local_player_id)
-        this.current_scene.finish()
+        try{
+            this.current_scene.finish()
+        }
+        catch (e) {
+            console.warn(
+                'Something\'s wrong when trying to finish current scene, \
+                maybe the player is not active.\n', e)
+        }
         this.current_scene.sys.shutdown()
         this.scene.start(data.scene, data.scene_data)
         this.current_scene = this.scene.getScene(data.scene)

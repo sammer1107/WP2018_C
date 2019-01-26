@@ -26,7 +26,7 @@ export default class Group extends Phaser.GameObjects.Container{
         this.setSize(90,55)
         this.scene.add.existing(this)
         this.scene.physics.world.enable(this)
-        this.body.setSize(45,45).setOffset(22.5,-15)
+        this.body.setSize(60,45).setOffset(15,-15)
         this.body.setCollideWorldBounds(true)
         /*  need this so when frames are flipped using scaleX
             the body stays in place */
