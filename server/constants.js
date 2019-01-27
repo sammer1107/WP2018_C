@@ -1,6 +1,7 @@
 module.exports = {
     MUZI: 'Muzi',
     KURO: 'Kuro',
+    REQUIRE_PLAYERS: 4,
     SCENE_TRANSITION_BUFFER_TIME: 8*1000,
     NOTES_ITEM_NAME: ['C', 'D', 'E', 'F', 'G', 'A', 'B'],
     BackupComposition: [

@@ -10,7 +10,6 @@ export default class Game extends Phaser.Game {
         this.players = new Map()
         this.local_player = null
         this.preload_complete = false
-        
         this.setup()
     }
     
@@ -24,10 +23,7 @@ export default class Game extends Phaser.Game {
         this.events.once('preloadComplete', this.onPreloadComplete, this)
         // socket events
         this.socket.on('connect', ()=>{Log('socket connected.')})
-        var events = ['gameInit', 'newPlayer', 'sceneTransition', 'updatePartner', 'destroyPlayer']
-        for(let e of events){
-            this.socket.on(e, this[`on${e[0].toUpperCase()}${e.substring(1)}`].bind(this))
-        }
+        this.listenToSocket('gameInit')
         // other settings
         this.sound.pauseOnBlur = false
         this.input.mouse.disableContextMenu()        
@@ -39,15 +35,19 @@ export default class Game extends Phaser.Game {
             this.players.set(player.id, player)
         }
         // local_player
-        this.local_player = data.local_player
-        this.players.set(this.local_player.id, this.local_player)
+        this.local_player = this.players.get(this.socket.id)
         this.scene.start(data.scene, data.scene_state)
         this.current_scene = this.scene.getScene(data.scene)
+
+        this.listenToSocket('newPlayer')
+        this.listenToSocket('sceneTransition')
+        this.listenToSocket('updatePartner')
+        this.listenToSocket('destroyPlayer')
     }
     
     onSceneTransition(data){
         // players
-        var local_player_id = this.local_player.id
+        var local_player_id = this.socket.id
         this.players.clear()
         for(let player of data.players){
             this.players.set(player.id, player)
@@ -59,8 +59,7 @@ export default class Game extends Phaser.Game {
         }
         catch (e) {
             console.warn(
-                'Something\'s wrong when trying to finish current scene, \
-                maybe the player is not active.\n', e)
+                'Something\'s wrong when trying to finish current scene, maybe the player is not active.\n', e)
         }
         this.current_scene.sys.shutdown()
         this.scene.start(data.scene, data.scene_data)
@@ -102,6 +101,11 @@ export default class Game extends Phaser.Game {
                 console.warn(`${data.Muzi} is set to be Muzi but no such player exist.`)
             }
         }
+    }
+
+    listenToSocket(event){
+        var func = `on${event[0].toUpperCase()}${event.substring(1)}`
+        this.socket.on(event, this[func].bind(this))
     }
 }
 

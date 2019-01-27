@@ -9,6 +9,7 @@ import {MOVE_SPEED, MOVE_UPDATE_PER_SEC,
 import {LocalPlayer, RemotePlayer} from '../GameObjects/Player.js'
 import Group from '../GameObjects/Group.js'
 import {getDirection, getValueByName} from '../utils.js'
+import SocketCallbackManager from './components/SocketCallbackManager.js'
 
 const MOVE_EVENT_INTERVAL = 1000/MOVE_UPDATE_PER_SEC
 
@@ -21,9 +22,11 @@ export default class BaseGameScene extends Phaser.Scene{
         this.delta_last_move_event  // number
         this.callbacks              // Map event_name => callback
         this.allowMoveToPointer     // bool
+        this.socket
     }
     
     init(){
+        this.socket = new SocketCallbackManager(this, this.game.socket)
         this.local_player = null
         this.players = new Map()
         this.groups = []
@@ -176,34 +179,6 @@ export default class BaseGameScene extends Phaser.Scene{
             
         }
     }
-    
-    listenToSocket(events){
-        // bind all event to its corresponding function by name
-        // we need to keep the binded functions in callbacks in order to remove them
-        if(events instanceof Array){
-            for(let e of events){
-                let func = this[`on${e[0].toUpperCase()}${e.substring(1)}`].bind(this)
-                this.game.socket.on(e, func)
-                this.callbacks.set(e, func)
-            }
-        }
-        else{
-            let e = events;
-            let func = this[`on${e[0].toUpperCase()}${e.substring(1)}`].bind(this)
-            this.game.socket.on(e, func)
-            this.callbacks.set(e, func)
-        }
-        
-    }
-    
-    detachSocket(){
-        // this function drops all listeners in this.callbacks
-        for(let [event, callback] of this.callbacks){
-            this.game.socket.off(event, callback)
-            this.callbacks.delete(event)
-        }
-    }
-    
     
     createMapObjects(){
         let obj_config = this.cache.json.get('map.objects.config'),

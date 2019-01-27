@@ -25,15 +25,13 @@ class MuziKuro extends BaseScene{
     }
     
     init(){
-        //this.theme_song = utils.randomSelect(ThemeSongs);
-        this.theme_song = ThemeSongs.LittleBee
+        this.theme_song = utils.randomSelect(ThemeSongs);
         this.notes = new NotesList(this.theme_song, map)
         this.timer = 0
         this.answered_group.length = 0
         // exchange composition
         var groups = this.game.groups
         if(groups.length >= 2){
-            // exchange compositions
             utils.shuffle(groups)
             var tmp = groups[0].composition
             for(let i=0;i<groups.length-1;i++){

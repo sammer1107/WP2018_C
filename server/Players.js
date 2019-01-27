@@ -16,6 +16,14 @@ exports.PlayerList = class PlayerList extends Map{
     removeById(del_id){
         this.delete(del_id)
     }
+
+    info(){
+        var infos = []
+        for(let p of this.values()){
+            infos.push(p.info())
+        }
+        return infos
+    }
 }
 
 exports.Player = class Player{

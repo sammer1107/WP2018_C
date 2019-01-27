@@ -12,7 +12,6 @@
 	font-style: bold;
 	font-weight: 600;
 	src: local('Gen Jyuu Gothic P Bold'),
-		url('genjyuu-b.woff2') format('woff2'), 
 		url('genjyuu-b.woff') format('woff');
 }
   

@@ -29,7 +29,7 @@ export default class MuziKuro extends BaseGameScene {
 
     create(data){
         var collide_layers, collide_objects, map_scale
-        this.listenToSocket(['disconnect', 'playerMove', 'destroyPlayer', 'updatePartner',
+        this.socket.listenTo(['disconnect', 'playerMove', 'destroyPlayer', 'updatePartner',
             'notesUpdate', 'notesRemove', 'tempoMeasurePast', 'setCompose',
             'scoreUpdate', 'gameFinish'])
 
@@ -97,9 +97,13 @@ export default class MuziKuro extends BaseGameScene {
         // only when player is set lonely will this be called
         // no new groups will be made in this scene
         let lonely_player = this.players.get(data.lonely)
-        this.groups = this.groups.filter( g => g !== lonely_player.group )
-        lonely_player.group.destroy()
-        lonely_player.partner_id = null
+        try{
+            this.groups = this.groups.filter( g => g !== lonely_player.group )
+            lonely_player.group.destroy()
+            lonely_player.partner_id = null
+        } catch(e) {
+            console.error(e)
+        }
     }
 
     onNotesUpdate(data) {
@@ -275,13 +279,15 @@ export default class MuziKuro extends BaseGameScene {
                 $('#score').text('0')
             })
         })
+
+        this.socket.detachAll()
+        this.sys.sleep()
     }
     
     finish(){
         Note.clearSoundPool(this)
         this.playerPiano.destroy()
         this.drumbeat.destroy()
-        this.detachSocket()
         this.UI.finish()
         this.UI.sys.shutdown()
     }

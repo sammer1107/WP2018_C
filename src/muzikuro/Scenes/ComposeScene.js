@@ -18,7 +18,7 @@ export default class ComposeScene extends BaseGameScene{
 
     create(){
         var collide_objects, collide_layers, map_scale
-        this.listenToSocket(['disconnect', 'playerMove', 'destroyPlayer', 'updatePartner'])
+        this.socket.listenTo(['disconnect', 'playerMove', 'destroyPlayer', 'updatePartner'])
 
         collide_layers = this.createTileMap('muzikuro')
         collide_objects = this.createMapObjects()
@@ -75,7 +75,7 @@ export default class ComposeScene extends BaseGameScene{
     finish(){
         this.UI.finish()
         this.UI.sys.shutdown()
-        this.detachSocket()
+        this.socket.detachAll()
     }
 }
 
