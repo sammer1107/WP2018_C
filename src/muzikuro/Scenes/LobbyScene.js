@@ -1,5 +1,4 @@
 import Phaser from 'phaser'
-import BoxMessage from '../GameObjects/BoxMessage'
 import SocketCallbackManager from './components/SocketCallbackManager'
 
 const DOT_INTERVAL = 800
