@@ -13,6 +13,8 @@ export default class PreloadScene extends Phaser.Scene{
         this.load.spritesheet('waiting', 'lick.png', {frameWidth: 266, frameHeight: 157})
         this.load.atlas('music_notes','music_notes.png', 'music_notes.json')
         this.load.spritesheet('phonograph', 'phonograph.png', {frameWidth: 293, frameHeight:381})
+        this.load.image('message_box', 'message_box.png')
+        this.load.image('start_collect', 'start_collect.png')
         this.load.setPath('/assets/sounds')
         this.load.audio('piano', 'piano_pitch4.ogg')
         this.load.audio('drumbeat', 'beat_0_115.mp3')

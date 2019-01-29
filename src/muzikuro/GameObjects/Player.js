@@ -26,7 +26,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.in_game = bool
     }
     
-    destroy(){
+    destroy(scene_shutdown){
         if(this.group){
             this.group.destroy()
         }

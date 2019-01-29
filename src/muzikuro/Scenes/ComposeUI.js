@@ -152,8 +152,12 @@ export default class ComposeUI extends Phaser.Scene {
     }
     
     finish(){
-        if(this.playerPiano) this.playerPiano.destroy()
-        if(this.buttonClick) this.buttonClick.destroy()
+        try{
+            if(this.playerPiano) this.playerPiano.destroy()
+            if(this.buttonClick) this.buttonClick.destroy()
+        } catch(e) {
+            console.warn(e)
+        }
     }
     
     setNote(idx, pitch){

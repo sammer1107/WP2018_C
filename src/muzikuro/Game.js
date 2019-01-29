@@ -1,5 +1,6 @@
 import Phaser from 'phaser'
 import io from 'socket.io-client'
+import boxMessageFactory from './GameObjects/BoxMessage'
 import {log_func} from './utils.js'
 
 
@@ -20,6 +21,7 @@ export default class Game extends Phaser.Game {
     }
     
     setup(){
+        this.plugins.registerGameObject('boxMessage', boxMessageFactory)
         this.events.once('preloadComplete', this.onPreloadComplete, this)
         // socket events
         this.socket.on('connect', ()=>{Log('socket connected.')})
@@ -54,14 +56,10 @@ export default class Game extends Phaser.Game {
         }
         // local_player
         this.local_player = this.players.get(local_player_id)
-        try{
-            this.current_scene.finish()
-        }
-        catch (e) {
-            console.warn(
-                'Something\'s wrong when trying to finish current scene, maybe the player is not active.\n', e)
-        }
+        
+        this.current_scene.finish()
         this.current_scene.sys.shutdown()
+        
         this.scene.start(data.scene, data.scene_data)
         this.current_scene = this.scene.getScene(data.scene)
         Log(`scene switched to ${data.scene}`)

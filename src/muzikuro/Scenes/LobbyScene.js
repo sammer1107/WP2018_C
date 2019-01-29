@@ -1,5 +1,6 @@
 import Phaser from 'phaser'
-import SocketCallbackManager from './components/SocketCallbackManager.js'
+import BoxMessage from '../GameObjects/BoxMessage'
+import SocketCallbackManager from './components/SocketCallbackManager'
 
 const DOT_INTERVAL = 800
 
@@ -46,7 +47,6 @@ export default class LobbyScene extends Phaser.Scene{
             cam.width/2,
             this.loading_text.y + this.loading_text.height*1.5,
             data.message, text_style).setOrigin(0.5,0)
-        
     }
             
     update(time, delta){

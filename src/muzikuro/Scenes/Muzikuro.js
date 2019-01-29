@@ -17,6 +17,7 @@ export default class MuziKuro extends BaseGameScene {
         this.user_keyin     // Array => string , user input in current tempo loop
         this.score          // number      
         this.notes_collect_tmp  // Array => Note, notes waiting to be collected
+        this.first_collect  // bool, whether current note collected is the first one
     }
     
     init(){
@@ -25,6 +26,7 @@ export default class MuziKuro extends BaseGameScene {
         this.user_keyin = new Array(8).fill('_')
         this.score = 0
         this.notes_collect_tmp = new Array()
+        this.first_collect = true
     }
 
     create(data){
@@ -227,6 +229,11 @@ export default class MuziKuro extends BaseGameScene {
                 this.notes_list.delete(id)
             }
         })
+        if(this.first_collect){
+            this.first_collect = false
+            let message = this.add.boxMessage('將音符填進唱片機\n來完成題目旋律!').show()
+            setTimeout(()=>message.remove(), 5000)
+        }
     }
     
     onPhonoClicked(pointer, _loc_x, _loc_y, event_container){
@@ -286,8 +293,12 @@ export default class MuziKuro extends BaseGameScene {
     
     finish(){
         Note.clearSoundPool(this)
-        this.playerPiano.destroy()
-        this.drumbeat.destroy()
+        try{
+            this.playerPiano.destroy()
+            this.drumbeat.destroy()
+        } catch(e) {
+            console.warn(e)
+        }
         this.UI.finish()
         this.UI.sys.shutdown()
     }

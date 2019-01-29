@@ -30,11 +30,27 @@ export default class ComposeScene extends BaseGameScene{
         //set phonograph and phonoPiano
         this.phonograph = new Phonograph(this, (this.map.widthInPixels+128)*map_scale/2, (this.map.heightInPixels+128)*map_scale/2)
         this.phonograph.startAnim()
+
         if(this.local_player.role === MUZI){
-            this.phonograph.setInteractive({
-                cursor: 'pointer',
-                pixelPrefect: true
-            }).on('pointerdown', this.onPhonoClicked, this)
+            let message = this.add.boxMessage('點擊唱片機創作!')
+            setTimeout(()=>{
+                message.show()
+                this.phonograph.setInteractive({
+                    cursor: 'pointer',
+                    pixelPrefect: true
+                })
+                .on('pointerdown', this.onPhonoClicked, this)
+                .once('pointerdown', ()=>message.remove())
+            }, 1000)
+        }
+        else if(this.local_player.role === KURO){
+            let message = this.add.boxMessage('帶領Muzi到唱片機')
+            setTimeout(()=>{
+                message.show()
+                setTimeout(()=>{
+                    message.remove()
+                }, 5000)
+            }, 1000)
         }
         
         if(this.local_player.group){
@@ -44,8 +60,6 @@ export default class ComposeScene extends BaseGameScene{
         }
 
         this.scene.sleep('ComposeUI')
-        
-        this.sound.context.resume()
     }
     
     onUpdatePartner(data){

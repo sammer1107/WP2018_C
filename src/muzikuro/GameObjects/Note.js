@@ -16,9 +16,13 @@ export default class Note extends Phaser.Physics.Arcade.Sprite {
         //console.log(Note.soundPool);
     }
     
-    static clearSoundPool(scene){
-        for(let sound of Note.soundPool){
-            scene.sound.remove(sound)
+    static clearSoundPool(){
+        try{
+            for(let sound of Note.soundPool){
+                sound.destroy()
+            }
+        } catch(e) {
+            console.warn(e)
         }
     }
     
@@ -146,9 +150,11 @@ export default class Note extends Phaser.Physics.Arcade.Sprite {
         })  
     }
     
-    destroy(){
-        this.scene.tweens.killTweensOf(this)
-        super.destroy()
+    destroy(scene_shutdown){
+        if(!scene_shutdown){
+            this.scene.tweens.killTweensOf(this)
+        }
+        super.destroy(scene_shutdown)
     }
     
     /*

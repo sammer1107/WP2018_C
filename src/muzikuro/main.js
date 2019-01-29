@@ -1,5 +1,6 @@
 'use strict'
 import Phaser from 'phaser'
+import {Plugin as NineSlicePlugin} from 'phaser3-nineslice'
 import Game from './Game.js'
 import PreloadScene from './Scenes/PreloadScene.js'
 import LobbyScene from './Scenes/LobbyScene.js'
@@ -19,6 +20,9 @@ var config = {
     physics: {
         default: 'arcade',
         arcade: {debug: __DEBUG}
+    },
+    plugins: {
+        global: [ NineSlicePlugin.DefaultCfg ],
     },
     scene: [PreloadScene, LobbyScene, ComposeScene, ComposeUI, MuziKuro, FillSheetScene],
 }

@@ -60,8 +60,14 @@ export default class Phonograph extends Phaser.Physics.Arcade.Sprite {
             })
     }
 
-    destroy(){
-        if(this.piano) this.piano.destroy()
-        super.destroy()
+    destroy(scene_shutdown){
+        if(this.piano){
+            try{
+                this.scene.sound.remove(this.piano)
+            } catch(e) {
+                console.warn(e)
+            }
+        }
+        super.destroy(scene_shutdown)
     }
 }

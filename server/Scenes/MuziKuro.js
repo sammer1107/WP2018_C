@@ -2,7 +2,7 @@ const BaseScene = require('./BaseScene')
 const NotesList = require('../Notes')
 const utils = require('../utils')
 const constants = require('../constants.js')
-const GAME_DURATION = 5*60*1000
+const GAME_DURATION = 10*60*1000
 const CHECK_INTERVAL = 10*1000
 const NOTE_SCORE_BASE = 50
 const NOTE_SCORE_BONUS = 10
@@ -31,7 +31,8 @@ class MuziKuro extends BaseScene{
         this.answered_group.length = 0
         // exchange composition
         var groups = this.game.groups
-        if(groups.length >= 2){
+        if(groups.length >= 1){
+            // also check for empty composition when there's only one group
             utils.shuffle(groups)
             var tmp = groups[0].composition
             for(let i=0;i<groups.length-1;i++){

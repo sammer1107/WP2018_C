@@ -66,14 +66,16 @@ export default class Group extends Phaser.GameObjects.Container{
         })
     }
     
-    destroy(){
-        this.iterate(child => {
-            child.setPosition(this.x, this.y)
-            child.setInGame(false)
-            child.group = null      
-        })
+    destroy(scene_shutdown){
+        if(!scene_shutdown){
+            this.iterate(child => {
+                child.setPosition(this.x, this.y)
+                child.setInGame(false)
+                child.group = null      
+            })
+        }
         this.removeAll()
-        super.destroy()
+        super.destroy(scene_shutdown)
     }
     
     update(time, delta){

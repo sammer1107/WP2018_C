@@ -18,7 +18,7 @@ export default class FillSheetScene extends Phaser.Scene{
 
     create(){
         //  ** Fill Sheet UI objects ** //
-        var cam, game
+        var cam, game, start_collect
         cam = this.cameras.main
         game = this.game
         var window = this.add.image(0, 0, 'UI.windowFill')
@@ -136,6 +136,24 @@ export default class FillSheetScene extends Phaser.Scene{
         }
         
         this.events.addListener('windowOn', this.windowOn, this)
+        
+        start_collect = this.add.image(cam.width/2, cam.height/2, 'start_collect').setAlpha(0)
+        this.tweens.add({
+            targets: start_collect,
+            props:{
+                alpha: 1
+            },
+            duration: 300
+        })
+        this.tweens.add({
+            targets: start_collect,
+            props:{
+                alpha: 0
+            },
+            duration: 300,
+            delay: 2000,
+            onComplete: ()=> start_collect.destroy()
+        })
     }
     
     update(){
@@ -150,8 +168,12 @@ export default class FillSheetScene extends Phaser.Scene{
     }
     
     finish(){
-        if(this.buttonClick) this.buttonClick.destroy()
-        if(this.itemPiano) this.itemPiano.destroy()
+        try{
+            if(this.buttonClick) this.buttonClick.destroy()
+            if(this.itemPiano) this.itemPiano.destroy()
+        } catch(e) {
+            console.warn(e)
+        }
     }
     
     close(pointer){
