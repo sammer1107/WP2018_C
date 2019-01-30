@@ -6,7 +6,7 @@ and make transition between game scenes.
 
 var constants = require('./constants')
 var MUZI = constants.MUZI
-var escapeHTML = require('./utils').escapeHTML
+var utils = require('./utils')
 var Players = require('./Players')
 var Player = Players.Player
 
@@ -17,11 +17,12 @@ class GameManager{
         this.scenes = require('./Scenes')(this)
         this.players = new Players.PlayerList()
         this.groups = [] // the id of each group is the index in the array
+        this.log = utils.log
     }
     
     start(){
         this.io.sockets.on('connection', function(socket){
-            Log(`socket ID: ${socket.id} connected.`)
+            this.log(`socket ID: ${socket.id} connected.`)
             this.bindSocket(socket, 'login')
             this.bindSocket(socket, 'return')
             this.bindSocket(socket, 'disconnect')
@@ -32,7 +33,7 @@ class GameManager{
     }
     
     onLogin(socket, data){
-        var name = escapeHTML(data.name)
+        var name = utils.escapeHTML(data.name)
         var new_player = new Player(name, socket)
         new_player.setAvailable(true)
         this.players.add(new_player)
@@ -53,20 +54,21 @@ class GameManager{
         let player = this.players.get(socket.id)
         player.setAvailable(true)
         
-        if(this.current_scene.onReturn) {
-            this.current_scene.onReturn(socket, player)
-        }
-
         socket.emit('sceneTransition', {
             scene: this.current_scene.key,
             scene_data: this.current_scene.getSceneState(),
             players: this.players.info(),
         })
+        
+        if(this.current_scene.onReturn) {
+            this.current_scene.onReturn(socket, player)
+        }
+
 
     }
         
     onDisconnect(socket, reason){
-        Log(`socket ID: ${socket.id} disconnected. (${reason})`)
+        this.log(`socket ID: ${socket.id} disconnected. (${reason})`)
         if(!this.players.has(socket.id)) return // player disconnected before creating a player
         
         var lonely_player = this.players.get(this.players.get(socket.id).partner_id)
@@ -76,7 +78,7 @@ class GameManager{
                 this.groups.splice(index, 1)
                 lonely_player.group.destroy()
             }
-            Log(`${lonely_player.name} is now lonely.`)
+            this.log(`${lonely_player.name} is now lonely.`)
             socket.broadcast.emit('updatePartner', {lonely: lonely_player.id})
         }
             
@@ -93,15 +95,15 @@ class GameManager{
         var player = this.players.get(socket.id)
         if(!player){
             socket.disconnect()
-            Log(`Disconnected ${socket.id} : player doesn't exist.`)
+            this.log(`Disconnected ${socket.id} : player doesn't exist.`)
             return
         }
         else if(player.role === MUZI || !player.group){
-            Log(`player ${player?player.name:player} moved but it shouldn't.`)
+            this.log(`player ${player?player.name:player} moved but it shouldn't.`)
             player.warning += 1
             if(player.warning > 100){
                 socket.disconnect()
-                Log(`Disconnected ${socket.id} (${player.name}) : too much warning.`)
+                this.log(`Disconnected ${socket.id} (${player.name}) : too much warning.`)
             }
             return
         }
@@ -113,7 +115,7 @@ class GameManager{
     }
     
     startScene(key){
-        Log(`Starting scene: ${key}`)
+        this.log(`Starting scene: ${key}`)
         var next = this.scenes.get(key)
         next.init()
 
@@ -137,8 +139,6 @@ class GameManager{
         socket.on(event, this[func].bind(this, socket))
     }
 }
-
-var Log = require('./utils').log_func(GameManager)
 
 module.exports = function(io){
     return new GameManager(io)

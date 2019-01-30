@@ -1,12 +1,13 @@
 import Phaser from 'phaser'
 import io from 'socket.io-client'
 import boxMessageFactory from './GameObjects/BoxMessage'
-import {log_func} from './utils.js'
+import {log} from './utils.js'
 
 
 export default class Game extends Phaser.Game {
     constructor(config){
         super(config)
+        this.log = log
         this.socket = io.connect()
         this.players = new Map()
         this.local_player = null
@@ -15,7 +16,7 @@ export default class Game extends Phaser.Game {
     }
     
     onPreloadComplete(){
-        Log('preload complete.')
+        this.log('preload complete.')
         this.preload_complete = true
         this.scene.remove('Preload')
     }
@@ -24,7 +25,7 @@ export default class Game extends Phaser.Game {
         this.plugins.registerGameObject('boxMessage', boxMessageFactory)
         this.events.once('preloadComplete', this.onPreloadComplete, this)
         // socket events
-        this.socket.on('connect', ()=>{Log('socket connected.')})
+        this.socket.on('connect', ()=>{this.log('socket connected.')})
         this.listenToSocket('gameInit')
         // other settings
         this.sound.pauseOnBlur = false
@@ -62,7 +63,7 @@ export default class Game extends Phaser.Game {
         
         this.scene.start(data.scene, data.scene_data)
         this.current_scene = this.scene.getScene(data.scene)
-        Log(`scene switched to ${data.scene}`)
+        this.log(`scene switched to ${data.scene}`)
     }
     
     onNewPlayer(data){
@@ -106,5 +107,3 @@ export default class Game extends Phaser.Game {
         this.socket.on(event, this[func].bind(this))
     }
 }
-
-var Log = log_func(Game)

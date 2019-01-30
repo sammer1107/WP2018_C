@@ -8,6 +8,7 @@ class ComposeScene extends BaseScene{
     constructor(GameManager){
         super(GameManager, 'Compose')
         this.timer
+        this.log = require('../utils').log
     }
         
     init(){
@@ -40,7 +41,7 @@ class ComposeScene extends BaseScene{
         + stop looping intervals
         + stop listening to events
         */
-        Log('scene stopped.')
+        this.log('scene stopped.')
         clearInterval(this.check_interval)
         this.socketOff('composeSet')
         return
@@ -81,4 +82,3 @@ class ComposeScene extends BaseScene{
 }
 
 module.exports = ComposeScene
-const Log = require('../utils.js').log_func(ComposeScene)

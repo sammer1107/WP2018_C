@@ -6,10 +6,8 @@ module.exports = {
         return Math.floor(Math.random() * (max - min) + min)
     },
     
-    log_func: function(ctx){
-        return function(...message){
-            console.log(`[${ctx.name}] `, ...message)
-        }
+    log: function(...message){ // mixin function
+        console.log(`[${this.constructor.name}] `, ...message)
     },
     
     randomSelect(obj){

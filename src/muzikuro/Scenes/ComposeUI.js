@@ -263,5 +263,3 @@ const SHEET_SPACING_HALF = 21.5
 const NOTE_PIVOT = [28,95]
 
 const NOTE_INDEX_Y = 510
-
-// var Log = log_func(ComposeUI)

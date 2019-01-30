@@ -15,6 +15,7 @@ var map = utils.loadMap('muzikuro.json')
 class MuziKuro extends BaseScene{
     constructor(GameManager){
         super(GameManager, 'MuziKuro')
+        this.log = utils.log
         this.notes
         this.timer
         this.check_interval
@@ -38,14 +39,14 @@ class MuziKuro extends BaseScene{
             for(let i=0;i<groups.length-1;i++){
                 let comp = groups[i].composition
                 if(!comp || comp.every( note => note === '_' ) ){
-                    groups[i].composition = BackupComposition[i%BackupComposition.length].split('')
+                    groups[i].composition = randomSelect(BackupComposition).split('')
                 }
                 else{
                     groups[i].composition = groups[i+1].composition
                 }
             }
             if(!tmp || tmp.every( note => note === '_' )){
-                groups[groups.length-1].composition = BackupComposition[utils.randint(0, BackupComposition.length)]
+                groups[groups.length-1].composition = randomSelect(BackupComposition).split('')
             }
             else{
                 groups[groups.length-1].composition = tmp
@@ -125,7 +126,7 @@ class MuziKuro extends BaseScene{
     collectHandle() {
         let collect_notes = new Array()
         for(const [note_id, pl_list] of this.collect_wait_list) {
-            Log(`Notes Collected: ${note_id}, by ${pl_list}`)
+            this.log(`Notes Collected: ${note_id}, by ${pl_list}`)
             collect_notes.push(note_id)
             this.notes.removeById(note_id)
             for(const id of pl_list) {
@@ -149,12 +150,12 @@ class MuziKuro extends BaseScene{
     }
 
     onClientAnswerSubmit(socket, answer) {
-        Log(`Submit from: ${socket.id}`)
+        this.log(`Submit from: ${socket.id}`)
         let player = this.game.players.get(socket.id)
         let pl_grp = player.group
         if(!this.answered_group.includes(pl_grp)) {
             let ques = pl_grp.composition
-            Log(`${answer.filter((v, i) => ques[i] === v )}`)
+            this.log(`${answer.filter((v, i) => ques[i] === v )}`)
             let match_num = answer.filter((v, i) => ques[i] === v ).length
             let score = match_num*60
             if(match_num === answer.length) {
@@ -179,7 +180,7 @@ class MuziKuro extends BaseScene{
         while(this.notes.size < this.notes.MAX_NOTES) {
             let tmp = this.notes.create()
             new_notes_tmp.push(tmp)
-            //console.log(`New Note at (${tmp.x}, ${tmp.y})`);
+            //this.log(`New Note at (${tmp.x}, ${tmp.y})`);
         }
         return new_notes_tmp
     }
@@ -200,7 +201,5 @@ class MuziKuro extends BaseScene{
         return [utils.randint(map.centerX-radius, map.centerX+radius), utils.randint(map.centerY-radius, map.centerY+radius)]
     }
 }
-
-var Log = require('../utils').log_func(MuziKuro)
 
 module.exports = MuziKuro

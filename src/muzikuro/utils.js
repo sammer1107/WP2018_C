@@ -16,14 +16,9 @@ export function getDirection(vec){
     }
 }
 
-export function log_func(ctx){
+export function log(...message){
     if(__DEBUG){ 
-        return function(...message){
-            console.log(`[${ctx.name}] `, ...message)
-        }
-    }
-    else {
-        return () => null 
+        console.log(`[${this.constructor.name}] `, ...message)
     }
 }
 

@@ -92,5 +92,3 @@ export default class ComposeScene extends BaseGameScene{
         this.socket.detachAll()
     }
 }
-
-// var Log = log_func(ComposeScene)

@@ -375,5 +375,3 @@ const ITEM_SCALE = 0.6
 // const ITEM_OFFEST_HEIGHT = 54
 // const BAR_SPACING = 89
 const volume = 1
-
-// const Log = require('../utils.js').log_func(FillSheetScene)

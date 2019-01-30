@@ -3,7 +3,7 @@ import {MUZI, KURO, NOTE_SCALE, PHONO_RADIUS, PIANO_CONFIG} from '../constants.j
 import BaseGameScene from './BaseGameScene.js'
 import Note from '../GameObjects/Note.js'
 import Phonograph from '../GameObjects/Phonograph.js'
-import {log_func, getValueByName} from '../utils.js'
+import {getValueByName, log} from '../utils.js'
 import Animation from '../lib/Animation.js'
 /* global $ */
         
@@ -13,11 +13,13 @@ var phono_radius, phono_inner_radius
 export default class MuziKuro extends BaseGameScene {
     constructor(){
         super({ key: 'MuziKuro'})
+        this.log = log
         this.notes_list     // Map id => Note
         this.user_keyin     // Array => string , user input in current tempo loop
         this.score          // number      
         this.notes_collect_tmp  // Array => Note, notes waiting to be collected
         this.first_collect  // bool, whether current note collected is the first one
+        this.beats_frame    // number
     }
     
     init(){
@@ -88,7 +90,7 @@ export default class MuziKuro extends BaseGameScene {
     */
 
     onSetCompose(data){
-        Log('received composition', data)
+        this.log('received composition', data)
         this.phonograph.setSheet(data)
         this.phonograph.createSound()
         this.phonograph.startAnim()
@@ -117,7 +119,7 @@ export default class MuziKuro extends BaseGameScene {
     }
     
     onNotesRemove(data) {
-        Log('notes remove:', data)
+        this.log('notes remove:', data)
         for(const note_id of data) {
             let index = this.notes_collect_tmp.indexOf(note_id)
             if(index !== -1) {
@@ -133,16 +135,16 @@ export default class MuziKuro extends BaseGameScene {
 
     onScoreUpdate(reward) {
         this.score += reward.score
-        Log(`Score Update to ${this.score}`)
+        this.log(`Score Update to ${this.score}`)
         if(reward.note_get !== null) {
-            Log(`Note Get: [${reward.note_get}]`)
+            this.log(`Note Get: [${reward.note_get}]`)
             this.UI.addItem(reward.note_get)
         }
     }
 
     onTempoMeasurePast(beat_d) {
-        //Log("Beats!");
-        //Log(`Prev Keyin: ${this.user_keyin}`);
+        //this.log("Beats!");
+        //this.log(`Prev Keyin: ${this.user_keyin}`);
         let ms_per_frame = beat_d>>1
         this.beats_frame = 0
         this.drumbeat.play('0')
@@ -167,7 +169,12 @@ export default class MuziKuro extends BaseGameScene {
             for(let [id, note] of this.notes_list) {
                 if(this.physics.overlap(this.local_player.group, note)) {
                     if(note.melody[frame_index] === note_name) {
-                        note.activate()
+                        if(this.local_player.role === MUZI){
+                            note.activate()
+                        }
+                        else if(this.local_player.role === KURO){
+                            // show position indicator
+                        }
                     }
                 }
             }
@@ -212,7 +219,7 @@ export default class MuziKuro extends BaseGameScene {
     }
 
     collectMusicNote(id){
-        Log(`Collected Note ID: ${id}`)
+        this.log(`Collected Note ID: ${id}`)
         this.notes_collect_tmp.push(id)
         let note = this.notes_list.get(id)
         this.note_get_sfx.play()
@@ -303,5 +310,3 @@ export default class MuziKuro extends BaseGameScene {
         this.UI.sys.shutdown()
     }
 }
-
-var Log = log_func(MuziKuro)

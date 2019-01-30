@@ -36,6 +36,7 @@ export default class BaseGameScene extends Phaser.Scene{
     }
     
     onDisconnect(){
+        this.add.boxMessage('與伺服器連線中斷:(').show()
         this.physics.pause()
     }
     

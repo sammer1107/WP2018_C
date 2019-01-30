@@ -9,6 +9,7 @@ var REQUIRE_PLAYERS = require('../constants.js').REQUIRE_PLAYERS
 class LobbyScene extends BaseScene{
     constructor(GameManager){
         super(GameManager, 'Lobby')
+        this.log = utils.log
     }
     
     init(){
@@ -27,7 +28,7 @@ class LobbyScene extends BaseScene{
         for(let i=0; i<players.length; i+=2){
             this.game.groups.push(new Group(players[i], players[i+1], ...this.getRandomSpawnPoint()))   
         }
-        Log('stopped scene.')
+        this.log('stopped scene.')
         return
     }
     
@@ -42,14 +43,14 @@ class LobbyScene extends BaseScene{
     }
     
     onLogin(socket, new_player){ // this will be called from GameManager.onLogin
-        Log(`Player joined: name:${new_player.name}`)
+        this.log(`Player joined: name:${new_player.name}`)
         socket.broadcast.emit('newPlayer', new_player.info())
         socket.broadcast.emit('message', this.getPlayerNumberMessage(this.game.players.getAvailable().length))
         this.checkPlayerNumber()
     }
     
     onReturn(socket, player) {
-        Log(`Player returned: name:${player.name}`)
+        this.log(`Player returned: name:${player.name}`)
         socket.broadcast.emit('message', this.getPlayerNumberMessage(this.game.players.getAvailable().length))
         this.checkPlayerNumber()
     }
@@ -64,7 +65,7 @@ class LobbyScene extends BaseScene{
     }
 
     getPlayerNumberMessage(current_number){
-        return `玩家數量 ${current_number} / ${REQUIRE_PLAYERS}`
+        return `玩家數針 ${current_number} / ${REQUIRE_PLAYERS}`
     }
 
     onDisconnect(socket){
@@ -82,6 +83,5 @@ class LobbyScene extends BaseScene{
     }
 }
 
-var Log = require('../utils').log_func(LobbyScene)
 
 module.exports = LobbyScene
