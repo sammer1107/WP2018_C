@@ -1,6 +1,6 @@
 import Phaser from 'phaser'
 import {getValueByName} from '../utils.js'
-import {NOTE_SCALE, NOTE_RADIUS} from '../constants.js'
+import {NOTE_SCALE} from '../constants.js'
 
 export default class Note extends Phaser.Physics.Arcade.Sprite {
     static setSoundPool(scene, asset_key, markers, amount) {
@@ -69,7 +69,6 @@ export default class Note extends Phaser.Physics.Arcade.Sprite {
         
         this.scene.add.existing(this)
         this.scene.physics.world.enable(this)
-        this.setupBody()
         this.playFloatAnim()
     }
 
@@ -97,9 +96,9 @@ export default class Note extends Phaser.Physics.Arcade.Sprite {
         }
     }
 
-    setupBody(){
+    setupBody(radius_in_tiles){
         var map_scale = getValueByName('scale', this.scene.map.properties) || 1
-        var radius = NOTE_RADIUS * this.scene.map.tileWidth * map_scale
+        var radius = radius_in_tiles * this.scene.map.tileWidth * map_scale
         
         this.body.setCircle(radius, -radius+(this.displayWidth/2), -radius+(this.displayHeight/2))
         // prevent body from scaling with Sprite.setScale
@@ -111,6 +110,8 @@ export default class Note extends Phaser.Physics.Arcade.Sprite {
                 note.changeVol( Phaser.Math.Clamp(volume, 0, 1)) // to prevent negative values
             }, null, this)
         }
+
+        return this
     }
     
     playFloatAnim(){

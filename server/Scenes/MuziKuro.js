@@ -39,14 +39,14 @@ class MuziKuro extends BaseScene{
             for(let i=0;i<groups.length-1;i++){
                 let comp = groups[i].composition
                 if(!comp || comp.every( note => note === '_' ) ){
-                    groups[i].composition = randomSelect(BackupComposition).split('')
+                    groups[i].composition = utils.randomSelect(BackupComposition).split('')
                 }
                 else{
                     groups[i].composition = groups[i+1].composition
                 }
             }
             if(!tmp || tmp.every( note => note === '_' )){
-                groups[groups.length-1].composition = randomSelect(BackupComposition).split('')
+                groups[groups.length-1].composition = utils.randomSelect(BackupComposition).split('')
             }
             else{
                 groups[groups.length-1].composition = tmp

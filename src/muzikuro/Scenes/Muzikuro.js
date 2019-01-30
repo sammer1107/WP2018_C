@@ -1,5 +1,5 @@
 import Phaser from 'phaser'
-import {MUZI, KURO, NOTE_SCALE, PHONO_RADIUS, PIANO_CONFIG} from '../constants.js'
+import {MUZI, KURO, NOTE_RADIUS, PHONO_RADIUS, PIANO_CONFIG} from '../constants.js'
 import BaseGameScene from './BaseGameScene.js'
 import Note from '../GameObjects/Note.js'
 import Phonograph from '../GameObjects/Phonograph.js'
@@ -8,6 +8,7 @@ import Animation from '../lib/Animation.js'
 /* global $ */
         
 const BPM = 115
+const ARROW_RADIUS = 200
 var phono_radius, phono_inner_radius
 
 export default class MuziKuro extends BaseGameScene {
@@ -18,8 +19,10 @@ export default class MuziKuro extends BaseGameScene {
         this.user_keyin     // Array => string , user input in current tempo loop
         this.score          // number      
         this.notes_collect_tmp  // Array => Note, notes waiting to be collected
-        this.first_collect  // bool, whether current note collected is the first one
-        this.beats_frame    // number
+        this.first_collect      // bool, whether current note collected is the first one
+        this.beats_frame        // number
+        this.show_direction     // number, how much time left to show the direction arrow
+        this.last_activated_note    // Note, as named
     }
     
     init(){
@@ -29,6 +32,7 @@ export default class MuziKuro extends BaseGameScene {
         this.score = 0
         this.notes_collect_tmp = new Array()
         this.first_collect = true
+        this.show_direction = 0
     }
 
     create(data){
@@ -36,31 +40,24 @@ export default class MuziKuro extends BaseGameScene {
         this.socket.listenTo(['disconnect', 'playerMove', 'destroyPlayer', 'updatePartner',
             'notesUpdate', 'notesRemove', 'tempoMeasurePast', 'setCompose',
             'scoreUpdate', 'gameFinish'])
+        
+            // start FillSheetScene
+        this.scene.launch('FillSheetScene')
+        this.UI = this.scene.get('FillSheetScene')
 
         collide_layers = this.createTileMap('muzikuro')
         collide_objects = this.createMapObjects()
         this.physics.world.setBounds(0, 0, this.map.realWidth, this.map.realHeight)
         
         // sounds
-        this.playerPiano = this.sound.add('piano')
+        this.playerPiano = this.sound.add('piano').setVolume(0.8)
         this.note_get_sfx = this.sound.add('note_get')
-        this.drumbeat = this.sound.add('drumbeat')
+        this.drumbeat = this.sound.add('drumbeat').setVolume(0.8)
         this.drumbeat.addMarker({name:'0', start:0, duration:60/BPM*1000*8})
         
         this.createSpritePlayers()
         
-        // setup piano
-        Note.setSoundPool(this, 'piano', PIANO_CONFIG, 5)
-        for(const [key, note_name, st] of PIANO_CONFIG) {
-            this.playerPiano.addMarker({name: note_name, start: st, duration: 1.5})
-            this.input.keyboard.addKey(key)
-            this.input.keyboard.on(`keydown_${key}`, this.onPlayerPlayNote.bind(this, note_name))
-        }
-        
-        // start FillSheetScene
-        this.scene.launch('FillSheetScene')
-        this.UI = this.scene.get('FillSheetScene')
-        
+        this.direction_arrow = this.add.image(0 ,0, 'direction_arrow').setVisible(false)
         map_scale = getValueByName('scale', this.map.properties) || 1
         // set phonograph and phonoPiano
         this.phonograph = new Phonograph(this, (this.map.widthInPixels+128)*map_scale/2, (this.map.heightInPixels+128)*map_scale/2)
@@ -69,25 +66,60 @@ export default class MuziKuro extends BaseGameScene {
             this.physics.add.collider(this.local_player.group, this.phonograph)     
             this.physics.add.collider(this.local_player.group, collide_objects)
             this.physics.add.collider(this.local_player.group, collide_layers)            
-        }
-
-        if(this.local_player.role === KURO){
-            this.phonograph.setInteractive({
-                cursor: 'pointer',
-                pixelPrefect: true
-            }).on('pointerdown', this.onPhonoClicked, this)         
+            if(this.local_player.role === KURO){
+                this.phonograph.setInteractive({
+                    cursor: 'pointer',
+                    pixelPrefect: true
+                }).on('pointerdown', this.onPhonoClicked, this)         
+            }
         }
         
+        // setup piano
+        Note.setSoundPool(this, 'piano', PIANO_CONFIG, 5)
+        for(const [key, note_name, st] of PIANO_CONFIG) {
+            this.playerPiano.addMarker({name: note_name, start: st, duration: 1.5})
+            this.input.keyboard.addKey(key)
+            this.input.keyboard.on(`keydown_${key}`, this.onPlayerPlayNote.bind(this, note_name))
+        }
+
         phono_radius = PHONO_RADIUS * this.map.tileWidth * map_scale
         phono_inner_radius = this.phonograph.body.width/2
         if(data.notes) this.onNotesUpdate(data.notes)
     }
 
-    /*
+    
     update(time, delta){
         super.update(time, delta)
+
+        if(this.direction_arrow.visible){
+            let player, radius, angle
+            player = this.local_player.group
+            angle = Phaser.Math.Angle.BetweenPointsY(player, this.last_activated_note)
+            radius = Math.min(
+                ARROW_RADIUS,
+                Phaser.Math.Distance.Between(player.x, player.y, this.last_activated_note.x, this.last_activated_note.y)/2
+            )
+            this.direction_arrow.setPosition(
+                player.x + Math.sin(angle)*radius,
+                player.y + Math.cos(angle)*radius
+            ).setRotation(-angle).setDepth(this.direction_arrow.y/this.map.realHeight)
+            this.show_direction -= delta
+            if(this.show_direction <= 0){
+                this.show_direction = 0
+                this.tweens.add({
+                    targets: this.direction_arrow,
+                    props:{
+                        alpha: 0
+                    },
+                    duration: 100,
+                    onComplete: ()=>{
+                        this.direction_arrow.setVisible(false).setAlpha(1)
+                    }
+                })
+            }
+        }
     }
-    */
+    
 
     onSetCompose(data){
         this.log('received composition', data)
@@ -114,6 +146,13 @@ export default class MuziKuro extends BaseGameScene {
         for(const note_d of data) {
             let note = new Note(this, note_d.x, note_d.y, note_d.melody)
             this.notes_list.set(`${note_d.x}_${note_d.y}`, note)
+
+            if(this.local_player.role === KURO){
+                note.setVisible(false).setupBody(NOTE_RADIUS*2.5)
+            }
+            else{
+                note.setupBody(NOTE_RADIUS)
+            }
             //console.log(`Create Note at (${note_d.x}, ${note_d.y})`);
         }
     }
@@ -158,7 +197,10 @@ export default class MuziKuro extends BaseGameScene {
             setTimeout(() => { this.phonoPlayCheck(i) }, ms_per_frame*i)
             setTimeout(() => { this.beats_frame += 1 }, ms_per_frame*(8+i)-tolerance)
         }
-        setTimeout(() => { this.collectNoteCheck() }, ms_per_frame*(8+8)-tolerance)
+
+        if(this.local_player.role === MUZI){
+            setTimeout(() => { this.collectNoteCheck() }, ms_per_frame*(8+8)-tolerance)
+        }
     }
 
     onPlayerPlayNote(note_name){
@@ -173,7 +215,10 @@ export default class MuziKuro extends BaseGameScene {
                             note.activate()
                         }
                         else if(this.local_player.role === KURO){
-                            // show position indicator
+                            let eighth = 60*1000/BPM/2
+                            this.show_direction += this.show_direction > eighth*8 ? eighth:eighth*2 // 1 eighth note
+                            this.direction_arrow.setVisible(true)
+                            this.last_activated_note = note
                         }
                     }
                 }
