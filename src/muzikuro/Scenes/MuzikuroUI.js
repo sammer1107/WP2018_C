@@ -1,13 +1,18 @@
 import Phaser from 'phaser'
 import {PIANO_CONFIG} from '../constants.js'
+const text_style = {
+    fontFamily: 'Gen Jyuu Gothic P',
+    fontSize: 36,
+    color: '#fefefe'
+}
 
-
-export default class FillSheetScene extends Phaser.Scene{
+export default class MuzikuroUI extends Phaser.Scene{
     constructor(){
-        super({ key: 'FillSheetScene'})
+        super({ key: 'MuzikuroUI'})
         this.space_info   // Array => Object, store the x, y position, center x,y position, note name
         this.bar_items    // Map string => Object, store the x, y position, frame and number of specific pitch on bar
         this.space_notes  // store the note image created on space
+        this.clock_interval
     }
     
     init(){
@@ -17,10 +22,43 @@ export default class FillSheetScene extends Phaser.Scene{
     }
 
     create(){
+        // UI setup
+        this.setupFillSheetWindow()
+        this.setupItemBar()
+        this.setupScore()
+        this.setupTimer()
+        
+        this.input.topOnly = false
+        this.input.on('drag', this.onDrag, this)
+        this.input.on('dragend', this.onDragEnd, this)
+        
+        this.showStart()
+    }
+    
+    update(){
+        var pointer = this.input.activePointer
+        for(let button of [this.reset_btn, this.submit_btn, this.close_btn]){
+            // reset the button if it was pressed and the pointer leaves the button
+            if(button.frame.name === 1 && !button.getBounds().contains(pointer.x, pointer.y)){
+                button.setFrame(0)
+            }
+        }
+    }
+    
+    finish(){
+        try{
+            if(this.buttonClick) this.buttonClick.destroy()
+            if(this.itemPiano) this.itemPiano.destroy()
+        } catch(e) {
+            console.warn(e)
+        }
+        if(this.clock_interval) clearInterval(this.clock_interval)
+    }
+
+    setupFillSheetWindow(){
         //  ** Fill Sheet UI objects ** //
-        var cam, game, start_collect
-        cam = this.cameras.main
-        game = this.game
+        var cam = this.cameras.main,
+            game = this.game
         var window = this.add.image(0, 0, 'UI.windowFill')
         window.setOrigin(0,0)
         this.window = this.add.container((cam.width-window.width)/2, (cam.height-window.height)/2, window)
@@ -78,43 +116,52 @@ export default class FillSheetScene extends Phaser.Scene{
             start_pos_x=SHEET_POS.x+NOTE_OFFEST_WIDTH,
             start_pos_y=SHEET_POS.y+NOTE_OFFEST_HEIGHT;
             i<SPACE_NUMBER; i++){
-                let note = {
-                    x: start_pos_x + SPACE_NOTE_WIDTH/2 + SHEET_SPACING*i -7,
-                    y: start_pos_y + SPACE_NOTE_HEIGHT,
-                    index: i,
-                }
-                
-                this.space_info[i] = note
-            }
-            
-            this.input.topOnly = false
-            this.input.on('drag', this.onDrag, this)
-            this.input.on('dragend', this.onDragEnd, this)
-            
-            // ** Items UI ** //
-            //create item bar
-            var bar = this.add.image(0, 0, 'UI.item_bar')
-            bar.setOrigin(0,0)
-            this.bar = this.add.container(cam.width-bar.width, (cam.height-bar.height)/2, bar)
-            this.bar.fit = function(){
-                var scale = game.config.height/1080
-                scale = (scale>1) ? 1 : scale
-                this.setScale(scale)
-                    .setPosition(cam.width-bar.width*scale, (cam.height-bar.height*scale)/2)
-                return this
-            }
-            this.bar.fit()
-            bar.setInteractive().on('pointerdown',
-            (_p,_x,_y, event_container) => {
-                event_container.stopPropagation()
-            })
-            
-            //set up piano
-            this.itemPiano = this.sound.add('piano')
-            for(const [key, note_name, st] of PIANO_CONFIG) {
-                this.itemPiano.addMarker({name: note_name, start: st, duration: 1.5})
-            }
-        
+            let note = {
+                x: start_pos_x + SPACE_NOTE_WIDTH/2 + SHEET_SPACING*i -7,
+                y: start_pos_y + SPACE_NOTE_HEIGHT,
+                index: i,
+            }    
+            this.space_info[i] = note
+        }
+
+        // set up space notes
+        for(let i=0;i<SPACE_NUMBER;i++){
+            let note = this.add.image(this.space_info[i].x, this.space_info[i].y, 'UI.item_notes').setVisible(false)
+            note.pitch = '_'
+            this.window.add(note)
+            this.space_notes[i] = note
+        }
+
+        this.events.addListener('windowOn', this.windowOn, this)
+    }
+
+    setupItemBar(){
+        var cam = this.cameras.main,
+            game = this.game
+        // ** Items UI ** //
+        // create item bar
+        var bar = this.add.image(0, 0, 'UI.item_bar')
+        bar.setOrigin(0,0)
+        this.bar = this.add.container(cam.width-bar.width, (cam.height-bar.height)/2, bar)
+        this.bar.fit = function(){
+            var scale = game.config.height/1080
+            scale = (scale>1) ? 1 : scale
+            this.setScale(scale)
+                .setPosition(cam.width-bar.width*scale, (cam.height-bar.height*scale)/2)
+            return this
+        }
+        this.bar.fit()
+        bar.setInteractive().on('pointerdown',
+        (_p,_x,_y, event_container) => {
+            event_container.stopPropagation()
+        })
+
+        //set up piano
+        this.itemPiano = this.sound.add('piano')
+        for(const [key, note_name, st] of PIANO_CONFIG) {
+            this.itemPiano.addMarker({name: note_name, start: st, duration: 1.5})
+        }
+
         // set up bar items
         var grid_height = (BAR_HEIGHT-2*BAR_PADDING)/PITCHES.length
         for(let i=0; i<PITCHES.length; i++){
@@ -126,18 +173,54 @@ export default class FillSheetScene extends Phaser.Scene{
             new_item.addToContainer(this.bar)
             this.bar_items.set(PITCHES[i], new_item)
         }
-        
-        // set up space notes
-        for(let i=0;i<SPACE_NUMBER;i++){
-            let note = this.add.image(this.space_info[i].x, this.space_info[i].y, 'UI.item_notes').setVisible(false)
-            note.pitch = '_'
-            this.window.add(note)
-            this.space_notes[i] = note
+    }
+
+    setupScore(){
+        var score_box, score_text
+        score_box = this.add.image(250, 100, 'UI.score').setOrigin(1,1)
+        score_text = this.add.text(score_box.x-25, score_box.y-14, 0, text_style).setOrigin(1,1).setShadow(3,3)
+        this.score_text = score_text
+    }
+
+    updateScore(score){
+        var score_text = this.score_text
+        var score_setter = {
+            _score: Number(score_text.text),
+            set score(s){
+                this._score = s
+                score_text.setText(Math.round(s).toString())
+            },
+            get score(){
+                return this._score
+            }
         }
-        
-        this.events.addListener('windowOn', this.windowOn, this)
-        
-        start_collect = this.add.image(cam.width/2, cam.height/2, 'start_collect').setAlpha(0)
+        this.tweens.add({
+            targets: score_setter,
+            props:{
+                score: score
+            },
+            duration: 500
+        })
+    }
+
+    setupTimer(){
+        var timer_box, cam = this.cameras.main
+        timer_box = this.add.image(cam.width/2, 100, 'UI.timer')
+        timer_box.y = timer_box.y-timer_box.height/2
+        this.timer_text = this.add.text(timer_box.x, timer_box.y+3, '00:00', text_style).setOrigin(0.5,0.5).setShadow(3,3)
+    }
+
+    startCountdown(duration){
+        this.sec_remaining = duration/1000;
+        this.clock_interval = setInterval(()=>{
+            this.sec_remaining = Math.max(0, this.sec_remaining-1)
+            this.timer_text.setText(`${Math.floor(this.sec_remaining/60)}:${(this.sec_remaining%60).toString().padStart(2,'0')}`)
+        }, 1000)
+    }
+
+    showStart(){
+        var cam = this.cameras.main
+        var start_collect = this.add.image(cam.width/2, cam.height/2, 'start_collect').setAlpha(0)
         this.tweens.add({
             targets: start_collect,
             props:{
@@ -154,26 +237,6 @@ export default class FillSheetScene extends Phaser.Scene{
             delay: 2000,
             onComplete: ()=> start_collect.destroy()
         })
-    }
-    
-    update(){
-        
-        var pointer = this.input.activePointer
-        for(let button of [this.reset_btn, this.submit_btn, this.close_btn]){
-            // reset the button if it was pressed and the pointer leaves the button
-            if(button.frame.name === 1 && !button.getBounds().contains(pointer.x, pointer.y)){
-                button.setFrame(0)
-            }
-        }
-    }
-    
-    finish(){
-        try{
-            if(this.buttonClick) this.buttonClick.destroy()
-            if(this.itemPiano) this.itemPiano.destroy()
-        } catch(e) {
-            console.warn(e)
-        }
     }
     
     close(pointer){

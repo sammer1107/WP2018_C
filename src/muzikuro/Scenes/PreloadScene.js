@@ -43,6 +43,8 @@ export default class PreloadScene extends Phaser.Scene{
         this.load.image('note_index', 'note_index.png')
         this.load.image('black_note', 'black_note.png')
         this.load.image('item_bar', 'item_bar.png')
+        this.load.image('timer', 'timer.png')
+        this.load.image('score', 'score.png')
         
         
         this.load.start()

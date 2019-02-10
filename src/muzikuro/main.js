@@ -7,7 +7,7 @@ import LobbyScene from './Scenes/LobbyScene.js'
 import ComposeScene from './Scenes/ComposeScene.js'
 import ComposeUI from './Scenes/ComposeUI.js'
 import MuziKuro from './Scenes/Muzikuro.js'
-import FillSheetScene from './Scenes/FillSheetScene.js'
+import FillSheetScene from './Scenes/MuzikuroUI.js'
 import Animation from './lib/Animation.js'
 /* global __DEBUG, $ */
 

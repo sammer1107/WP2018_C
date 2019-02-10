@@ -29,6 +29,8 @@ class MuziKuro extends BaseScene{
         this.theme_song = utils.randomSelect(ThemeSongs);
         this.notes = new NotesList(this.theme_song, map)
         this.timer = 0
+        this.collect_waiting = false
+        this.collect_wait_list.clear()
         this.answered_group.length = 0
         // exchange composition
         var groups = this.game.groups
@@ -80,9 +82,8 @@ class MuziKuro extends BaseScene{
                 this.gameFinish()
             }
         }, CHECK_INTERVAL)
-
-        this.collect_waiting = false
-        this.collect_wait_list.clear()
+        
+        this.start_time = Date.now()
     }
     
     stop(){
@@ -96,12 +97,16 @@ class MuziKuro extends BaseScene{
     
     getSceneState(){
         return {
-            notes: Array.from(this.notes.values())
+            notes: Array.from(this.notes.values()),
+            duration: GAME_DURATION ,
+            start_time: this.start_time
         }
     }
     
     getInitData(){
-        return null
+        return {
+            duration: GAME_DURATION
+        }
     }
 
     onCollectWaiting(socket, note_id){

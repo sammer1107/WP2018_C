@@ -52,8 +52,12 @@ class GameManager{
 
     onReturn(socket){
         let player = this.players.get(socket.id)
-        player.setAvailable(true)
-        
+        try {
+            player.setAvailable(true)
+        } catch(e) {
+            console.log(e)
+            return
+        }
         socket.emit('sceneTransition', {
             scene: this.current_scene.key,
             scene_data: this.current_scene.getSceneState(),

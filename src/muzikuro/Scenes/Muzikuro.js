@@ -41,9 +41,10 @@ export default class MuziKuro extends BaseGameScene {
             'notesUpdate', 'notesRemove', 'tempoMeasurePast', 'setCompose',
             'scoreUpdate', 'gameFinish'])
         
-            // start FillSheetScene
-        this.scene.launch('FillSheetScene')
-        this.UI = this.scene.get('FillSheetScene')
+        // start MuzikuroUI
+        this.scene.launch('MuzikuroUI')
+        this.UI = this.scene.get('MuzikuroUI')
+        this.UI.startCountdown(data.duration)
 
         collide_layers = this.createTileMap('muzikuro')
         collide_objects = this.createMapObjects()
@@ -174,6 +175,7 @@ export default class MuziKuro extends BaseGameScene {
 
     onScoreUpdate(reward) {
         this.score += reward.score
+        this.UI.updateScore(this.score)
         this.log(`Score Update to ${this.score}`)
         if(reward.note_get !== null) {
             this.log(`Note Get: [${reward.note_get}]`)
@@ -291,7 +293,7 @@ export default class MuziKuro extends BaseGameScene {
     onPhonoClicked(pointer, _loc_x, _loc_y, event_container){
         if(!pointer.leftButtonDown()) return
         
-        if(!this.UI) this.UI = this.scene.get('FillSheetScene')
+        if(!this.UI) this.UI = this.scene.get('MuzikuroUI')
 
         this.input.enabled = false
         this.allowMoveToPointer = false
