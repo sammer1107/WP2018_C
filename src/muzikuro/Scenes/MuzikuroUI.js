@@ -214,7 +214,11 @@ export default class MuzikuroUI extends Phaser.Scene{
         this.sec_remaining = duration/1000;
         this.clock_interval = setInterval(()=>{
             this.sec_remaining = Math.max(0, this.sec_remaining-1)
-            this.timer_text.setText(`${Math.floor(this.sec_remaining/60)}:${(this.sec_remaining%60).toString().padStart(2,'0')}`)
+            try{
+                this.timer_text.setText(`${Math.floor(this.sec_remaining/60)}:${(this.sec_remaining%60).toString().padStart(2,'0')}`)
+            } catch(e) {
+                console.warn(e)
+            }
         }, 1000)
     }
 
@@ -313,6 +317,9 @@ export default class MuzikuroUI extends Phaser.Scene{
         }).on('pointerdown', (pointer) => {
             if (pointer.leftButtonDown()){
                 this.itemPiano.play(note.pitch, { volume: volume })
+                this.game.socket.emit('playInstrument', {
+                    pitch: note.pitch
+                })
                 // TODO: pick space note up
             } else {
                 note.setVisible(false)

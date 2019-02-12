@@ -73,9 +73,10 @@ class MuziKuro extends BaseScene{
             this.io.emit('tempoMeasurePast', this.noteLasting)
         }, this.noteLasting*8) //=noteLasting*4 *2(pause for 4 notes)
 
-        this.socketOn('noteCollect', this.onCollectWaiting.bind(this))
-        this.socketOn('answerSubmit', this.onClientAnswerSubmit.bind(this))
-        
+        this.socketOn('noteCollect', this.onCollectWaiting)
+        this.socketOn('answerSubmit', this.onClientAnswerSubmit)
+        this.socketOn('playInstrument', this.onPlayInstrument)
+
         this.check_interval = setInterval(()=>{
             this.timer += CHECK_INTERVAL
             if( this.timer >= GAME_DURATION || this.game.players.size < 2){ // check active players
@@ -199,6 +200,12 @@ class MuziKuro extends BaseScene{
         }
         this.stop()
         this.game.startScene('Lobby')
+    }
+
+    onPlayInstrument(socket, data){
+        let partner_id = this.game.players.get(socket.id).partner_id
+        data['player'] = socket.id
+        this.io.sockets.to(partner_id).emit('playInstrument', data)
     }
     
     getRandomSpawnPoint(){

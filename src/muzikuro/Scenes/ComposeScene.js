@@ -1,7 +1,7 @@
 import BaseGameScene from './BaseGameScene.js'
 import Phonograph from '../GameObjects/Phonograph.js'
-import {log_func, getValueByName} from '../utils.js'
-import {MUZI, KURO} from '../constants.js'
+import {getValueByName} from '../utils.js'
+import {MUZI, KURO, PIANO_CONFIG} from '../constants.js'
 
 export default class ComposeScene extends BaseGameScene{
     constructor(){
@@ -18,7 +18,10 @@ export default class ComposeScene extends BaseGameScene{
 
     create(){
         var collide_objects, collide_layers, map_scale
-        this.socket.listenTo(['disconnect', 'playerMove', 'destroyPlayer', 'updatePartner'])
+        this.socket.listenTo([
+            'disconnect', 'playerMove', 'destroyPlayer', 'updatePartner',
+            'playInstrument'
+        ])
 
         collide_layers = this.createTileMap('muzikuro')
         collide_objects = this.createMapObjects()
@@ -27,7 +30,7 @@ export default class ComposeScene extends BaseGameScene{
         
         this.createSpritePlayers()
         map_scale = getValueByName('scale', this.map.properties) || 1
-        //set phonograph and phonoPiano
+        // set phonograph
         this.phonograph = new Phonograph(this, (this.map.widthInPixels+128)*map_scale/2, (this.map.heightInPixels+128)*map_scale/2)
         this.phonograph.startAnim()
 
@@ -52,6 +55,11 @@ export default class ComposeScene extends BaseGameScene{
                 }, 5000)
             }, 1000)
         }
+
+        this.partnerPiano = this.sound.add('piano', {volume: 0.6})
+        for(const [key, note_name, st] of PIANO_CONFIG) {
+            this.partnerPiano.addMarker({name: note_name, start: st, duration: 1.5})
+        }
         
         if(this.local_player.group){
             this.physics.add.collider(this.local_player.group, this.phonograph)     
@@ -72,13 +80,11 @@ export default class ComposeScene extends BaseGameScene{
 
     }
     
-    onPhonoClicked(pointer/*, local_x, local_y, stop */){
+    onPhonoClicked(pointer/*, local_x, local_y, event_container */){
         if(!pointer.leftButtonDown()) return
         
         if(!this.UI) this.UI = this.scene.get('ComposeUI')
-        //this.input.enabled = false;
         this.UI.events.once('composeClose', (composeDone)=>{
-            //this.input.enabled = true;
             if(composeDone){
                 this.input.clear(this.phonograph)
             }
@@ -90,5 +96,14 @@ export default class ComposeScene extends BaseGameScene{
         this.UI.finish()
         this.UI.sys.shutdown()
         this.socket.detachAll()
+        try {
+            this.partnerPiano.destroy()
+        } catch(e) {
+            console.warn(e)
+        }
+    }
+
+    onPlayInstrument(data){
+        this.partnerPiano.play(data.pitch)
     }
 }

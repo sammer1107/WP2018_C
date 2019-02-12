@@ -1,5 +1,4 @@
 var BaseScene = require('./BaseScene.js')
-//var BUFFER_TIME = require('../constants.js').SCENE_TRANSITION_BUFFER_TIME
 
 const GAME_DURATION = 5*60*1000
 const CHECK_INTERVAL = 5*1000
@@ -20,6 +19,7 @@ class ComposeScene extends BaseScene{
     
     start(){
         this.socketOn('composeSet', this.onComposeSet)
+        this.socketOn('playInstrument', this.onPlayInstrument)
         
         this.check_interval = setInterval(()=>{
             this.timer += CHECK_INTERVAL
@@ -37,10 +37,6 @@ class ComposeScene extends BaseScene{
     }
     
     stop(){
-        /*
-        + stop looping intervals
-        + stop listening to events
-        */
         this.log('scene stopped.')
         clearInterval(this.check_interval)
         this.socketOff('composeSet')
@@ -48,19 +44,10 @@ class ComposeScene extends BaseScene{
     }
     
     getSceneState(){
-        /*
-        This function should return the necessary scene state (does not including the players) so that 
-        the client just connected can sync the game state.
-        */
         return null
     }
     
     getInitData(){
-        /*
-        This function should return the data needed for the client side to start one scene.
-        Ex. regrouped players, new positions
-
-        */
         return null
     }
     
@@ -78,6 +65,12 @@ class ComposeScene extends BaseScene{
             this.stop()
             this.game.startScene('MuziKuro')
         }
+    }
+
+    onPlayInstrument(socket, data){
+        let partner_id = this.game.players.get(socket.id).partner_id
+        data['player'] = socket.id
+        this.io.sockets.to(partner_id).emit('playInstrument', data)
     }
 }
 

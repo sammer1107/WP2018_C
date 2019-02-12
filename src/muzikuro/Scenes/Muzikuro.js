@@ -37,9 +37,11 @@ export default class MuziKuro extends BaseGameScene {
 
     create(data){
         var collide_layers, collide_objects, map_scale
-        this.socket.listenTo(['disconnect', 'playerMove', 'destroyPlayer', 'updatePartner',
+        this.socket.listenTo([
+            'disconnect', 'playerMove', 'destroyPlayer', 'updatePartner',
             'notesUpdate', 'notesRemove', 'tempoMeasurePast', 'setCompose',
-            'scoreUpdate', 'gameFinish'])
+            'scoreUpdate', 'gameFinish', 'playInstrument'
+        ])
         
         // start MuzikuroUI
         this.scene.launch('MuzikuroUI')
@@ -52,10 +54,19 @@ export default class MuziKuro extends BaseGameScene {
         
         // sounds
         this.playerPiano = this.sound.add('piano').setVolume(0.8)
+        this.remotePiano = this.sound.add('piano').setVolume(0.6)
         this.note_get_sfx = this.sound.add('note_get')
         this.drumbeat = this.sound.add('drumbeat').setVolume(0.8)
         this.drumbeat.addMarker({name:'0', start:0, duration:60/BPM*1000*8})
-        
+        // setup piano
+        Note.setSoundPool(this, 'piano', PIANO_CONFIG, 5)
+        for(const [key, note_name, st] of PIANO_CONFIG) {
+            this.playerPiano.addMarker({name: note_name, start: st, duration: 1.5})
+            this.remotePiano.addMarker({name: note_name, start: st, duration: 1.5})
+            this.input.keyboard.addKey(key)
+            this.input.keyboard.on(`keydown_${key}`, this.onPlayerPlayNote.bind(this, note_name))
+        }
+
         this.createSpritePlayers()
         
         this.direction_arrow = this.add.image(0 ,0, 'direction_arrow').setVisible(false)
@@ -73,14 +84,6 @@ export default class MuziKuro extends BaseGameScene {
                     pixelPrefect: true
                 }).on('pointerdown', this.onPhonoClicked, this)         
             }
-        }
-        
-        // setup piano
-        Note.setSoundPool(this, 'piano', PIANO_CONFIG, 5)
-        for(const [key, note_name, st] of PIANO_CONFIG) {
-            this.playerPiano.addMarker({name: note_name, start: st, duration: 1.5})
-            this.input.keyboard.addKey(key)
-            this.input.keyboard.on(`keydown_${key}`, this.onPlayerPlayNote.bind(this, note_name))
         }
 
         phono_radius = PHONO_RADIUS * this.map.tileWidth * map_scale
@@ -207,6 +210,9 @@ export default class MuziKuro extends BaseGameScene {
 
     onPlayerPlayNote(note_name){
         this.playerPiano.play(note_name)
+        this.game.socket.emit('playInstrument', {
+            pitch: note_name
+        })
         if(this.beats_frame > 8) {
             let frame_index = this.beats_frame - 8 - 1
             this.user_keyin[frame_index] = note_name
@@ -226,6 +232,10 @@ export default class MuziKuro extends BaseGameScene {
                 }
             }
         }
+    }
+
+    onPlayInstrument(data){
+        this.remotePiano.play(data.pitch)
     }
 
     playNoteCheck(index, ms_per_frame) {
@@ -349,6 +359,7 @@ export default class MuziKuro extends BaseGameScene {
         Note.clearSoundPool(this)
         try{
             this.playerPiano.destroy()
+            this.remotePiano.destroy()
             this.drumbeat.destroy()
         } catch(e) {
             console.warn(e)

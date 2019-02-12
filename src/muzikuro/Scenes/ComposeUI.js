@@ -111,6 +111,9 @@ export default class ComposeUI extends Phaser.Scene {
             this.input.keyboard.on(`keydown_${key}`, () => {
                 this.playerPiano.play(note_name)
                 this.setNote(this.current_note, note_name)
+                this.game.socket.emit('playInstrument', {
+                    pitch: note_name
+                })
             })
         }
         
