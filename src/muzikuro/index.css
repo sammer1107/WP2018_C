@@ -29,6 +29,26 @@ button:active {
     left: 0;
 }
 
+#how-to-play {
+    width: 30em;
+    border-radius: 1em;
+    background-color: #f5f5f5;
+    position: absolute;
+    z-index: 3;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    padding: 1.5em;
+    transition: opacity 0.2s;
+    box-shadow: 2px 2px 10px #4f4e4e;
+    opacity: 0;
+    pointer-events: none;
+}
+
+#how-to-play p {
+    margin: 0;
+}
+
 /*=== WELCOME SCREEN ===*/
 
 #welcome, #end-screen {
@@ -130,6 +150,26 @@ button:active {
     margin: 0;
 }
 
+#welcome #what{
+    width: 2em;
+    height: 2em;
+    background-color: whitesmoke;
+    z-index: 2;
+    border-radius: 0.25em;
+    line-height: 2em;
+    bottom: 1em;
+    position: absolute;
+    right: 1em;
+    box-shadow: 2px 2px 3px 0px #4f4e4e99;
+}
+
+#welcome #what p{
+    color: #8c8b8b;
+    margin: 0;
+    text-align: center;
+    font-weight: bolder;
+}
+
 #welcome #nickname {
     z-index: 2;
     width: 25vw;
@@ -187,6 +227,7 @@ button:active {
     font-family: inherit;
     font-weight: bolder;
 }
+
 
 /*=== END OF WELCOME SCREEN ===*/
 

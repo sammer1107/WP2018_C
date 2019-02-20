@@ -65,6 +65,12 @@ $(document).ready( function(){
             } 
         })
     })
+
+    $('#what').hover(()=>{
+        $('#how-to-play').css('opacity', 1)
+    }, ()=>{
+        $('#how-to-play').css('opacity', 0)
+    })
 })
 
 function joinGame(){

@@ -65,7 +65,7 @@ class LobbyScene extends BaseScene{
     }
 
     getPlayerNumberMessage(current_number){
-        return `玩家數針 ${current_number} / ${REQUIRE_PLAYERS}`
+        return `玩家數量 ${current_number} / ${REQUIRE_PLAYERS}`
     }
 
     onDisconnect(socket){
