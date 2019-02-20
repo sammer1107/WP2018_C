@@ -4,7 +4,7 @@ Repository for WP2018 team C
 # Usage
 1. `npm install` to install the dependancies
 2. launch server in production mode using `npm start`, set the PORT environment variable to change the port(default __11070__)
-3. browse __localhost:11070/muzikuro__ to see the game.
+3. browse __localhost:11070__ for about_us page, and __/muzikuro__ for the game.
 
 # Files and Folders
 ### assets/
