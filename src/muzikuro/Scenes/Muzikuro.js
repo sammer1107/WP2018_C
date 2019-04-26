@@ -69,7 +69,7 @@ export default class MuziKuro extends BaseGameScene {
 
         this.createSpritePlayers()
         
-        this.direction_arrow = this.add.image(0 ,0, 'direction_arrow').setVisible(false)
+        this.direction_arrow = this.add.image(0 ,0, 'direction_arrow').setVisible(false).setScale(0.5)
         map_scale = getValueByName('scale', this.map.properties) || 1
         // set phonograph and phonoPiano
         this.phonograph = new Phonograph(this, (this.map.widthInPixels+128)*map_scale/2, (this.map.heightInPixels+128)*map_scale/2)
