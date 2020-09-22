@@ -9,7 +9,7 @@ Repository for WP2018 team C
 # Files and Folders
 ### assets/
 Images and static files to be used in the game.
-### js/
-client and server side javascript
-### public/
-html and css, including the about us page and the game page.
+### server/
+Nodejs server implementation
+### src/
+html,css and javascript for the about us page and the game page.
